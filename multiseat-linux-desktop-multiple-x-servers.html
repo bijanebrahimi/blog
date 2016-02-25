@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Multiseat Linux Desktop, Multiple X servers</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/linux.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+</head>
+<body>
+
+    <div class="main-nav-container">
+
+        <div class="pure-g">
+            <div class="pure-u-1 pure-u-lg-2-3">
+                <div class="main-nav">
+                    <ul class="main-nav-list">
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/" class="pure-menu-link">Routines Excluded</a></li>
+
+                        <li class="main-nav-item active"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+                    </ul>
+                </div>
+             </div>
+
+             <div class="pure-u-1 pure-u-lg-1-3"></div>
+        </div>
+
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+            <div class="pure-u">
+                <a href="http://bijanebrahimi.github.io/blog/category/linux.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/category_linux_thumb.png " class="post-avatar" alt="Linux"></a>
+            </div>
+            <div class="pure-u-3-4 meta-data">
+                <a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="category">Linux</a><br />
+
+                <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+                &mdash; <abbr title="2014-10-22T10:35:00+03:30">Wed 22 October 2014</abbr>
+            </div>
+        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg);">
+                <img src="http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg" alt="Multiseat Linux Desktop, Multiple X servers">
+                <div class="title">
+                <h1>
+                    Multiseat Linux Desktop, Multiple X servers
+                </h1>
+                <h2>
+                    A Walkthrough to How I managed to run my first multiseat solution
+                </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <p>This is the first solution in the main Article <a href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html">Multiseat Linux Desktop</a>. you may also find other solutions for multiseat configuration in there as well.</p>
+<h3>Hardware Requirements</h3>
+<p>for each user, we need seperate:</p>
+<ul>
+<li>mouse</li>
+<li>keyboard</li>
+<li>monitor</li>
+<li>Video Card</li>
+</ul>
+<p>each Monitor will be attached to a seperate Video Card.</p>
+<h3>Introduction</h3>
+<p>the <a href="https://en.wikipedia.org/wiki/X_Window_System">X Window System</a> is a system program which implements the hardware layer and the basis for graphical user interfaces (GUIs). to run seperate Desktop Environment in linux, we need to run seperate X servers as well. each X server will use separate Video card, Mouse and Keyboard (input devices). for that we have to configure the X server to do that. but first we have to identify the devices we have plugged to the computer to address them later in the X configuration file.
+<!-- BREAK --></p>
+<h3>Hardware Detection</h3>
+<p>we can find our input devices (Mouse &amp; Keyboards) in <code>/dev/input</code> directory. lets look to see what have we here:</p>
+<div class="highlight"><pre><span></span>$ ls -la /dev/input
+drwxr-xr-x  <span class="m">4</span> root root    <span class="m">320</span> Apr <span class="m">23</span> 09:57 .
+drwxr-xr-x <span class="m">15</span> root root   <span class="m">3060</span> Apr <span class="m">23</span> 09:59 ..
+drwxr-xr-x  <span class="m">2</span> root root    <span class="m">160</span> Apr <span class="m">23</span> 09:57 by-id
+drwxr-xr-x  <span class="m">2</span> root root    <span class="m">220</span> Apr <span class="m">23</span> 09:57 by-path
+crw-------  <span class="m">1</span> root root 13, <span class="m">64</span> Apr <span class="m">23</span> 09:57 event0
+crw-------  <span class="m">1</span> root root 13, <span class="m">65</span> Apr <span class="m">23</span> 09:57 event1
+crw-------  <span class="m">1</span> root root 13, <span class="m">66</span> Apr <span class="m">23</span> 09:57 event2
+crw-------  <span class="m">1</span> root root 13, <span class="m">67</span> Apr <span class="m">23</span> 09:57 event3
+crw-------  <span class="m">1</span> root root 13, <span class="m">68</span> Apr <span class="m">23</span> 09:57 event4
+crw-------  <span class="m">1</span> root root 13, <span class="m">69</span> Apr <span class="m">23</span> 09:57 event5
+crw-------  <span class="m">1</span> root root 13, <span class="m">70</span> Apr <span class="m">23</span> 09:57 event6
+crw-------  <span class="m">1</span> root root 13, <span class="m">71</span> Apr <span class="m">23</span> 09:57 event7
+crw-------  <span class="m">1</span> root root 13, <span class="m">72</span> Apr <span class="m">23</span> 09:57 event8
+crw-------  <span class="m">1</span> root root 13, <span class="m">63</span> Apr <span class="m">23</span> 09:57 mice
+crw-------  <span class="m">1</span> root root 13, <span class="m">32</span> Apr <span class="m">23</span> 09:57 mouse0
+crw-------  <span class="m">1</span> root root 13, <span class="m">33</span> Apr <span class="m">23</span> 09:57 mouse1
+</pre></div>
+
+
+<p>before explaining what is each of these files and directories, first we have to look at their permissions. they belogs to root user and group. so for reading them, we have to have read permission. run the below commands as super user or just run them using the <code>sudo</code> command which i did.</p>
+<p>each <code>/dev/input/event*</code> file is an input device file. to find out which one is related to which input device we can print the files and see if it contains output when we move our mouse or press a key. so i did run the command and played with my input devices to see which one is which.</p>
+<div class="highlight"><pre><span></span>$ sudo cat /dev/input/event0
+</pre></div>
+
+
+<p>do this till you find all of your input devices.</p>
+<p>an alternative way (which i preffer) is to look into <code>/dev/input/by-id/</code> directory. your Input devices should be listed there with their human readable names.</p>
+<div class="highlight"><pre><span></span>$ ls -la /dev/input/by-id/
+drwxr-xr-x <span class="m">2</span> root root <span class="m">160</span> Apr <span class="m">23</span> 09:57 .
+drwxr-xr-x <span class="m">2</span> root root <span class="m">160</span> Apr <span class="m">23</span> 09:57 .
+drwxr-xr-x <span class="m">4</span> root root <span class="m">320</span> Apr <span class="m">23</span> 09:57 ..
+lrwxrwxrwx <span class="m">1</span> root root   <span class="m">9</span> Apr <span class="m">23</span> 09:57 usb-15ca_USB_Optical_Mouse-event-mouse -&gt; ../event2
+lrwxrwxrwx <span class="m">1</span> root root   <span class="m">9</span> Apr <span class="m">23</span> 09:57 usb-15ca_USB_Optical_Mouse-mouse -&gt; ../mouse0
+lrwxrwxrwx <span class="m">1</span> root root   <span class="m">9</span> Apr <span class="m">23</span> 09:57 usb-CHICONY_USB_Keyboard-event-if01 -&gt; ../event4
+lrwxrwxrwx <span class="m">1</span> root root   <span class="m">9</span> Apr <span class="m">23</span> 09:57 usb-CHICONY_USB_Keyboard-event-kbd -&gt; ../event3
+lrwxrwxrwx <span class="m">1</span> root root   <span class="m">9</span> Apr <span class="m">23</span> 09:57 usb-Logitech_Logitech_USB_Keyboard-event-if01 -&gt; ../event1
+lrwxrwxrwx <span class="m">1</span> root root   <span class="m">9</span> Apr <span class="m">23</span> 09:57 usb-Logitech_Logitech_USB_Keyboard-event-kbd -&gt; ../event0
+</pre></div>
+
+
+<p>since you may notice, there may be a lot more input devices there. that's because linux will create several input device files for devices like Keyboards which have fancy buttons. try the old <code>cat</code> command to find out which one is your proper device driver file. i did it this way:</p>
+<div class="highlight"><pre><span></span>$ sudo cat /dev/input/by-id/usb-15ca_USB_Optical_Mouse-event-mouse
+</pre></div>
+
+
+<p>write your input device names with their related device file name somewhere cause we're going to need those later.</p>
+<p>at last for Video Cards. Video cards are identified by their address on the PCI bus. so to find them we can use <code>lspci</code> command.</p>
+<div class="highlight"><pre><span></span>$ lspci <span class="p">|</span>  grep VGA
+00:09.0 VGA compatible controller: nVidia Corporation NV18 <span class="o">[</span>GeForce4 MX <span class="m">4000</span> AGP 8x<span class="o">]</span> <span class="o">(</span>rev c1<span class="o">)</span>
+00:0a.0 VGA compatible controller: nVidia Corporation NV18 <span class="o">[</span>GeForce4 MX <span class="m">4000</span> AGP 8x<span class="o">]</span> <span class="o">(</span>rev c1<span class="o">)</span>
+</pre></div>
+
+
+<p>this command lists the pci devices connected to the computer and filters the lines containing VGA. the number on the left is the device PCI address. now we have the table below for our multiseat configuration:</p>
+<ul>
+<li>Seat number one</li>
+<li>mouse: /dev/input/event2</li>
+<li>keyboard: /dev/input/event0</li>
+<li>Video Card: 00:09.0</li>
+<li>Seat number two</li>
+<li>mouse: /dev/input/event8</li>
+<li>keyboard: /dev/input/event3</li>
+<li>Video Card: /dev/input/event8</li>
+</ul>
+<h3>X Configuration</h3>
+<p>the X keeps it's configuration file in <code>/etc/X11</code> directory. we can directly modify it's current configuration file <code>xorg.conf</code> or we can simply create an alternative configuration file and tell X to read from it manually. that will help us to run X with default configurations if our configuration somehow didn't work.</p>
+<div class="highlight"><pre><span></span>$ sudo touch /etc/X11/xorg.conf.multiseat
+$ sudo nano xorg.conf.multiseat
+</pre></div>
+
+
+<p>First of all, we need to set <a href="https://wiki.archlinux.org/index.php/Xorg_multiseat#The_basics">basic Xorg configuration</a>.</p>
+<div class="highlight"><pre><span></span>Section &quot;ServerFlags&quot;
+    Option &quot;AutoAddDevices&quot;     &quot;false&quot;
+    Option &quot;AutoEnableDevices&quot;  &quot;false&quot;
+    Option &quot;AllowMouseOpenFail&quot; &quot;on&quot;
+    Option &quot;AllowEmptyInput&quot; &quot;on&quot;
+    Option &quot;ZapWarning&quot;         &quot;on&quot;
+    Option &quot;HandleSpecialKeys&quot;  &quot;off&quot; # Zapping on
+    Option &quot;DRI2&quot; &quot;on&quot;
+    Option &quot;Xinerama&quot; &quot;off&quot;
+EndSection
+</pre></div>
+
+
+<p>after that we need to define input devices, screens, monitors and layouts. do the following configuration for each seat you want to have. so first we need to define out input devices. look at the "Option Device". it is the device file name we detect earlier:</p>
+<div class="highlight"><pre><span></span>Section &quot;InputDevice&quot;
+    Identifier      &quot;Keyboard0&quot;
+    Driver          &quot;evdev&quot;
+    Option          &quot;Device&quot;                &quot;/dev/input/event0&quot;
+    Option &quot;xkb_rules&quot; &quot;evdev&quot;
+    Option &quot;xkb_model&quot; &quot;evdev&quot;
+    Option &quot;xkb_layout&quot; &quot;us&quot;
+    Option &quot;GrabDevice&quot; &quot;on&quot; # prevent send event to other X-servers
+EndSection
+Section &quot;InputDevice&quot;
+    Identifier &quot;Mouse0&quot;
+    Driver &quot;evdev&quot;
+    Option &quot;Device&quot; &quot;/dev/input/event2&quot;
+    Option &quot;GrabDevice&quot; &quot;on&quot;
+EndSection
+</pre></div>
+
+
+<p>now we need to define Screen with uses Monitor and Device which is our Video Card (you can tweak the Modes and ... if you like). the BusId Option is the PCI address we also found earlier.</p>
+<div class="highlight"><pre><span></span>Section &quot;Device&quot;
+    Identifier      &quot;Nvidia0&quot;
+    Driver          &quot;nouveau&quot;
+    BusId           &quot;PCI:00:09.0&quot;
+EndSection
+    Section &quot;Monitor&quot;
+    Identifier      &quot;Lg0&quot;
+    HorizSync       30-93
+    VertRefresh     60
+    Option          &quot;dpms&quot;
+EndSection
+Section &quot;Screen&quot;
+    Identifier              &quot;Screen0&quot;
+    Device                  &quot;Nvidia0&quot;
+    Monitor                 &quot;Lg0&quot;
+    DefaultDepth    24
+    Option                  &quot;DPI&quot;   &quot;100x100&quot;
+    Subsection &quot;Display&quot;
+        Depth   24
+        Modes   &quot;1280x1024&quot;     &quot;1024x768&quot;
+    EndSubsection
+EndSection
+</pre></div>
+
+
+<p>and finally, we need to define a Layout which we will later tell X to load it. it simply gathers the defined input devices and Screens.</p>
+<div class="highlight"><pre><span></span>Section &quot;ServerLayout&quot;
+    Identifier      &quot;Seat0&quot;
+    Screen          1               &quot;Screen0&quot;       1                   1
+    InputDevice     &quot;Mouse0&quot;        &quot;CorePointer&quot;
+    InputDevice     &quot;keyboard0&quot;      &quot;CoreKeyboard&quot;
+    Option &quot;Clone&quot; &quot;off&quot;
+    Option &quot;AutoAddDevices&quot; &quot;off&quot;
+    Option &quot;DisableModInDev&quot; &quot;true&quot;
+    Option &quot;SingleCard&quot; &quot;on&quot;   # use this to simplfied isolatedevice option
+EndSection
+</pre></div>
+
+
+<p>that's it. do this process again for the next seats and then you're done.</p>
+<h3>Test The Configuration</h3>
+<p>to test if everything is OK, we can run X using our multiseat configuration file and defined Layout. so we need to tell X where to look for COnfiguration file and load Which layout.</p>
+<div class="highlight"><pre><span></span>$ startx -- :1 -layout Seat0 -config xorg.conf.multiseat
+</pre></div>
+
+
+<p>in the above code, i used <code>startx</code>. it is a front-end script to xinit. you can also simply run the X directly:</p>
+<div class="highlight"><pre><span></span>$ X -novtswitch -sharevts -nolisten tcp -config xorg.conf.multiseat -layout Seat0 :1
+</pre></div>
+
+
+<p>you may need to go to the 7th console to use it (CTRL+F7) as the second seat will be available on the 8th console and so on.</p>
+<div class="highlight"><pre><span></span>$ startx -- :2 -layout Seat0 -config xorg.conf.multiseat
+</pre></div>
+
+
+<p>if anything happend,read the log files and search the web.</p>
+<h3>Configure Display Managers</h3>
+<p>it is possible to configure your Display Manager (like KDM or GDM) to behave properly with Multiseat configuration at boot-up, but since i dont use any Display Manager, i can not tell you exactly how to do it. search the web for that matter. you can do it the easy way by configuring your Display Manager rc file or the hard way by editing the <code>/etc/inittab</code> file if you have systemV.</p>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/x11.html">X11</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/config.html">config</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/xephyr.html">xephyr</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/author.jpg" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
+                        <p class="author-description">
+                          
+            I Love to Read, Code and Explore the Possibilities.
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="pure-u-1 pure-u-md-1-2">
+
+                <div class="pure-g post-category-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/category/linux.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/category_linux_thumb.png" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/category/linux.html">Linux</a></h3>
+                        <p class="author-description">
+                          Linux Related Stuff
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </footer>
+
+
+</div>
+
+
+</body>
+</html>

@@ -139,4 +139,197 @@ from about 3 hours to almost 4 and a half hours.&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: The tests and battery benchmark did not placed in a controlled
 environment but it seems logical to expect similar effects.&lt;/p&gt;
-&lt;/blockquote&gt;</summary><category term="linux"></category><category term="powertop"></category><category term="power"></category></entry></feed>
+&lt;/blockquote&gt;</summary><category term="linux"></category><category term="powertop"></category><category term="power"></category></entry><entry><title>Multiseat Linux Desktop, Multiple X servers</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html" rel="alternate"></link><updated>2014-10-22T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-22:blog/multiseat-linux-desktop-multiple-x-servers.html</id><summary type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
+&lt;h3&gt;Hardware Requirements&lt;/h3&gt;
+&lt;p&gt;for each user, we need seperate:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;mouse&lt;/li&gt;
+&lt;li&gt;keyboard&lt;/li&gt;
+&lt;li&gt;monitor&lt;/li&gt;
+&lt;li&gt;Video Card&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;each Monitor will be attached to a seperate Video Card.&lt;/p&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;the &lt;a href="https://en.wikipedia.org/wiki/X_Window_System"&gt;X Window System&lt;/a&gt; is a system program which implements the hardware layer and the basis for graphical user interfaces (GUIs). to run seperate Desktop Environment in linux, we need to run seperate X servers as well. each X server will use separate Video card, Mouse and Keyboard (input devices). for that we have to configure the X server to do that. but first we have to identify the devices we have plugged to the computer to address them later in the X configuration file.
+&lt;!-- BREAK --&gt;&lt;/p&gt;
+&lt;h3&gt;Hardware Detection&lt;/h3&gt;
+&lt;p&gt;we can find our input devices (Mouse &amp;amp; Keyboards) in &lt;code&gt;/dev/input&lt;/code&gt; directory. lets look to see what have we here:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ls -la /dev/input
+drwxr-xr-x  &lt;span class="m"&gt;4&lt;/span&gt; root root    &lt;span class="m"&gt;320&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 .
+drwxr-xr-x &lt;span class="m"&gt;15&lt;/span&gt; root root   &lt;span class="m"&gt;3060&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:59 ..
+drwxr-xr-x  &lt;span class="m"&gt;2&lt;/span&gt; root root    &lt;span class="m"&gt;160&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 by-id
+drwxr-xr-x  &lt;span class="m"&gt;2&lt;/span&gt; root root    &lt;span class="m"&gt;220&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 by-path
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;64&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event0
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;65&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event1
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;66&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event2
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;67&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event3
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;68&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event4
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;69&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event5
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;70&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event6
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;71&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event7
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;72&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event8
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;63&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 mice
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;32&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 mouse0
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;33&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 mouse1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;before explaining what is each of these files and directories, first we have to look at their permissions. they belogs to root user and group. so for reading them, we have to have read permission. run the below commands as super user or just run them using the &lt;code&gt;sudo&lt;/code&gt; command which i did.&lt;/p&gt;
+&lt;p&gt;each &lt;code&gt;/dev/input/event*&lt;/code&gt; file is an input device file. to find out which one is related to which input device we can print the files and see if it contains output when we move our mouse or press a key. so i did run the command and played with my input devices to see which one is which.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo cat /dev/input/event0
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;do this till you find all of your input devices.&lt;/p&gt;
+&lt;p&gt;an alternative way (which i preffer) is to look into &lt;code&gt;/dev/input/by-id/&lt;/code&gt; directory. your Input devices should be listed there with their human readable names.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ls -la /dev/input/by-id/
+drwxr-xr-x &lt;span class="m"&gt;2&lt;/span&gt; root root &lt;span class="m"&gt;160&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 .
+drwxr-xr-x &lt;span class="m"&gt;2&lt;/span&gt; root root &lt;span class="m"&gt;160&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 .
+drwxr-xr-x &lt;span class="m"&gt;4&lt;/span&gt; root root &lt;span class="m"&gt;320&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 ..
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-15ca_USB_Optical_Mouse-event-mouse -&amp;gt; ../event2
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-15ca_USB_Optical_Mouse-mouse -&amp;gt; ../mouse0
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-CHICONY_USB_Keyboard-event-if01 -&amp;gt; ../event4
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-CHICONY_USB_Keyboard-event-kbd -&amp;gt; ../event3
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-Logitech_Logitech_USB_Keyboard-event-if01 -&amp;gt; ../event1
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-Logitech_Logitech_USB_Keyboard-event-kbd -&amp;gt; ../event0
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;since you may notice, there may be a lot more input devices there. that's because linux will create several input device files for devices like Keyboards which have fancy buttons. try the old &lt;code&gt;cat&lt;/code&gt; command to find out which one is your proper device driver file. i did it this way:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo cat /dev/input/by-id/usb-15ca_USB_Optical_Mouse-event-mouse
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;write your input device names with their related device file name somewhere cause we're going to need those later.&lt;/p&gt;
+&lt;p&gt;at last for Video Cards. Video cards are identified by their address on the PCI bus. so to find them we can use &lt;code&gt;lspci&lt;/code&gt; command.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ lspci &lt;span class="p"&gt;|&lt;/span&gt;  grep VGA
+00:09.0 VGA compatible controller: nVidia Corporation NV18 &lt;span class="o"&gt;[&lt;/span&gt;GeForce4 MX &lt;span class="m"&gt;4000&lt;/span&gt; AGP 8x&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;rev c1&lt;span class="o"&gt;)&lt;/span&gt;
+00:0a.0 VGA compatible controller: nVidia Corporation NV18 &lt;span class="o"&gt;[&lt;/span&gt;GeForce4 MX &lt;span class="m"&gt;4000&lt;/span&gt; AGP 8x&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;rev c1&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;this command lists the pci devices connected to the computer and filters the lines containing VGA. the number on the left is the device PCI address. now we have the table below for our multiseat configuration:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Seat number one&lt;/li&gt;
+&lt;li&gt;mouse: /dev/input/event2&lt;/li&gt;
+&lt;li&gt;keyboard: /dev/input/event0&lt;/li&gt;
+&lt;li&gt;Video Card: 00:09.0&lt;/li&gt;
+&lt;li&gt;Seat number two&lt;/li&gt;
+&lt;li&gt;mouse: /dev/input/event8&lt;/li&gt;
+&lt;li&gt;keyboard: /dev/input/event3&lt;/li&gt;
+&lt;li&gt;Video Card: /dev/input/event8&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;X Configuration&lt;/h3&gt;
+&lt;p&gt;the X keeps it's configuration file in &lt;code&gt;/etc/X11&lt;/code&gt; directory. we can directly modify it's current configuration file &lt;code&gt;xorg.conf&lt;/code&gt; or we can simply create an alternative configuration file and tell X to read from it manually. that will help us to run X with default configurations if our configuration somehow didn't work.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo touch /etc/X11/xorg.conf.multiseat
+$ sudo nano xorg.conf.multiseat
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;First of all, we need to set &lt;a href="https://wiki.archlinux.org/index.php/Xorg_multiseat#The_basics"&gt;basic Xorg configuration&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Section &amp;quot;ServerFlags&amp;quot;
+    Option &amp;quot;AutoAddDevices&amp;quot;     &amp;quot;false&amp;quot;
+    Option &amp;quot;AutoEnableDevices&amp;quot;  &amp;quot;false&amp;quot;
+    Option &amp;quot;AllowMouseOpenFail&amp;quot; &amp;quot;on&amp;quot;
+    Option &amp;quot;AllowEmptyInput&amp;quot; &amp;quot;on&amp;quot;
+    Option &amp;quot;ZapWarning&amp;quot;         &amp;quot;on&amp;quot;
+    Option &amp;quot;HandleSpecialKeys&amp;quot;  &amp;quot;off&amp;quot; # Zapping on
+    Option &amp;quot;DRI2&amp;quot; &amp;quot;on&amp;quot;
+    Option &amp;quot;Xinerama&amp;quot; &amp;quot;off&amp;quot;
+EndSection
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;after that we need to define input devices, screens, monitors and layouts. do the following configuration for each seat you want to have. so first we need to define out input devices. look at the "Option Device". it is the device file name we detect earlier:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Section &amp;quot;InputDevice&amp;quot;
+    Identifier      &amp;quot;Keyboard0&amp;quot;
+    Driver          &amp;quot;evdev&amp;quot;
+    Option          &amp;quot;Device&amp;quot;                &amp;quot;/dev/input/event0&amp;quot;
+    Option &amp;quot;xkb_rules&amp;quot; &amp;quot;evdev&amp;quot;
+    Option &amp;quot;xkb_model&amp;quot; &amp;quot;evdev&amp;quot;
+    Option &amp;quot;xkb_layout&amp;quot; &amp;quot;us&amp;quot;
+    Option &amp;quot;GrabDevice&amp;quot; &amp;quot;on&amp;quot; # prevent send event to other X-servers
+EndSection
+Section &amp;quot;InputDevice&amp;quot;
+    Identifier &amp;quot;Mouse0&amp;quot;
+    Driver &amp;quot;evdev&amp;quot;
+    Option &amp;quot;Device&amp;quot; &amp;quot;/dev/input/event2&amp;quot;
+    Option &amp;quot;GrabDevice&amp;quot; &amp;quot;on&amp;quot;
+EndSection
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;now we need to define Screen with uses Monitor and Device which is our Video Card (you can tweak the Modes and ... if you like). the BusId Option is the PCI address we also found earlier.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Section &amp;quot;Device&amp;quot;
+    Identifier      &amp;quot;Nvidia0&amp;quot;
+    Driver          &amp;quot;nouveau&amp;quot;
+    BusId           &amp;quot;PCI:00:09.0&amp;quot;
+EndSection
+    Section &amp;quot;Monitor&amp;quot;
+    Identifier      &amp;quot;Lg0&amp;quot;
+    HorizSync       30-93
+    VertRefresh     60
+    Option          &amp;quot;dpms&amp;quot;
+EndSection
+Section &amp;quot;Screen&amp;quot;
+    Identifier              &amp;quot;Screen0&amp;quot;
+    Device                  &amp;quot;Nvidia0&amp;quot;
+    Monitor                 &amp;quot;Lg0&amp;quot;
+    DefaultDepth    24
+    Option                  &amp;quot;DPI&amp;quot;   &amp;quot;100x100&amp;quot;
+    Subsection &amp;quot;Display&amp;quot;
+        Depth   24
+        Modes   &amp;quot;1280x1024&amp;quot;     &amp;quot;1024x768&amp;quot;
+    EndSubsection
+EndSection
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and finally, we need to define a Layout which we will later tell X to load it. it simply gathers the defined input devices and Screens.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Section &amp;quot;ServerLayout&amp;quot;
+    Identifier      &amp;quot;Seat0&amp;quot;
+    Screen          1               &amp;quot;Screen0&amp;quot;       1                   1
+    InputDevice     &amp;quot;Mouse0&amp;quot;        &amp;quot;CorePointer&amp;quot;
+    InputDevice     &amp;quot;keyboard0&amp;quot;      &amp;quot;CoreKeyboard&amp;quot;
+    Option &amp;quot;Clone&amp;quot; &amp;quot;off&amp;quot;
+    Option &amp;quot;AutoAddDevices&amp;quot; &amp;quot;off&amp;quot;
+    Option &amp;quot;DisableModInDev&amp;quot; &amp;quot;true&amp;quot;
+    Option &amp;quot;SingleCard&amp;quot; &amp;quot;on&amp;quot;   # use this to simplfied isolatedevice option
+EndSection
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;that's it. do this process again for the next seats and then you're done.&lt;/p&gt;
+&lt;h3&gt;Test The Configuration&lt;/h3&gt;
+&lt;p&gt;to test if everything is OK, we can run X using our multiseat configuration file and defined Layout. so we need to tell X where to look for COnfiguration file and load Which layout.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ startx -- :1 -layout Seat0 -config xorg.conf.multiseat
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;in the above code, i used &lt;code&gt;startx&lt;/code&gt;. it is a front-end script to xinit. you can also simply run the X directly:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ X -novtswitch -sharevts -nolisten tcp -config xorg.conf.multiseat -layout Seat0 :1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;you may need to go to the 7th console to use it (CTRL+F7) as the second seat will be available on the 8th console and so on.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ startx -- :2 -layout Seat0 -config xorg.conf.multiseat
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;if anything happend,read the log files and search the web.&lt;/p&gt;
+&lt;h3&gt;Configure Display Managers&lt;/h3&gt;
+&lt;p&gt;it is possible to configure your Display Manager (like KDM or GDM) to behave properly with Multiseat configuration at boot-up, but since i dont use any Display Manager, i can not tell you exactly how to do it. search the web for that matter. you can do it the easy way by configuring your Display Manager rc file or the hard way by editing the &lt;code&gt;/etc/inittab&lt;/code&gt; file if you have systemV.&lt;/p&gt;</summary><category term="X11"></category><category term="config"></category><category term="xephyr"></category></entry><entry><title>Multiseat Linux Desktop</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html" rel="alternate"></link><updated>2014-10-21T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-21:blog/multiseat-linux-desktop.html</id><summary type="html">&lt;p&gt;here is the story. my 3 years old nephew (which i love him so much) is so curious about computers. every time he comes to visit (which is not rarely), he insist on helping me with my computer works. of course he thinks he is helping but i can't have him messing my projects. so i wondered if i can (peacefully) share the computer with him. i searched and i found out about &lt;a href="en.wikipedia.org/wiki/Multiseat_configuration"&gt;Multiseat&lt;/a&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A multiseat, multi-station or multiterminal configuration is a single computer which supports
+multiple independent local users at the same time. In modern usage the terms refer to multiple
+users using one personal computer, each with their own console, consisting of a keyboard a mouse,
+a monitor, and possibly headphones --Wikipedia&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;so obviously that was the solution. time to get my hands dirty on the code :)&lt;/p&gt;
+&lt;h3&gt;GNU/Linux Solutions&lt;/h3&gt;
+&lt;p&gt;as it may be obvious, there are numbers of solution to do configure the GNU/Linux system to fit my need. so, in the following next articles (below links), i will explain these solution as i experienced them. i try to do them separately and independently, so you can skip ones you are not interested about. here are what i found:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html"&gt;Multiple X servers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Nested X servers (i will write about it very soon)&lt;/li&gt;
+&lt;li&gt;The Multi-seat display manager&lt;/li&gt;
+&lt;/ol&gt;</summary><category term="X11"></category><category term="config"></category></entry></feed>
