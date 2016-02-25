@@ -9,7 +9,7 @@ with a 4-cell battery and running &lt;code&gt;i3-wm&lt;/code&gt;, a lightweight 
 So depending on your hardware and programs you have running and your daily usage
 pattern, the results may vary for you.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;img alt="Gnome Battery Bench" src="/assets/images/extend_linux_battery_life-battery_bench_before_tunning.png" title="Gnome Battery Bench - Before Tunning" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Gnome Battery Bench" src="http://bijanebrahimi.github.io/blog/assets/images/extend_linux_battery_life-battery_bench_before_tunning.png" title="Gnome Battery Bench - Before Tunning" /&gt;&lt;/p&gt;
 &lt;p&gt;First, run &lt;code&gt;powertop&lt;/code&gt; to find out which devices/processes are draining power the most.
 In The &lt;code&gt;Overview Tab&lt;/code&gt; you can actually see what processes/devices are draining
 how much power and By applying the Good option in &lt;code&gt;Tunables Tab&lt;/code&gt;, powertop
@@ -135,7 +135,7 @@ WantedBy=multi-user.target
 &lt;h1&gt;Conclusion&lt;/h1&gt;
 &lt;p&gt;The result is very satisfactory. In daily usage, my battery life went up
 from about 3 hours to almost 4 and a half hours.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Gnome Battery Bench" src="/assets/images/extend_linux_battery_life-battery_bench_after_tunning.png" title="Gnome Battery Bench - After Tunning" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Gnome Battery Bench" src="http://bijanebrahimi.github.io/blog/assets/images/extend_linux_battery_life-battery_bench_after_tunning.png" title="Gnome Battery Bench - After Tunning" /&gt;&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: The tests and battery benchmark did not placed in a controlled
 environment but it seems logical to expect similar effects.&lt;/p&gt;
