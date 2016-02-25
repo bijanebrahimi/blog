@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Extending The Battery Life in Linux</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/linux.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+</head>
+<body>
+
+    <div class="main-nav-container">
+
+        <div class="pure-g">
+            <div class="pure-u-1 pure-u-lg-2-3">
+                <div class="main-nav">
+                    <ul class="main-nav-list">
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/" class="pure-menu-link">Routines Excluded</a></li>
+
+                        <li class="main-nav-item active"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+                    </ul>
+                </div>
+             </div>
+
+             <div class="pure-u-1 pure-u-lg-1-3"></div>
+        </div>
+
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+            <div class="pure-u">
+                <a href="http://bijanebrahimi.github.io/blog/category/linux.html"><img src="/assets/images/category_linux_thumb.png " class="post-avatar" alt="Linux"></a>
+            </div>
+            <div class="pure-u-3-4 meta-data">
+                <a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="category">Linux</a><br />
+
+                <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+                &mdash; <abbr title="2016-02-25T14:20:00+03:30">Thu 25 February 2016</abbr>
+            </div>
+        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(/assets/images/post_category_linux.jpg);">
+                <img src="/assets/images/post_category_linux.jpg" alt="Extending The Battery Life in Linux">
+                <div class="title">
+                <h1>
+                    Extending The Battery Life in Linux
+                </h1>
+                <h2>
+                    A Walkthrough to How I managed to extend my laptop battery life
+                </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <p>Before Running any tunning, the average estimated lifetime of my battery was
+about 3 hours (below image). Through this post we learn how to extend it to
+almost 4 and a half hours. It's more than 50 percent increase!</p>
+<blockquote>
+<p><strong>Note</strong>: I'm currently using a lenovo G50 laptop with Quad-Core AMD CPU equiped
+with a 4-cell battery and running <code>i3-wm</code>, a lightweight tilling window manager
+(no Gnome/KDE craps for me) on ArchLinux.
+So depending on your hardware and programs you have running and your daily usage
+pattern, the results may vary for you.</p>
+</blockquote>
+<p><img alt="Gnome Battery Bench" src="/assets/images/extend_linux_battery_life-battery_bench_before_tunning.png" title="Gnome Battery Bench - Before Tunning" /></p>
+<p>First, run <code>powertop</code> to find out which devices/processes are draining power the most.
+In The <code>Overview Tab</code> you can actually see what processes/devices are draining
+how much power and By applying the Good option in <code>Tunables Tab</code>, powertop
+automatically tunes them. you can do this manually for every item in Tunable tab
+or just use the <code>--auto-tune</code> option.</p>
+<div class="highlight"><pre><span></span>$ sudo powertop --auto-tune
+</pre></div>
+
+
+<p>That single command will probably add a noticeable extra minutes to your battery
+life. But there are still other ways to improve it more. Let's Go to powertop's
+<code>Overview Tab</code> again:</p>
+<div class="highlight"><pre><span></span>Power est.  Usage        Events/s    Category    Description
+  5.18 W    0.4 pkts/s               Device      Network interface: wlp2s0 (wl)
+  3.80 W    100.0%                   Device      Display backlight
+  1.26 W    165.5 ms/s   123.3       Process     /usr/share/atom/atom --type=zygote --no-sandbox
+  675 mW    95.9 ms/s    5.3         Process     atom
+  660 mW    94.0%                    Device      USB device: USB2.0-CRW (Generic)
+  262 mW    27.0 ms/s    90.1        Process     /usr/share/atom/atom --executed-from=/home/bijan --pid=1109
+  247 mW    27.2 ms/s    70.4        Process     /usr/lib/xorg-server/Xorg :0 -seat seat0 -auth /run/lightdm/root/:0 -nolisten tc
+  103 mW    2.0 ms/s     109.7        kWork      od_dbs_timer
+</pre></div>
+
+
+<p>According to above, after my wireless interface (which i use), the display backlight,
+USB CD-RW and my Ethernet interface are the most draining power sources.
+The last two I never/rarely use.</p>
+<h3>Turning Off unnecessary devices</h3>
+<p>Since I never/rarely use my CD-RW and I never connect to Internet through wired
+connection, so it seems logical to me to disable them. to find my CD-RW device
+power location, I used powertop <code>Tunable Tab</code>:</p>
+<div class="highlight"><pre><span></span># Disable CR-RW
+$ echo 0 | s tee /sys/bus/usb/devices/1-1.3/power/autosuspend_delay_ms
+$ echo auto | s tee /sys/bus/usb/devices/1-1.3/power/control
+</pre></div>
+
+
+<p>To disable my Ethernet device, first I have to find it's device number:</p>
+<div class="highlight"><pre><span></span># Find Ethernet domain:bus:slot number
+$ lspci | grep -i ethernet
+03:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller (rev 10)
+
+# Find relative device on /sys/devices
+$ find /sys/devices -name &quot;*03:00.0&quot;
+/sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0
+
+# Turn off device
+echo 1 | s tee /sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0/remove
+</pre></div>
+
+
+<h3>Backlight</h3>
+<p>To reduce the brightness LED backlight, I set a brightness value (between 0 and 255):</p>
+<div class="highlight"><pre><span></span><span class="err">#</span><span class="x"> Brightness</span>
+<span class="x">basedir=&quot;/sys/class/backlight/&quot;</span>
+<span class="x">handler=</span><span class="p">$</span><span class="nv">basedir</span><span class="p">$(</span><span class="err">ls</span> <span class="p">$</span><span class="nv">basedir</span><span class="p">)</span><span class="x">&quot;/&quot;</span>
+
+<span class="x">chmod 666 </span><span class="p">$</span><span class="nv">handler</span><span class="x">/brightness</span>
+<span class="x">echo 100 &gt; handler/brightness</span>
+</pre></div>
+
+
+<h1>Running as a Service</h1>
+<p>To execute the above commands at boot up, I created a shell script and run that
+as a service.</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1"># /usr/local/bin/powertop_tuning.sh</span>
+
+<span class="c1"># Auto-tune powertop</span>
+powertop --auto-tune
+
+<span class="c1"># Disable CR-RW</span>
+<span class="nb">echo</span> <span class="m">0</span> <span class="p">|</span> s tee /sys/bus/usb/devices/1-1.3/power/autosuspend_delay_ms
+<span class="nb">echo</span> auto <span class="p">|</span> s tee /sys/bus/usb/devices/1-1.3/power/control
+
+<span class="c1"># Disable Ethernet</span>
+<span class="nb">echo</span> <span class="m">1</span> <span class="p">|</span> s tee /sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0/remove
+
+<span class="c1"># Brightness</span>
+chmod <span class="m">666</span> /sys/class/backlight/radeon_bl0/brightness
+<span class="nb">echo</span> <span class="m">80</span> &gt; /sys/class/backlight/radeon_bl0/brightness
+</pre></div>
+</td></tr></table>
+
+<p>And to create proper systemd service:</p>
+<div class="highlight"><pre><span></span># /lib/systemd/system/powertop_tuning.service
+[Unit]
+Description=&quot;PowerTop Tuning config&quot;
+ConditionPathExists=/usr/local/bin/powertop_tuning.sh
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+KillMode=none
+ExecStart=/usr/local/bin/powertop_tuning.sh
+ExecStop=exit
+
+[Install]
+WantedBy=multi-user.target
+</pre></div>
+
+
+<p>So, to make <code>powertop_tuning</code> service run automatically, just enable the service:</p>
+<div class="highlight"><pre><span></span>$ sudo systemctl <span class="nb">enable</span> powertop_tuning.service
+</pre></div>
+
+
+<h1>Conclusion</h1>
+<p>The result is very satisfactory. In daily usage, my battery life went up
+from about 3 hours to almost 4 and a half hours.</p>
+<p><img alt="Gnome Battery Bench" src="/assets/images/extend_linux_battery_life-battery_bench_after_tunning.png" title="Gnome Battery Bench - After Tunning" /></p>
+<blockquote>
+<p><strong>Disclaimer</strong>: The tests and battery benchmark did not placed in a controlled
+environment but it seems logical to expect similar effects.</p>
+</blockquote>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/linux.html">linux</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/powertop.html">powertop</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/power.html">power</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="/assets/images/author.jpg" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
+                        <p class="author-description">
+                          
+            I Love to Read, Code and Explore the Possibilities.
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="pure-u-1 pure-u-md-1-2">
+
+                <div class="pure-g post-category-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/category/linux.html"><img src="/assets/images/category_linux_thumb.png" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/category/linux.html">Linux</a></h3>
+                        <p class="author-description">
+                          Linux Related Stuff
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </footer>
+
+
+</div>
+
+
+</body>
+</html>

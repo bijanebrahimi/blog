@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/linux.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2016-02-25T14:20:00+03:30</updated><entry><title>Extending The Battery Life in Linux</title><link href="http://bijanebrahimi.github.io/blog/extending-the-battery-life-in-linux.html" rel="alternate"></link><updated>2016-02-25T14:20:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-25:blog/extending-the-battery-life-in-linux.html</id><summary type="html">&lt;p&gt;Before Running any tunning, the average estimated lifetime of my battery was
+about 3 hours (below image). Through this post we learn how to extend it to
+almost 4 and a half hours. It's more than 50 percent increase!&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: I'm currently using a lenovo G50 laptop with Quad-Core AMD CPU equiped
+with a 4-cell battery and running &lt;code&gt;i3-wm&lt;/code&gt;, a lightweight tilling window manager
+(no Gnome/KDE craps for me) on ArchLinux.
+So depending on your hardware and programs you have running and your daily usage
+pattern, the results may vary for you.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img alt="Gnome Battery Bench" src="/assets/images/extend_linux_battery_life-battery_bench_before_tunning.png" title="Gnome Battery Bench - Before Tunning" /&gt;&lt;/p&gt;
+&lt;p&gt;First, run &lt;code&gt;powertop&lt;/code&gt; to find out which devices/processes are draining power the most.
+In The &lt;code&gt;Overview Tab&lt;/code&gt; you can actually see what processes/devices are draining
+how much power and By applying the Good option in &lt;code&gt;Tunables Tab&lt;/code&gt;, powertop
+automatically tunes them. you can do this manually for every item in Tunable tab
+or just use the &lt;code&gt;--auto-tune&lt;/code&gt; option.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo powertop --auto-tune
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That single command will probably add a noticeable extra minutes to your battery
+life. But there are still other ways to improve it more. Let's Go to powertop's
+&lt;code&gt;Overview Tab&lt;/code&gt; again:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Power est.  Usage        Events/s    Category    Description
+  5.18 W    0.4 pkts/s               Device      Network interface: wlp2s0 (wl)
+  3.80 W    100.0%                   Device      Display backlight
+  1.26 W    165.5 ms/s   123.3       Process     /usr/share/atom/atom --type=zygote --no-sandbox
+  675 mW    95.9 ms/s    5.3         Process     atom
+  660 mW    94.0%                    Device      USB device: USB2.0-CRW (Generic)
+  262 mW    27.0 ms/s    90.1        Process     /usr/share/atom/atom --executed-from=/home/bijan --pid=1109
+  247 mW    27.2 ms/s    70.4        Process     /usr/lib/xorg-server/Xorg :0 -seat seat0 -auth /run/lightdm/root/:0 -nolisten tc
+  103 mW    2.0 ms/s     109.7        kWork      od_dbs_timer
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;According to above, after my wireless interface (which i use), the display backlight,
+USB CD-RW and my Ethernet interface are the most draining power sources.
+The last two I never/rarely use.&lt;/p&gt;
+&lt;h3&gt;Turning Off unnecessary devices&lt;/h3&gt;
+&lt;p&gt;Since I never/rarely use my CD-RW and I never connect to Internet through wired
+connection, so it seems logical to me to disable them. to find my CD-RW device
+power location, I used powertop &lt;code&gt;Tunable Tab&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Disable CR-RW
+$ echo 0 | s tee /sys/bus/usb/devices/1-1.3/power/autosuspend_delay_ms
+$ echo auto | s tee /sys/bus/usb/devices/1-1.3/power/control
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To disable my Ethernet device, first I have to find it's device number:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Find Ethernet domain:bus:slot number
+$ lspci | grep -i ethernet
+03:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller (rev 10)
+
+# Find relative device on /sys/devices
+$ find /sys/devices -name &amp;quot;*03:00.0&amp;quot;
+/sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0
+
+# Turn off device
+echo 1 | s tee /sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0/remove
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Backlight&lt;/h3&gt;
+&lt;p&gt;To reduce the brightness LED backlight, I set a brightness value (between 0 and 255):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Brightness&lt;/span&gt;
+&lt;span class="x"&gt;basedir=&amp;quot;/sys/class/backlight/&amp;quot;&lt;/span&gt;
+&lt;span class="x"&gt;handler=&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;basedir&lt;/span&gt;&lt;span class="p"&gt;$(&lt;/span&gt;&lt;span class="err"&gt;ls&lt;/span&gt; &lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;basedir&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="x"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;
+
+&lt;span class="x"&gt;chmod 666 &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;handler&lt;/span&gt;&lt;span class="x"&gt;/brightness&lt;/span&gt;
+&lt;span class="x"&gt;echo 100 &amp;gt; handler/brightness&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;Running as a Service&lt;/h1&gt;
+&lt;p&gt;To execute the above commands at boot up, I created a shell script and run that
+as a service.&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt; 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c1"&gt;# /usr/local/bin/powertop_tuning.sh&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Auto-tune powertop&lt;/span&gt;
+powertop --auto-tune
+
+&lt;span class="c1"&gt;# Disable CR-RW&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; s tee /sys/bus/usb/devices/1-1.3/power/autosuspend_delay_ms
+&lt;span class="nb"&gt;echo&lt;/span&gt; auto &lt;span class="p"&gt;|&lt;/span&gt; s tee /sys/bus/usb/devices/1-1.3/power/control
+
+&lt;span class="c1"&gt;# Disable Ethernet&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; s tee /sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0/remove
+
+&lt;span class="c1"&gt;# Brightness&lt;/span&gt;
+chmod &lt;span class="m"&gt;666&lt;/span&gt; /sys/class/backlight/radeon_bl0/brightness
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="m"&gt;80&lt;/span&gt; &amp;gt; /sys/class/backlight/radeon_bl0/brightness
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;And to create proper systemd service:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# /lib/systemd/system/powertop_tuning.service
+[Unit]
+Description=&amp;quot;PowerTop Tuning config&amp;quot;
+ConditionPathExists=/usr/local/bin/powertop_tuning.sh
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+KillMode=none
+ExecStart=/usr/local/bin/powertop_tuning.sh
+ExecStop=exit
+
+[Install]
+WantedBy=multi-user.target
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So, to make &lt;code&gt;powertop_tuning&lt;/code&gt; service run automatically, just enable the service:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo systemctl &lt;span class="nb"&gt;enable&lt;/span&gt; powertop_tuning.service
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;The result is very satisfactory. In daily usage, my battery life went up
+from about 3 hours to almost 4 and a half hours.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Gnome Battery Bench" src="/assets/images/extend_linux_battery_life-battery_bench_after_tunning.png" title="Gnome Battery Bench - After Tunning" /&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: The tests and battery benchmark did not placed in a controlled
+environment but it seems logical to expect similar effects.&lt;/p&gt;
+&lt;/blockquote&gt;</summary><category term="linux"></category><category term="powertop"></category><category term="power"></category></entry></feed>
