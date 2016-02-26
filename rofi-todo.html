@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>rofi-todo</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/projects.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+</head>
+<body>
+
+    <div class="main-nav-container">
+
+        <div class="pure-g">
+            <div class="pure-u-1 pure-u-lg-2-3">
+                <div class="main-nav">
+                    <ul class="main-nav-list">
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/" class="pure-menu-link">Routines Excluded</a></li>
+
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+                        <li class="main-nav-item active"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
+                    </ul>
+                </div>
+             </div>
+
+             <div class="pure-u-1 pure-u-lg-1-3"></div>
+        </div>
+
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+            <div class="pure-u">
+                <a href="http://bijanebrahimi.github.io/blog/category/projects.html"><img src="/assets/images/category_projects_thumb.png " class="post-avatar" alt="Projects"></a>
+            </div>
+            <div class="pure-u-3-4 meta-data">
+                <a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="category">Projects</a><br />
+
+                <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+                &mdash; <abbr title="2016-02-26T18:15:00+03:30">Fri 26 February 2016</abbr>
+            </div>
+        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg);">
+                <img src="http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg" alt="rofi-todo">
+                <div class="title">
+                <h1>
+                    rofi-todo
+                </h1>
+                <h2>
+                    a rofi script to do the dirty job
+                </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <p>If you're unfamiliar with <a href="https://davedavenport.github.io/rofi/">rofi</a>:</p>
+<blockquote>
+<p>It's a popup window switcher roughly based on <a href="http://code.google.com/p/superswitcher/">superswitcher</a>,
+requiring only xlib and pango</p>
+</blockquote>
+<p>Rofi has multiple modes.</p>
+<ol>
+<li><strong>RUN</strong>: Shows a list of executables in $PATH and can launch them (optional in a terminal).</li>
+<li><strong>DRUN</strong>: Same as the run launches, but the list is created from the installed desktop files.</li>
+<li><strong>Window</strong>: Show a list of all the windows and allow switching between them.</li>
+<li><strong>WindowCD</strong>: Shows a list of the windows on the current desktop and allows switching between them.</li>
+<li><strong>SSH</strong>: Shows a list of SSH targets based on your ssh config file, and allows to quickly ssh into them.</li>
+<li><strong>Script</strong>: Allows custom scripted Modi to be added.</li>
+</ol>
+<p>Using <code>script</code> mode, one can extend the rofi. There are plenty scripts
+other there. you should definitely check <a href="https://davedavenport.github.io/rofi/p07-Scripts.html">them</a> out.</p>
+<h2>TODO List Script</h2>
+<p>Script modi can be enabled using <code>name:script</code> syntax. Just save the following
+script somewhere in your <code>PATH</code> directory like <code>/usr/local/bin</code>, make sure it's
+executable and run the following:</p>
+<div class="highlight"><pre><span></span>rofi -modi TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t
+</pre></div>
+
+
+<p><img alt="rofi-todo" src="http://bijanebrahimi.github.io/blog/assets/images/rofi_todolist-rofi_todo.png" /></p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="nv">TODO_FILE</span><span class="o">=</span>~/.rofi_todos
+
+<span class="k">if</span> <span class="o">[[</span> ! -a <span class="s2">&quot;</span><span class="si">${</span><span class="nv">TODO_FILE</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+    touch <span class="s2">&quot;</span><span class="si">${</span><span class="nv">TODO_FILE</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="k">fi</span>
+
+<span class="k">function</span> list_todos<span class="o">()</span>
+<span class="o">{</span>
+    <span class="nv">TODO</span><span class="o">=</span><span class="k">$(</span>cat <span class="s2">&quot;</span><span class="si">${</span><span class="nv">TODO_FILE</span><span class="si">}</span><span class="s2">&quot;</span><span class="k">)</span>
+    <span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;</span><span class="si">${</span><span class="nv">TODO</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="nv">TODDO</span><span class="o">=</span><span class="s2">&quot;\n&quot;</span>
+    <span class="k">fi</span>
+    <span class="nb">echo</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">TODO</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="o">}</span>
+
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span> <span class="o">]</span>
+<span class="k">then</span>
+    list_todos
+<span class="k">else</span>
+    <span class="nv">TODO</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="s2">&quot;</span><span class="si">${</span><span class="p">@</span><span class="si">}</span><span class="s2">&quot;</span> <span class="p">|</span> sed <span class="s2">&quot;s/\([^a-zA-Z0-9]\)/\\\\\\1/g&quot;</span><span class="k">)</span>
+    <span class="nv">TODO_UNSCAPED</span><span class="o">=</span><span class="si">${</span><span class="p">@</span><span class="si">}</span>
+
+    <span class="nv">MATCHING</span><span class="o">=</span><span class="k">$(</span>grep <span class="s2">&quot;^</span><span class="si">${</span><span class="nv">TODO</span><span class="si">}</span>$<span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">TODO_FILE</span><span class="si">}</span><span class="s2">&quot;</span><span class="k">)</span>
+    <span class="k">if</span> <span class="o">[[</span> -n <span class="s2">&quot;</span><span class="si">${</span><span class="nv">MATCHING</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+        sed -i <span class="s2">&quot;/^</span><span class="si">${</span><span class="nv">TODO</span><span class="si">}</span>$<span class="s2">/d&quot;</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">TODO_FILE</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">else</span>
+        <span class="nb">echo</span> -e <span class="s2">&quot;`date +&quot;</span>%B %d %H:%M<span class="s2">&quot;` </span><span class="si">${</span><span class="nv">TODO_UNSCAPED</span><span class="si">}</span><span class="s2">&quot;</span> &gt;&gt; <span class="s2">&quot;</span><span class="si">${</span><span class="nv">TODO_FILE</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">fi</span>
+    list_todos
+<span class="k">fi</span>
+</pre></div>
+
+
+<p><strong>Instructions</strong>:
+- To <strong>Add new TODO</strong>, just type it (It should be Unique, BTW) at TODO prompt
+- To <strong>Delete one</strong>, Just Select the one and hit Enter</p>
+<p>If you're already using rofi, just add <code>TODO</code> modi to your existing command-line:</p>
+<div class="highlight"><pre><span></span>rofi -modi DRun,Run,Window,TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t -show TODO
+</pre></div>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/linux.html">linux</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/rofi.html">rofi</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/rofi-todo.html">rofi-todo</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/rofi-script.html">rofi-script</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/bash.html">bash</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/project.html">project</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/author.jpg" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
+                        <p class="author-description">
+                          
+            I Love to Read, Code and Explore the Possibilities.
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="pure-u-1 pure-u-md-1-2">
+
+                <div class="pure-g post-category-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/category/projects.html"><img src="/assets/images/category_projects_thumb.png" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/category/projects.html">Projects</a></h3>
+                        <p class="author-description">
+                          You can follow me also at github.com/bijanebrahimi
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'bijanebrahimi';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+</body>
+</html>

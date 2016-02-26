@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/projects.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2016-02-26T18:15:00+03:30</updated><entry><title>rofi-todo</title><link href="http://bijanebrahimi.github.io/blog/rofi-todo.html" rel="alternate"></link><updated>2016-02-26T18:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-26:blog/rofi-todo.html</id><summary type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;It's a popup window switcher roughly based on &lt;a href="http://code.google.com/p/superswitcher/"&gt;superswitcher&lt;/a&gt;,
+requiring only xlib and pango&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Rofi has multiple modes.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;RUN&lt;/strong&gt;: Shows a list of executables in $PATH and can launch them (optional in a terminal).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DRUN&lt;/strong&gt;: Same as the run launches, but the list is created from the installed desktop files.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Window&lt;/strong&gt;: Show a list of all the windows and allow switching between them.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WindowCD&lt;/strong&gt;: Shows a list of the windows on the current desktop and allows switching between them.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SSH&lt;/strong&gt;: Shows a list of SSH targets based on your ssh config file, and allows to quickly ssh into them.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Script&lt;/strong&gt;: Allows custom scripted Modi to be added.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Using &lt;code&gt;script&lt;/code&gt; mode, one can extend the rofi. There are plenty scripts
+other there. you should definitely check &lt;a href="https://davedavenport.github.io/rofi/p07-Scripts.html"&gt;them&lt;/a&gt; out.&lt;/p&gt;
+&lt;h2&gt;TODO List Script&lt;/h2&gt;
+&lt;p&gt;Script modi can be enabled using &lt;code&gt;name:script&lt;/code&gt; syntax. Just save the following
+script somewhere in your &lt;code&gt;PATH&lt;/code&gt; directory like &lt;code&gt;/usr/local/bin&lt;/code&gt;, make sure it's
+executable and run the following:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;rofi -modi TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="rofi-todo" src="http://bijanebrahimi.github.io/blog/assets/images/rofi_todolist-rofi_todo.png" /&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;~/.rofi_todos
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; ! -a &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+    touch &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="k"&gt;function&lt;/span&gt; list_todos&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="nv"&gt;TODO&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;cat &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+        &lt;span class="nv"&gt;TODDO&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;fi&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$@&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+    list_todos
+&lt;span class="k"&gt;else&lt;/span&gt;
+    &lt;span class="nv"&gt;TODO&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; sed &lt;span class="s2"&gt;&amp;quot;s/\([^a-zA-Z0-9]\)/\\\\\\1/g&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;TODO_UNSCAPED&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;
+
+    &lt;span class="nv"&gt;MATCHING&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;grep &lt;span class="s2"&gt;&amp;quot;^&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;$&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;MATCHING&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+        sed -i &lt;span class="s2"&gt;&amp;quot;/^&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;$&lt;span class="s2"&gt;/d&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;`date +&amp;quot;&lt;/span&gt;%B %d %H:%M&lt;span class="s2"&gt;&amp;quot;` &lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_UNSCAPED&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;fi&lt;/span&gt;
+    list_todos
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;Instructions&lt;/strong&gt;:
+- To &lt;strong&gt;Add new TODO&lt;/strong&gt;, just type it (It should be Unique, BTW) at TODO prompt
+- To &lt;strong&gt;Delete one&lt;/strong&gt;, Just Select the one and hit Enter&lt;/p&gt;
+&lt;p&gt;If you're already using rofi, just add &lt;code&gt;TODO&lt;/code&gt; modi to your existing command-line:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;rofi -modi DRun,Run,Window,TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t -show TODO
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="linux"></category><category term="rofi"></category><category term="rofi-todo"></category><category term="rofi-script"></category><category term="bash"></category><category term="project"></category></entry></feed>
