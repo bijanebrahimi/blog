@@ -12,8 +12,8 @@ and &lt;code&gt;F1&lt;/code&gt; key as hot key to toggle terminator since I have
 known help button key on linux.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Add this to your i3 config (~/.config/i3/config) and restart i3 (Super+Shift+R)
 exec --no-startup-id &amp;quot;terminator -m&amp;quot;
-for_window [class=&amp;quot;Terminator&amp;quot;] move scratchpad;
-bindsym F1 [class=&amp;quot;Terminator&amp;quot;] scratchpad show; move position 0 0; resize set 1366 768;
+for_window [class=&amp;quot;Terminator&amp;quot; title=&amp;quot;^((?!Terminator Preferences).)*$&amp;quot;] move scratchpad, move position 0 0, resize set 1366 768;
+bindsym F1 [class=&amp;quot;Terminator&amp;quot;] scratchpad show;
 &lt;/pre&gt;&lt;/div&gt;
 
 
