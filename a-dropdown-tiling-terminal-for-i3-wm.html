@@ -80,12 +80,21 @@ and <code>F1</code> key as hot key to toggle terminator since I have no other us
 known help button key on linux.</p>
 <div class="highlight"><pre><span></span># Add this to your i3 config (~/.config/i3/config) and restart i3 (Super+Shift+R)
 exec --no-startup-id &quot;terminator -m&quot;
-for_window [class=&quot;Terminator&quot;] move scratchpad; [class=&quot;Terminator&quot;] scratchpad show; move position 0 0; resize set 1366 768; move scratchpad
-bindsym F1 [class=&quot;Terminator&quot;]  scratchpad show; move position 0 0; resize set 1366 768;
+for_window [class=&quot;Terminator&quot;] move scratchpad;
+bindsym F1 [class=&quot;Terminator&quot;] scratchpad show; move position 0 0; resize set 1366 768;
 </pre></div>
 
 
 <p>You can also view the changes via <a href="https://gist.github.com/bijanebrahimi/6641e8022dffb2e6a5dd">Github Gist</a>.</p>
+<p><strong>Update</strong>: It's possible to send other programs into scratchpad workspace, and
+toggle them using different key bindings. The trick is to exclude <strong>Terminator</strong>
+which is also in Scratchpad from showing. for example, Using the code below we
+can simply send any active programs into Scratchpad using <code>Super+Shift+F1</code> key
+and retrieve them one by one by hitting <code>Super+F1</code> and only by pressing <code>F1</code> we
+can toggle <strong>Terminator</strong>:</p>
+<div class="highlight"><pre><span></span><span class="x">bindsym </span><span class="p">$</span><span class="nv">mod</span><span class="x">+Shift+F1 move container to scratchpad</span>
+<span class="x">bindsym </span><span class="p">$</span><span class="nv">mod</span><span class="x">+F1 [class=&quot;^((?!Terminator).)*</span><span class="p">$</span><span class="x">&quot;] scratchpad show</span>
+</pre></div>
     </div>
 
     <footer>

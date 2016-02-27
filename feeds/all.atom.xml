@@ -12,12 +12,21 @@ and &lt;code&gt;F1&lt;/code&gt; key as hot key to toggle terminator since I have
 known help button key on linux.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Add this to your i3 config (~/.config/i3/config) and restart i3 (Super+Shift+R)
 exec --no-startup-id &amp;quot;terminator -m&amp;quot;
-for_window [class=&amp;quot;Terminator&amp;quot;] move scratchpad; [class=&amp;quot;Terminator&amp;quot;] scratchpad show; move position 0 0; resize set 1366 768; move scratchpad
-bindsym F1 [class=&amp;quot;Terminator&amp;quot;]  scratchpad show; move position 0 0; resize set 1366 768;
+for_window [class=&amp;quot;Terminator&amp;quot;] move scratchpad;
+bindsym F1 [class=&amp;quot;Terminator&amp;quot;] scratchpad show; move position 0 0; resize set 1366 768;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;You can also view the changes via &lt;a href="https://gist.github.com/bijanebrahimi/6641e8022dffb2e6a5dd"&gt;Github Gist&lt;/a&gt;.&lt;/p&gt;</summary><category term="linux"></category><category term="terminal"></category><category term="terminator"></category><category term="i3"></category><category term="scratchpad"></category></entry><entry><title>rofi-todo</title><link href="http://bijanebrahimi.github.io/blog/rofi-todo.html" rel="alternate"></link><updated>2016-02-26T18:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-26:blog/rofi-todo.html</id><summary type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;You can also view the changes via &lt;a href="https://gist.github.com/bijanebrahimi/6641e8022dffb2e6a5dd"&gt;Github Gist&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: It's possible to send other programs into scratchpad workspace, and
+toggle them using different key bindings. The trick is to exclude &lt;strong&gt;Terminator&lt;/strong&gt;
+which is also in Scratchpad from showing. for example, Using the code below we
+can simply send any active programs into Scratchpad using &lt;code&gt;Super+Shift+F1&lt;/code&gt; key
+and retrieve them one by one by hitting &lt;code&gt;Super+F1&lt;/code&gt; and only by pressing &lt;code&gt;F1&lt;/code&gt; we
+can toggle &lt;strong&gt;Terminator&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="x"&gt;bindsym &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;mod&lt;/span&gt;&lt;span class="x"&gt;+Shift+F1 move container to scratchpad&lt;/span&gt;
+&lt;span class="x"&gt;bindsym &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;mod&lt;/span&gt;&lt;span class="x"&gt;+F1 [class=&amp;quot;^((?!Terminator).)*&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt;&amp;quot;] scratchpad show&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="linux"></category><category term="terminal"></category><category term="terminator"></category><category term="i3"></category><category term="scratchpad"></category></entry><entry><title>rofi-todo</title><link href="http://bijanebrahimi.github.io/blog/rofi-todo.html" rel="alternate"></link><updated>2016-02-26T18:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-26:blog/rofi-todo.html</id><summary type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;It's a popup window switcher roughly based on &lt;a href="http://code.google.com/p/superswitcher/"&gt;superswitcher&lt;/a&gt;,
 requiring only xlib and pango&lt;/p&gt;
