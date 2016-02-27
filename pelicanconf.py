@@ -60,4 +60,8 @@ MEDIUS_CATEGORIES = {
         'description': 'You can follow me also at github.com/bijanebrahimi',
         'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_projects_thumb.png'
     },
+    'Gists': {
+        'description': 'Useful snippets of code',
+        'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_gist_thumb.png'
+    },
 }
