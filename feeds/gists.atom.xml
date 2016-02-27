@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/gists.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2016-02-27T14:27:00+03:30</updated><entry><title>A dropdown Tiling Terminal for i3-wm</title><link href="http://bijanebrahimi.github.io/blog/a-dropdown-tiling-terminal-for-i3-wm.html" rel="alternate"></link><updated>2016-02-27T14:27:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-27:blog/a-dropdown-tiling-terminal-for-i3-wm.html</id><summary type="html">&lt;p&gt;&lt;a href="http://i3wm.org/docs/userguide.html#_scratchpad"&gt;Scratchpad&lt;/a&gt; is one of the
+coolest, and unique features in &lt;a href="http://i3wm.org"&gt;i3&lt;/a&gt;. Scratchpad is basically a
+hidden workspace that you can send your programs into it.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;There is no way to open that workspace. Instead, when using &lt;code&gt;scratchpad show&lt;/code&gt;,
+the window will be shown again, as a floating window, centered on your current
+workspace&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Using scratchpad, we can turn any terminal into a drop-down terminal. I'm using &lt;a href="www.tenshu.net/p/terminator.html"&gt;terminator&lt;/a&gt; which supports tiling (and more)
+and &lt;code&gt;F1&lt;/code&gt; key as hot key to toggle terminator since I have no other use for formally
+known help button key on linux.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Add this to your i3 config (~/.config/i3/config) and restart i3 (Super+Shift+R)
+exec --no-startup-id &amp;quot;terminator -m&amp;quot;
+for_window [class=&amp;quot;Terminator&amp;quot;] move scratchpad; [class=&amp;quot;Terminator&amp;quot;] scratchpad show; move position 0 0; resize set 1366 768; move scratchpad
+bindsym F1 [class=&amp;quot;Terminator&amp;quot;]  scratchpad show; move position 0 0; resize set 1366 768;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can also view the changes via &lt;a href="https://gist.github.com/bijanebrahimi/6641e8022dffb2e6a5dd"&gt;Github Gist&lt;/a&gt;.&lt;/p&gt;</summary><category term="linux"></category><category term="terminal"></category><category term="terminator"></category><category term="i3"></category><category term="scratchpad"></category></entry></feed>
