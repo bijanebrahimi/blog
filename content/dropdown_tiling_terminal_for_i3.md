@@ -15,7 +15,7 @@ hidden workspace that you can send your programs into it.
 the window will be shown again, as a floating window, centered on your current
 workspace
 
-Using scratchpad, we can turn any terminal into a drop-down terminal. I'm using [terminator](www.tenshu.net/p/terminator.html) which supports tiling (and more)
+Using scratchpad, we can turn any terminal into a drop-down terminal. I'm using [terminator](http://www.tenshu.net/p/terminator.html) which supports tiling (and more)
 and `F1` key as hot key to toggle terminator since I have no other use for formally
 known help button key on linux.
 
