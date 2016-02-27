@@ -7,7 +7,7 @@ hidden workspace that you can send your programs into it.&lt;/p&gt;
 the window will be shown again, as a floating window, centered on your current
 workspace&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;Using scratchpad, we can turn any terminal into a drop-down terminal. I'm using &lt;a href="www.tenshu.net/p/terminator.html"&gt;terminator&lt;/a&gt; which supports tiling (and more)
+&lt;p&gt;Using scratchpad, we can turn any terminal into a drop-down terminal. I'm using &lt;a href="http://www.tenshu.net/p/terminator.html"&gt;terminator&lt;/a&gt; which supports tiling (and more)
 and &lt;code&gt;F1&lt;/code&gt; key as hot key to toggle terminator since I have no other use for formally
 known help button key on linux.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Add this to your i3 config (~/.config/i3/config) and restart i3 (Super+Shift+R)
