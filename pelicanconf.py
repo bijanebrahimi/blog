@@ -52,16 +52,16 @@ MEDIUS_AUTHORS = {
     }
 }
 MEDIUS_CATEGORIES = {
-    'Linux': {
-        'description': 'Linux Related Stuff',
-        'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_linux_thumb.png'
-    },
     'Projects': {
         'description': 'You can follow me also at github.com/bijanebrahimi',
         'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_projects_thumb.png'
     },
-    'Gists': {
+    'Gist': {
         'description': 'Useful snippets of code',
         'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_gist_thumb.png'
+    },
+    'Linux': {
+        'description': 'Linux Related Stuff',
+        'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_linux_thumb.png'
     },
 }

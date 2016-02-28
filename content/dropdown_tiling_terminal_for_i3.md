@@ -3,7 +3,7 @@ SubTitle: Using scratchpad and Terminator
 Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
 Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux_thumb.jpg
 Date: 2016-02-27 14:27
-Category: Gists
+Category: Gist
 Tags: linux, terminal, terminator, i3, scratchpad
 
 
