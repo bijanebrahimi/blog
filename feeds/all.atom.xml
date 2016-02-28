@@ -1,5 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2016-02-27T14:27:00+03:30</updated><entry><title>A dropdown Tiling Terminal for i3-wm</title><link href="http://bijanebrahimi.github.io/blog/a-dropdown-tiling-terminal-for-i3-wm.html" rel="alternate"></link><updated>2016-02-27T14:27:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-27:blog/a-dropdown-tiling-terminal-for-i3-wm.html</id><summary type="html">&lt;p&gt;&lt;a href="http://i3wm.org/docs/userguide.html#_scratchpad"&gt;Scratchpad&lt;/a&gt; is one of the
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2016-02-28T17:07:00+03:30</updated><entry><title>py3status Configuration</title><link href="http://bijanebrahimi.github.io/blog/py3status-configuration.html" rel="alternate"></link><updated>2016-02-28T17:07:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-28:blog/py3status-configuration.html</id><summary type="html">&lt;p&gt;Follow changes via &lt;a href="https://gist.github.com/bijanebrahimi/d39f8fbbfe12e945db67"&gt;gist&lt;/a&gt; repository.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Screenshot&lt;/strong&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="py3status Configuration" src="http://bijanebrahimi.github.io/blog/assets/images/py3status-conf-i3bar.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Dependencies&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/ultrabug/py3status"&gt;py3status&lt;/a&gt; is an extensible i3status wrapper written in python.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-flag"&gt;&lt;/i&gt; &lt;a href="https://fortawesome.github.io/Font-Awesome/"&gt;Font Awesome&lt;/a&gt;: Font Icons for i3-bar&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-camera"&gt;&lt;/i&gt; &lt;a href="https://github.com/naelstrof/maim"&gt;maim&lt;/a&gt;: a utility that takes screenshots of your desktop&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-lock"&gt;&lt;/i&gt; &lt;a href="http://i3wm.org/i3lock/"&gt;i3lock&lt;/a&gt;: is a simple screen locker like slock.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-picture-o"&gt;&lt;/i&gt; &lt;a href="http://linux.die.net/man/1/feh"&gt;feh&lt;/a&gt;: to randomly change wallpaper.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-calendar"&gt;&lt;/i&gt; &lt;a href="https://gahshomar.github.io/gahshomar/"&gt;gahshomar&lt;/a&gt; is a calendar with simplicity in design and elegance in execution.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;~/.config/i3/config&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;bar {
+    ...
+    status_command py3status -c ~/.config/i3/i3status.conf
+    font pango:DejaVu Sans Mono, Awesome 10
+    ...
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;~/.config/i3/i3status.conf&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# i3status configuration file.
+# see &amp;quot;man i3status&amp;quot; for documentation.
+
+# It is important that this file is edited as UTF-8.
+# The following line should contain a sharp s:
+# ß
+# If the above line is not correctly displayed, fix your editor first!
+
+general {
+        colors = true
+        interval = 5
+}
+order += &amp;quot;static_string i3lock&amp;quot;
+order += &amp;quot;static_string screenshot&amp;quot;
+order += &amp;quot;static_string wallpaper&amp;quot;
+order += &amp;quot;net_rate&amp;quot;
+order + = &amp;quot;online_status&amp;quot;
+order += &amp;quot;keyboard_layout&amp;quot;
+order += &amp;quot;battery_level&amp;quot;
+order += &amp;quot;time local&amp;quot;
+
+time {
+    format = &amp;quot;   %A %e %B  %H:%M&amp;quot;
+    on_click 1 = &amp;quot;exec --no-startup-id gahshomar&amp;quot;
+}
+battery_level{
+    blocks = &amp;quot;&amp;quot;
+    charging_character = &amp;quot;&amp;quot;
+    format = &amp;quot; {percent} {icon} {time_remaining}&amp;quot;
+    color_charging = &amp;quot;#FFFFFF&amp;quot;
+    cache_timeout = 5
+}
+keyboard_layout {
+    cache_timeout = 1
+    format = &amp;quot;  {layout}&amp;quot;
+    color = &amp;quot;#FFFFFF&amp;quot;
+}
+net_rate {
+    format = &amp;quot;  {total}&amp;quot;
+    precision = 0
+}
+online_status {
+    cache_timeout = 10
+    format_offline = &amp;quot;&amp;quot;
+    format_online = &amp;quot;&amp;quot;
+    timeout = 20
+}
+static_string wallpaper {
+    format = &amp;quot;&amp;quot;
+    on_click 1 = &amp;quot;exec --no-startup-id feh --bg-scale $(find /home/bijan/Pictures/wallpapers/ | shuf | head -n 1)&amp;quot;
+}
+static_string screenshot {
+    format = &amp;quot;&amp;quot;
+    # Taking Screenshot using maim
+    on_click 1 = &amp;quot;exec --no-startup-id echo ~/Pictures/Screenshots/img-$(date +%Y-%m-%d)-&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;RANDOM&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;.png | xargs -I &amp;#39;{}&amp;#39; maim -s &amp;#39;{}&amp;#39; &lt;span class="err"&gt;&amp;amp;&amp;amp;&lt;/span&gt; notify-send &amp;#39;Screenshot&amp;#39; &amp;#39;Screenshot taken&amp;#39;&amp;quot;}
+static_string i3lock {
+    format = &amp;quot;&amp;quot;
+    # Set background for lock screen using -i argument
+    on_click 1 = &amp;quot;exec --no-startup-id i3lock -d -I 5&amp;quot;
+}
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="linux"></category><category term="i3"></category><category term="py3status"></category><category term="i3status"></category><category term="font-awesome"></category></entry><entry><title>A dropdown Tiling Terminal for i3-wm</title><link href="http://bijanebrahimi.github.io/blog/a-dropdown-tiling-terminal-for-i3-wm.html" rel="alternate"></link><updated>2016-02-27T14:27:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-27:blog/a-dropdown-tiling-terminal-for-i3-wm.html</id><summary type="html">&lt;p&gt;&lt;a href="http://i3wm.org/docs/userguide.html#_scratchpad"&gt;Scratchpad&lt;/a&gt; is one of the
 coolest, and unique features in &lt;a href="http://i3wm.org"&gt;i3&lt;/a&gt;. Scratchpad is basically a
 hidden workspace that you can send your programs into it.&lt;/p&gt;
 &lt;blockquote&gt;
