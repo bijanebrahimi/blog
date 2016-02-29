@@ -116,7 +116,7 @@ echo 80 > /sys/class/backlight/radeon_bl0/brightness
 And to create proper systemd service:
 
 ```
-# /lib/systemd/system/powertop_tuning.service
+# /etc/systemd/system/powertop_tuning.service
 [Unit]
 Description="PowerTop Tuning config"
 ConditionPathExists=/usr/local/bin/powertop_tuning.sh
