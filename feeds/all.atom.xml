@@ -285,7 +285,7 @@ chmod &lt;span class="m"&gt;666&lt;/span&gt; /sys/class/backlight/radeon_bl0/bri
 &lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 
 &lt;p&gt;And to create proper systemd service:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# /lib/systemd/system/powertop_tuning.service
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# /etc/systemd/system/powertop_tuning.service
 [Unit]
 Description=&amp;quot;PowerTop Tuning config&amp;quot;
 ConditionPathExists=/usr/local/bin/powertop_tuning.sh
