@@ -45,7 +45,7 @@
                 <a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="category">Gist</a><br />
 
                 <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
-                &mdash; <abbr title="2016-02-28T17:07:00+03:30">Sun 28 February 2016</abbr>
+                &mdash; <abbr title="2016-03-14T22:35:00+03:30">Mon 14 March 2016</abbr>
             </div>
         </div>
     </div>
@@ -68,90 +68,19 @@
     </div>
 
     <div class="entry-content">
-        <p>Follow changes via <a href="https://gist.github.com/bijanebrahimi/d39f8fbbfe12e945db67">gist</a> repository.</p>
+        <p>Edited: Follow changes via my <a href="https://github.com/bijanebrahimi/py3status-config">Github</a> repository.</p>
 <p><strong>Screenshot</strong>:</p>
-<p><img alt="py3status Configuration" src="http://bijanebrahimi.github.io/blog/assets/images/py3status-conf-i3bar.png" /></p>
+<p><img alt="py3status Configuration" src="https://bijanebrahimi.github.io/py3status-config/images/py3status.png" /></p>
 <p><strong>Dependencies</strong>:</p>
 <ul>
 <li><a href="https://github.com/ultrabug/py3status">py3status</a> is an extensible i3status wrapper written in python.</li>
 <li><i class="fa fa-flag"></i> <a href="https://fortawesome.github.io/Font-Awesome/">Font Awesome</a>: Font Icons for i3-bar</li>
 <li><i class="fa fa-camera"></i> <a href="https://github.com/naelstrof/maim">maim</a>: a utility that takes screenshots of your desktop</li>
 <li><i class="fa fa-lock"></i> <a href="http://i3wm.org/i3lock/">i3lock</a>: is a simple screen locker like slock.</li>
-<li><i class="fa fa-picture-o"></i> <a href="http://linux.die.net/man/1/feh">feh</a>: to randomly change wallpaper.</li>
+<li><i class="fa fa-picture-o"></i> <a href="https://github.com/bijanebrahimi/waffle">waffle</a>: to randomly download/change wallpaper.</li>
 <li><i class="fa fa-calendar"></i> <a href="https://gahshomar.github.io/gahshomar/">gahshomar</a> is a calendar with simplicity in design and elegance in execution.</li>
+<li><i class="fa fa-music"></i> <a href="http://audacious-media-player.org/">audacious</a> Music Player (needs qdbus and audacious mpris plugins installed).</li>
 </ul>
-<p><code>~/.config/i3/config</code></p>
-<div class="highlight"><pre><span></span>bar {
-    ...
-    status_command py3status -c ~/.config/i3/i3status.conf
-    font pango:DejaVu Sans Mono, Awesome 10
-    ...
-}
-</pre></div>
-
-
-<p><code>~/.config/i3/i3status.conf</code></p>
-<div class="highlight"><pre><span></span># i3status configuration file.
-# see &quot;man i3status&quot; for documentation.
-
-# It is important that this file is edited as UTF-8.
-# The following line should contain a sharp s:
-# ß
-# If the above line is not correctly displayed, fix your editor first!
-
-general {
-        colors = true
-        interval = 5
-}
-order += &quot;static_string i3lock&quot;
-order += &quot;static_string screenshot&quot;
-order += &quot;static_string wallpaper&quot;
-order += &quot;net_rate&quot;
-order + = &quot;online_status&quot;
-order += &quot;keyboard_layout&quot;
-order += &quot;battery_level&quot;
-order += &quot;time local&quot;
-
-time {
-    format = &quot;   %A %e %B  %H:%M&quot;
-    on_click 1 = &quot;exec --no-startup-id gahshomar&quot;
-}
-battery_level{
-    blocks = &quot;&quot;
-    charging_character = &quot;&quot;
-    format = &quot; {percent} {icon} {time_remaining}&quot;
-    color_charging = &quot;#FFFFFF&quot;
-    cache_timeout = 5
-}
-keyboard_layout {
-    cache_timeout = 1
-    format = &quot;  {layout}&quot;
-    color = &quot;#FFFFFF&quot;
-}
-net_rate {
-    format = &quot;  {total}&quot;
-    precision = 0
-}
-online_status {
-    cache_timeout = 10
-    format_offline = &quot;&quot;
-    format_online = &quot;&quot;
-    timeout = 20
-}
-static_string wallpaper {
-    format = &quot;&quot;
-    on_click 1 = &quot;exec --no-startup-id feh --bg-scale $(find /home/bijan/Pictures/wallpapers/ | shuf | head -n 1)&quot;
-}
-static_string screenshot {
-    format = &quot;&quot;
-    # Taking Screenshot using maim
-    on_click 1 = &quot;exec --no-startup-id echo ~/Pictures/Screenshots/img-$(date +%Y-%m-%d)-<span class="cp">${</span><span class="n">RANDOM</span><span class="cp">}</span>.png | xargs -I &#39;{}&#39; maim -s &#39;{}&#39; <span class="err">&amp;&amp;</span> notify-send &#39;Screenshot&#39; &#39;Screenshot taken&#39;&quot;}
-static_string i3lock {
-    format = &quot;&quot;
-    # Set background for lock screen using -i argument
-    on_click 1 = &quot;exec --no-startup-id i3lock -d -I 5&quot;
-}
-</pre></div>
     </div>
 
     <footer>
