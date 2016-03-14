@@ -64,4 +64,8 @@ MEDIUS_CATEGORIES = {
         'description': 'Linux Related Stuff',
         'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_linux_thumb.png'
     },
+    'Book': {
+        'description': 'List of Books I read or like to read',
+        'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_book_thumb.png'
+    },
 }
