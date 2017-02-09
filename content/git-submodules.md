@@ -1,7 +1,7 @@
 Title: Git Submodules
 SubTitle: How git submodules comes to rescue
-Cover: http://bijanebrahimi.github.io/blog/blog/assets/images/post_category_linux.jpg
-Thumbnail: http://bijanebrahimi.github.io/blog/blog/assets/images/post_category_linux.jpg
+Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
+Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
 Date: 2017-02-06 12:22
 Category: Git
 Tags: git, svn, git submodules
