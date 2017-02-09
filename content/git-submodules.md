@@ -1,7 +1,7 @@
 Title: Git Submodules
 SubTitle: How git submodules comes to rescue
-Cover: http://sbijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
-Thumbnail: http://sbijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
+Cover: http://sbijanebrahimi.github.io/blog/blog/assets/images/post_category_linux.jpg
+Thumbnail: http://sbijanebrahimi.github.io/blog/blog/assets/images/post_category_linux.jpg
 Date: 2017-02-06 12:22
 Category: Git
 Tags: git, svn, git submodules
@@ -84,7 +84,7 @@ $ git push origin --all
 $ git push --tags
 ```
 
-![image](/assets/images/git_submodules_diagram_01.svg)
+![image](/blog/assets/images/git_submodules_diagram_01.svg)
 
 Now to follow our git-flow, we need to fork a new branch named **dev** from master branch. What we should do  first is to create a dev branch in all of our sub-projects using `git submodule foreach` which executes given commands in each of our (initialized) submodules:
 ```
@@ -99,7 +99,7 @@ $ git tag -a v0.1-dev -m v0.1-dev
 $ git push origin --tags
 ```
 
-![image](/assets/images/git_submodules_diagram_02.svg)
+![image](/blog/assets/images/git_submodules_diagram_02.svg)
 
 Now it's time for our developers to clone the super project and changes some code. our developer **kevin** is the maintainer of the shell-y and only have access to our shared library beside his project so he should avoid trying to get protocol-x project:
 ```
@@ -114,7 +114,7 @@ $ git submodule init libs/lib-shared
 $ git submodule update --remote
 ```
 
-![image](/assets/images/git_submodules_diagram_03.svg)
+![image](/blog/assets/images/git_submodules_diagram_03.svg)
 
 To make a change in lib-shared, he needs to fork a new feature-branch from lib-shared's dev branch and simply pushes his branch to remote and notify the manager:
 ```
@@ -136,14 +136,14 @@ $ git submodule status
 -a2b7c92292a6b47a5ece5feea9e3390879d49d89 ../protocols/protocol-x
 ```
 
-![image](/assets/images/git_submodules_diagram_04.svg)
+![image](/blog/assets/images/git_submodules_diagram_04.svg)
 
 The `+` sign beside lib-shared submodule shows that this subodule has changes which super-project does not added yet. the `-` sign beside protocol-x submodule indictes that this module has not been initialized. Since his changes to lib-shared has not been accepted yet, he should revert update this submodule to point at the right hash commit which dev knows:
 ```
 $ git submodule update
 ```
 
-![image](/assets/images/git_submodules_diagram_05.svg)
+![image](/blog/assets/images/git_submodules_diagram_05.svg)
 
 Now The manager is notified and should review kevin's changes and decide if it's good enough to be merged into lib-shared's dev branch:
 ```
@@ -156,7 +156,7 @@ $ git checkout dev
 $ git merge --no-ff feature-authors -m "merged feature authors"
 ```
 
-![image](/assets/images/git_submodules_diagram_06.svg)
+![image](/blog/assets/images/git_submodules_diagram_06.svg)
 
 Now lib-shared has reached v0.1-dev-3 should be included in super-project's dev branch:
 ```
@@ -178,7 +178,7 @@ The changes of lib-shared and super-project should can be send to their remotes 
 $ git submodule foreach 'git push --tags'
 ```
 
-![image](/assets/images/git_submodules_diagram_07.svg)
+![image](/blog/assets/images/git_submodules_diagram_07.svg)
 
 Now kevin can fetch new changes in dev:
 ```
@@ -187,7 +187,7 @@ $ git pull origin dev
 $ git submodule update --remote
 ```
 
-![image](/assets/images/git_submodules_diagram_08.svg)
+![image](/blog/assets/images/git_submodules_diagram_08.svg)
 
 Merging branches in super-project is a little tricky. When merging dev branch into master, we should always check not to change `.gitmodules` between merges. To do that we use `--no-commit` argument just to do merge the, and before `git commit` we should revert any changing comming from dev to master into `.gitmodules`:
 ```
@@ -221,4 +221,4 @@ $ git submodule foreach 'git push origin master'
 $ git push origin master
 ```
 
-![image](/assets/images/git_submodules_diagram_09.svg)
+![image](/blog/assets/images/git_submodules_diagram_09.svg)
