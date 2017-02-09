@@ -1,0 +1,224 @@
+Title: Git Submodules
+SubTitle: How git submodules comes to rescue
+Cover: http://sbijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
+Thumbnail: http://sbijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
+Date: 2017-02-06 12:22
+Category: Git
+Tags: git, svn, git submodules
+
+
+# Introduction
+There are many good articles and blog posts on the Interenet describing how to migrate from svn to git repository. There are a lot of advantages to migrate to git, ([git-flow](nvie.com/posts/a-successful-git-branching-model) to metion one) but there are also a few draw-backs. For example svn supports [Path-Based Authorization](http://svnbook.red-bean.com/en/1.7/svn.serverconfig.pathbasedauthz.html) meaning great control over who sees what parts of the project. Unfortunately git does not provide such mechanism meaning to overcome this task, we should split such files or directories into separate git repositories to restrict access per project and yet keep the project as a whole. In this post I explain how to use git submdules to do that.
+
+# Git-Flow using submodules
+Imagine the following scenario in which we have a shared library named **lib-shared** and two projects named **protocol-x** and **shell-y** which different developers have access to one of them.
+
+```
+$ find . -type d
+./libs/lib-shared
+./routing/protocol-x
+./cli/shell-y
+```
+
+What we're going to do is to create a separate git repository for each project (as sub-projects):
+```
+$ mkdir lib-shared
+$ cd lib-shared
+$ git init
+$ touch .gitignore
+$ git add .
+$ git commit -m "added .gitignore"
+$ git remote add origin git@debian:root/lib-shared.git
+$ git tag -a v0.1 -m v0.1
+$ git push origin --all
+$ git push --tags
+$ cd ..
+$ mkdir protocol-x
+$ cd protocol-x
+$ git init
+$ touch .gitignore
+$ git add .
+$ git commit -m "added .gitignore"
+$ git remote add origin git@debian:root/protocol-x.git
+$ git tag -a v0.1 -m v0.1
+$ git push origin --all
+$ git push --tags
+$ cd ..
+$ mkdir shell-y
+$ cd shell-y
+$ git init
+$ touch .gitignore
+$ git add .
+$ git commit -m "added .gitignore"
+$ git remote add origin git@debian:root/shell-y.git
+$ git tag -a v0.1 -m v0.1
+$ git push origin --all
+$ git push --tags
+$ cd ..
+```
+
+And we create another project (super-project) containing these projects. To do that, we should add above sub-projects as submodules. 
+```
+$ cd /home/manager/
+$ mkdir super-project
+$ cd super-project
+$ git init
+$ git remote add origin git@debian:root/super-project.git
+$ git submodule add -b master --name lib-shared git@debian:root/lib-shared libs/lib-shared
+$ git submodule add -b master --name protocol-x git@debian:root/protocol-x protocols/protocol-x
+$ git submodule add -b master --name shell-y git@debian:root/shell-y cli/shell-y
+```
+
+Running `git status` we can see that git created a file named `.gitmodules` which keeps a list of our current submodules. This file should be a part of source code and it'll help other people cloning this super-project to know which submodules they should also get using `git submodule init` (if they have permission ofc). Also Git sees these sub-projects as files instead of directories. This is how git sees submodules. Each submodule points to a git commit SHA-1 which in our case is the latest commit in master branch of each-subproject. You can confirm this by running `git diff --staged` command. More interestingly, we can see which version of submodules out super-project is following (before committing):
+```
+$ git submodule status
+ fa75a2c38ed4b80f1c42e4434fd3d43e230605ba cli/shell-y (v0.1)
+ 9f0dd01bea1ec7f719bf17e2ff2018dc64fbe335 libs/lib-shared (v0.1)
+ a2b7c92292a6b47a5ece5feea9e3390879d49d89 protocols/protocol-x (v0.1)
+```
+Now we can commit the changes in our super-project:
+```
+$ git commit -m "added libshared, protocol-x and shell-y sub-projects"
+$ git tag -a v0.1 -m "v0.1"
+$ git push origin --all
+$ git push --tags
+```
+
+![image](/assets/images/git_submodules_diagram_01.svg)
+
+Now to follow our git-flow, we need to fork a new branch named **dev** from master branch. What we should do  first is to create a dev branch in all of our sub-projects using `git submodule foreach` which executes given commands in each of our (initialized) submodules:
+```
+$ cd /home/manager/projects/super-project
+$ git checkout -b dev master
+$ git submodule foreach 'git pull origin master; git checkout -b dev master; $ $ git push origin dev'
+$ sed -i'' 's/branch = master/branch = dev/g' .gitmodules
+$ git add .gitmodules
+$ git commit -m "forked dev branch"
+$ git push origin dev
+$ git tag -a v0.1-dev -m v0.1-dev
+$ git push origin --tags
+```
+
+![image](/assets/images/git_submodules_diagram_02.svg)
+
+Now it's time for our developers to clone the super project and changes some code. our developer **kevin** is the maintainer of the shell-y and only have access to our shared library beside his project so he should avoid trying to get protocol-x project:
+```
+$ make /home/kevin/projects/kevin-project
+$ cd ~/kevin/projects/kevin-project
+$ git init
+$ git remote add origin git@debian:root/super-project.git
+$ git fetch origin
+$ git checkout -b dev remotes/origin/dev
+$ git submodule init cli/shell-y
+$ git submodule init libs/lib-shared
+$ git submodule update --remote
+```
+
+![image](/assets/images/git_submodules_diagram_03.svg)
+
+To make a change in lib-shared, he needs to fork a new feature-branch from lib-shared's dev branch and simply pushes his branch to remote and notify the manager:
+```
+cd libs/lib-shared
+git checkout -b feature-authors remotes/origin/dev
+touch AUTHORS
+git add AUTHORS
+git commit -m "added AUTHORS file"
+echo "bijan-e" > AUTHORS
+git commit -a -m "added bijan-e to AUTHORS"
+git push origin feature-authors
+```
+
+**Note**: If kevin now goes to the root of his super-project, he sees that his super-project has changes:
+```
+$ git submodule status
+ fa75a2c38ed4b80f1c42e4434fd3d43e230605ba ../cli/shell-y (v0.1)
++51b9fbe3b08bc793193a70a48e762b4a5629514f lib-shared (v0.1-2-g51b9fbe)
+-a2b7c92292a6b47a5ece5feea9e3390879d49d89 ../protocols/protocol-x
+```
+
+![image](/assets/images/git_submodules_diagram_04.svg)
+
+The `+` sign beside lib-shared submodule shows that this subodule has changes which super-project does not added yet. the `-` sign beside protocol-x submodule indictes that this module has not been initialized. Since his changes to lib-shared has not been accepted yet, he should revert update this submodule to point at the right hash commit which dev knows:
+```
+$ git submodule update
+```
+
+![image](/assets/images/git_submodules_diagram_05.svg)
+
+Now The manager is notified and should review kevin's changes and decide if it's good enough to be merged into lib-shared's dev branch:
+```
+$ cd /home/manager/projects/super-project/libs/lib-shared
+$ git pull origin
+$ git tag -a v0.1-dev -m v0.1-dev
+$ git checkout -b feature-authors remotes/origin/feature-authors
+$ // Code Review
+$ git checkout dev
+$ git merge --no-ff feature-authors -m "merged feature authors"
+```
+
+![image](/assets/images/git_submodules_diagram_06.svg)
+
+Now lib-shared has reached v0.1-dev-3 should be included in super-project's dev branch:
+```
+$ cd /home/manager/projects/super-project
+$ git submodule status
+ fa75a2c38ed4b80f1c42e4434fd3d43e230605ba cli/shell-y (v0.1)
++04edc4cd6f3916f5d51a7f5cc7a6df92b11014a9 libs/lib-shared (v0.1-dev-3-g04edc4c)
+ a2b7c92292a6b47a5ece5feea9e3390879d49d89 protocols/protocol-x (v0.1)
+$ git diff --submodule
+Submodule libs/lib-shared 9f0dd01..04edc4c:
+  > merged feature authors
+$ git add libs/lib-shared
+$ git commit -m "merged lib-shared v0.1-dev-3"
+$ git push origin dev --recurse-submodules=on-demand
+```
+
+The changes of lib-shared and super-project should can be send to their remotes manually for each project or only once from super-project using `--recurse-submodules` argument. Note that push doesn't push submodule's tags so we need to push submodules's tags separately:
+```
+$ git submodule foreach 'git push --tags'
+```
+
+![image](/assets/images/git_submodules_diagram_07.svg)
+
+Now kevin can fetch new changes in dev:
+```
+$ cd /home/kevin/projects/kevin-project
+$ git pull origin dev
+$ git submodule update --remote
+```
+
+![image](/assets/images/git_submodules_diagram_08.svg)
+
+Merging branches in super-project is a little tricky. When merging dev branch into master, we should always check not to change `.gitmodules` between merges. To do that we use `--no-commit` argument just to do merge the, and before `git commit` we should revert any changing comming from dev to master into `.gitmodules`:
+```
+$ cd /home/manager/projects/super-project
+$ git checkout master
+$ git submodule update
+$ git submodule foreach 'git checkout master'
+$ git merge --no-commit --no-ff dev
+$ git reset HEAD .gitmodules
+$ git checkout -- .gitmodules
+$ git diff --submodule --staged
+Submodule libs 9f0dd01..04edc4c:
+  > merged feature authors
+```
+
+The `git diff --submodule --staged` shows which changes is going from submodules. We can use this commit messages to create a `CHANGELOG` file. FInally before committing we should also merge submodules changes using `--merge` argument:
+```
+$ git submodule update --merge
+Updating 9f0dd01..04edc4c
+Fast-forward
+ AUTHORS | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 AUTHORS
+Submodule path 'libs/lib-shared': merged in '04edc4cd6f3916f5d51a7f5cc7a6df92b11014a9'
+```
+
+This confirms what the changes from dev's submodules are also merged into master's submodules. We should finalize this merge by committing changes and pushing both super-project and sub-project merge commits to remote:
+```
+$ git commit -m "merged v0.1-dev-1 into master"
+$ git submodule foreach 'git push origin master'
+$ git push origin master
+```
+
+![image](/assets/images/git_submodules_diagram_09.svg)

@@ -68,4 +68,8 @@ MEDIUS_CATEGORIES = {
         'description': 'List of Books I read or like to read',
         'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_book_thumb.png'
     },
+    'Git': {
+        'description': 'Git related stuff',
+        'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_git_thumb.png'
+    },
 }
