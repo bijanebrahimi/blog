@@ -54,8 +54,8 @@
     <div class="article-header-container">
         <div class="background-image-container">
 
-            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://sbijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg);">
-                <img src="http://sbijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg" alt="Git Submodules">
+            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://sbijanebrahimi.github.io/blog/blog/assets/images/post_category_linux.jpg);">
+                <img src="http://sbijanebrahimi.github.io/blog/blog/assets/images/post_category_linux.jpg" alt="Git Submodules">
                 <div class="title">
                 <h1>
                     Git Submodules
@@ -145,7 +145,7 @@ $ git push --tags
 </pre></div>
 
 
-<p><img alt="image" src="/assets/images/git_submodules_diagram_01.svg" /></p>
+<p><img alt="image" src="/blog/assets/images/git_submodules_diagram_01.svg" /></p>
 <p>Now to follow our git-flow, we need to fork a new branch named <strong>dev</strong> from master branch. What we should do  first is to create a dev branch in all of our sub-projects using <code>git submodule foreach</code> which executes given commands in each of our (initialized) submodules:</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /home/manager/projects/super-project
 $ git checkout -b dev master
@@ -159,7 +159,7 @@ $ git push origin --tags
 </pre></div>
 
 
-<p><img alt="image" src="/assets/images/git_submodules_diagram_02.svg" /></p>
+<p><img alt="image" src="/blog/assets/images/git_submodules_diagram_02.svg" /></p>
 <p>Now it's time for our developers to clone the super project and changes some code. our developer <strong>kevin</strong> is the maintainer of the shell-y and only have access to our shared library beside his project so he should avoid trying to get protocol-x project:</p>
 <div class="highlight"><pre><span></span>$ make /home/kevin/projects/kevin-project
 $ <span class="nb">cd</span> ~/kevin/projects/kevin-project
@@ -173,7 +173,7 @@ $ git submodule update --remote
 </pre></div>
 
 
-<p><img alt="image" src="/assets/images/git_submodules_diagram_03.svg" /></p>
+<p><img alt="image" src="/blog/assets/images/git_submodules_diagram_03.svg" /></p>
 <p>To make a change in lib-shared, he needs to fork a new feature-branch from lib-shared's dev branch and simply pushes his branch to remote and notify the manager:</p>
 <div class="highlight"><pre><span></span>cd libs/lib-shared
 git checkout -b feature-authors remotes/origin/dev
@@ -194,13 +194,13 @@ git push origin feature-authors
 </pre></div>
 
 
-<p><img alt="image" src="/assets/images/git_submodules_diagram_04.svg" /></p>
+<p><img alt="image" src="/blog/assets/images/git_submodules_diagram_04.svg" /></p>
 <p>The <code>+</code> sign beside lib-shared submodule shows that this subodule has changes which super-project does not added yet. the <code>-</code> sign beside protocol-x submodule indictes that this module has not been initialized. Since his changes to lib-shared has not been accepted yet, he should revert update this submodule to point at the right hash commit which dev knows:</p>
 <div class="highlight"><pre><span></span>$ git submodule update
 </pre></div>
 
 
-<p><img alt="image" src="/assets/images/git_submodules_diagram_05.svg" /></p>
+<p><img alt="image" src="/blog/assets/images/git_submodules_diagram_05.svg" /></p>
 <p>Now The manager is notified and should review kevin's changes and decide if it's good enough to be merged into lib-shared's dev branch:</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /home/manager/projects/super-project/libs/lib-shared
 $ git pull origin
@@ -212,7 +212,7 @@ $ git merge --no-ff feature-authors -m <span class="s2">&quot;merged feature aut
 </pre></div>
 
 
-<p><img alt="image" src="/assets/images/git_submodules_diagram_06.svg" /></p>
+<p><img alt="image" src="/blog/assets/images/git_submodules_diagram_06.svg" /></p>
 <p>Now lib-shared has reached v0.1-dev-3 should be included in super-project's dev branch:</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /home/manager/projects/super-project
 $ git submodule status
@@ -233,7 +233,7 @@ $ git push origin dev --recurse-submodules<span class="o">=</span>on-demand
 </pre></div>
 
 
-<p><img alt="image" src="/assets/images/git_submodules_diagram_07.svg" /></p>
+<p><img alt="image" src="/blog/assets/images/git_submodules_diagram_07.svg" /></p>
 <p>Now kevin can fetch new changes in dev:</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /home/kevin/projects/kevin-project
 $ git pull origin dev
@@ -241,7 +241,7 @@ $ git submodule update --remote
 </pre></div>
 
 
-<p><img alt="image" src="/assets/images/git_submodules_diagram_08.svg" /></p>
+<p><img alt="image" src="/blog/assets/images/git_submodules_diagram_08.svg" /></p>
 <p>Merging branches in super-project is a little tricky. When merging dev branch into master, we should always check not to change <code>.gitmodules</code> between merges. To do that we use <code>--no-commit</code> argument just to do merge the, and before <code>git commit</code> we should revert any changing comming from dev to master into <code>.gitmodules</code>:</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /home/manager/projects/super-project
 $ git checkout master
@@ -274,7 +274,7 @@ $ git push origin master
 </pre></div>
 
 
-<p><img alt="image" src="/assets/images/git_submodules_diagram_09.svg" /></p>
+<p><img alt="image" src="/blog/assets/images/git_submodules_diagram_09.svg" /></p>
     </div>
 
     <footer>
