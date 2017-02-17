@@ -1,5 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/gist.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2016-02-27T14:27:00+03:30</updated><entry><title>A dropdown Tiling Terminal for i3-wm</title><link href="http://bijanebrahimi.github.io/blog/a-dropdown-tiling-terminal-for-i3-wm.html" rel="alternate"></link><updated>2016-02-27T14:27:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-27:blog/a-dropdown-tiling-terminal-for-i3-wm.html</id><summary type="html">&lt;p&gt;&lt;a href="http://i3wm.org/docs/userguide.html#_scratchpad"&gt;Scratchpad&lt;/a&gt; is one of the
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/gist.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-02-17T12:04:00+03:30</updated><entry><title>GCC Cross-Compiler</title><link href="http://bijanebrahimi.github.io/blog/gcc-cross-compiler.html" rel="alternate"></link><updated>2017-02-17T12:04:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-17:blog/gcc-cross-compiler.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A cross compiler is a compiler capable of creating executable code for a platform other than the one on which the compiler is running. For example, a compiler that runs on a Windows 7 PC but generates code that runs on Android smartphone is a cross compiler.&lt;/p&gt;
+&lt;p&gt;--&lt;a href="https://en.wikipedia.org/wiki/Crosscompiler"&gt;Wikipedia&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Before we continue, there issome definitions we need to decide.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Build&lt;/strong&gt;: The machine you are building on which in our case, we're building our cross-compiler on a linux machine (&lt;code&gt;--host&lt;/code&gt; option).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Host&lt;/strong&gt;: The machine that you are building for and again, it's a linux machine we're trying to build our binaries (&lt;code&gt;--host&lt;/code&gt; option).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Target&lt;/strong&gt;: The machine that GCC will produce code for which is a freebsd machine (&lt;code&gt;--target&lt;/code&gt; option).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: To decide the values of the above configuration, simply run &lt;code&gt;gdb --version&lt;/code&gt; on the native machine. for a linux machine it's &lt;code&gt;x86_64-pc-linux-gnu&lt;/code&gt; and for my target machine it's &lt;code&gt;amd64-marcel-freebsd9.2&lt;/code&gt;. Since we're building and running our cross-compile on the same machine (&lt;code&gt;x86_64-pc-linux-gnu&lt;/code&gt;), we don't need to specify the build and the host configuration which gcc will pick automatically.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;TARGET&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;amd64-marcel-freebsd9.2
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And since, we don't wan to mix our cross-compile toolchains with our native binaries, we install our cross-compiler toolchains in the &lt;code&gt;/usr/cross-build&lt;/code&gt; directory:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PREFIX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/usr/cross-build
+$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;TARGET_PREFIX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX/$TARGET
+$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;$PATH:$PREFIX/bin
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;One more important note before start compiling is that we need the head-files and libraries of the target machine. So we should copy &lt;code&gt;/lib&lt;/code&gt; and &lt;code&gt;/include&lt;/code&gt; directories from our freebsd machine to our cross-build directory:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="n"&gt;mkdir&lt;/span&gt; -&lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="nv"&gt;$TARGET_PREFIX&lt;/span&gt;{,&lt;span class="sr"&gt;/lib,/&lt;/span&gt;&lt;span class="n"&gt;include&lt;/span&gt;}
+&lt;span class="c c-Singleline"&gt;# copy /lib and /include directories from our freebsd machine in our target $TARGET_PREFIX directory.&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;GCC requires that a compiled copy of binutils be available for each targeted platform. So we need to download the source code of binutils and compile it for the freebsd machine.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ mkdir -p build-binutils
+$ wget https://ftp.gnu.org/gnu/binutils/binutils-2.27.tar.gz
+$ tar zxvf binutils-2.27.tar.gz
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; build-binutils
+$ ../binutils-2.27/configure --target&lt;span class="o"&gt;=&lt;/span&gt;$TARGET --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX -v
+$ make -j 4
+$ sudo make install
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;GCC also depends on the following components:
+&lt;em&gt; GMP: GNU Multiple Precision Arithmetic Library
+&lt;/em&gt; MPFR: GNU Multiple-precision floating-point rounding library
+* MPC: GNU Multiple-precision C library&lt;/p&gt;
+&lt;p&gt;To build our cross-compiler, we need to compile these dependencies but since these dependencies should produce code for our target machine, we need to build them for the host option set to our tagret (&lt;code&gt;--host=amd64-marcel-freebsd9.2&lt;/code&gt;):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ mkdir build-gmp
+$ wget https://ftp.gnu.org/gnu/gmp/gmp-6.1.1.tar.xz
+$ tar xvf gmp-6.1.1.tar.xz
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; build-gmp
+$ ../gmp-6.1.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --enable-shared --enable-static --enable-mpbsd --enable-fft --enable-cxx --host&lt;span class="o"&gt;=&lt;/span&gt;$TARGET
+$ make -j 4
+$ sudo make install
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
+
+$ mkdir build-mpfr
+$ wget https://ftp.gnu.org/gnu/mpfr/mpfr-3.1.5.tar.xz
+$ tar xvf mpfr-3.1.5.tar.xz
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; build-mpfr
+$ ../mpfr-3.1.5/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX  --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;$TARGET
+$ make -j 4
+$ sudo make install
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
+
+$ mkdir build-mpci
+$ wget https://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz
+$ tar zxvf mpc-1.0.3.tar.gz
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; build-mpc
+$ ../mpc-1.0.3/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;$TARGET
+$ make -j 4
+$ sudo make install
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Finally, to compile gcc we need to specify where to look for it's dependencies above:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ mkdir build-gcc
+$ wget https://ftp.gnu.org/gnu/gcc/gcc-6.2.0/gcc-6.2.0.tar.gz
+$ tar zxvf gcc-6.2.0.tar.gz
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; build-gcc
+$ ../gcc-6.2.0/configure --without-headers --with-gnu-as --with-gnu-ld --enable-languages&lt;span class="o"&gt;=&lt;/span&gt;c,c++ --disable-nls --enable-libssp --enable-gold --enable-ld --target&lt;span class="o"&gt;=&lt;/span&gt;$TARGET --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-mpc&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --disable-libgomp
+$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX/lib make -j 4
+$ sudo make install
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, we should have our own cross-compiler's toolchain in &lt;code&gt;/usr/cross-build/bin&lt;/code&gt; directory. To use it we should include it in our &lt;code&gt;$PATH&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="x"&gt;export PATH=&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="x"&gt;:&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;PREFIX&lt;/span&gt;&lt;span class="x"&gt;/bin&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To test our own cross-compiler, we simply run:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcc main.c -o helloworld-linux
+$ file helloword-linux
+main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;SYSV&lt;span class="o"&gt;)&lt;/span&gt;, dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, &lt;span class="k"&gt;for&lt;/span&gt; GNU/Linux 2.6.32, BuildID&lt;span class="o"&gt;[&lt;/span&gt;sha1&lt;span class="o"&gt;]=&lt;/span&gt;ca5ba57ac722ef8521d50ee8ecbbdca4b44a76e1, not stripped
+$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX/lib amd64-marcel-freebsd9.2-gcc helloworld.c -o helloworld-freebsd
+$ file helloworld-freebsd
+main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;FreeBSD&lt;span class="o"&gt;)&lt;/span&gt;, dynamically linked, interpreter /libexec/ld-elf.so.1, &lt;span class="k"&gt;for&lt;/span&gt; FreeBSD 9.2, not stripped
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you need a cross-compile version of gdb, simply compile the gdb for the target machine like above:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ wget https://ftp.gnu.org/gnu/gdb/gdb-7.11.tar.xz
+$ tar xvf gdb-7.11.tar.xz
+$ ../gdb-7.11.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --target&lt;span class="o"&gt;=&lt;/span&gt;$TARGET
+$ make -j 4
+$ sudo make install
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can see the whole compile process in my &lt;a href="https://gist.github.com/bijanebrahimi/62596745808f8667c40ff91b07d9e7b8"&gt;github gist&lt;/a&gt;.&lt;/p&gt;</summary><category term="gist"></category><category term="gcc"></category><category term="cross-compiler"></category><category term="freebsd"></category><category term="linux"></category><category term="compiler"></category></entry><entry><title>A dropdown Tiling Terminal for i3-wm</title><link href="http://bijanebrahimi.github.io/blog/a-dropdown-tiling-terminal-for-i3-wm.html" rel="alternate"></link><updated>2016-02-27T14:27:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-27:blog/a-dropdown-tiling-terminal-for-i3-wm.html</id><summary type="html">&lt;p&gt;&lt;a href="http://i3wm.org/docs/userguide.html#_scratchpad"&gt;Scratchpad&lt;/a&gt; is one of the
 coolest, and unique features in &lt;a href="http://i3wm.org"&gt;i3&lt;/a&gt;. Scratchpad is basically a
 hidden workspace that you can send your programs into it.&lt;/p&gt;
 &lt;blockquote&gt;
