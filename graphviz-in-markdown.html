@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Graphviz in markdown</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/gist.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+</head>
+<body>
+
+    <div class="main-nav-container">
+
+        <div class="pure-g">
+            <div class="pure-u-1 pure-u-lg-2-3">
+                <div class="main-nav">
+                    <ul class="main-nav-list">
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/" class="pure-menu-link">Routines Excluded</a></li>
+
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/category/books.html" class="pure-menu-link">Books</a></li>
+                        <li class="main-nav-item active"><a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="pure-menu-link">Gist</a></li>
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/category/git.html" class="pure-menu-link">Git</a></li>
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
+                    </ul>
+                </div>
+             </div>
+
+             <div class="pure-u-1 pure-u-lg-1-3"></div>
+        </div>
+
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+            <div class="pure-u">
+                <a href="http://bijanebrahimi.github.io/blog/category/gist.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/category_gist_thumb.png " class="post-avatar" alt="Gist"></a>
+            </div>
+            <div class="pure-u-3-4 meta-data">
+                <a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="category">Gist</a><br />
+
+                <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+                &mdash; <abbr title="2017-02-20T20:12:00+03:30">Mon 20 February 2017</abbr>
+            </div>
+        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg);">
+                <img src="http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg" alt="Graphviz in markdown">
+                <div class="title">
+                <h1>
+                    Graphviz in markdown
+                </h1>
+                <h2>
+                    Or How I use dot graph in Gitlab's Markdown formatted files
+                </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <h1>Introduction</h1>
+<p>There is a good tutorial on <a href="https://github.com/TLmaK0/gravizo">How to include graphviz graphs in github</a>. Basically it introduced me to an online web service which takes graphviz scripts as part of a url query string and renders it into an image type. It is a very good idea for many reasons. One, the graph is still plain text and searchable inside source files, Second, editing an already drawn graph inside a wiki page is now very easy and the dot files are pretty easy to write.</p>
+<h1>Problem?</h1>
+<p>So, what's the problem? As I said, It was a good idea (even our Project Manager liked it since we're about to move our project's knowledge base into a local Gitlab's server, way better than using <a href="http://asciiflow.com">asciiflow.com</a>). The Only problem was that It was an unnecessary dependency to use an remote web-service and I thought why not I build our own local version of it? So, I did.</p>
+<h1>Requirments</h1>
+<p>Since we already had an omnibus version of gitlab running on a debian server, I tried to write a simple php-script serving on the already running bundle version of nginx in gitlab omnibus package. The following is the work around. If you have a similiar but not quiet the same situation, you may consider changing the following steps as fits your needs so I try to explain as much as needed.</p>
+<h1>Gitlab's Nginx, a proxy to local Apache</h1>
+<p>Since I knew php way better than ruby (still I'm not a php developer anymore), I deided to write my graphviz web-service in php language, so I installed apache (running on port 8090) and php and no to forget, the graphviz command tools:</p>
+<div class="highlight"><pre><span></span>$ apt-get install apache2 libapache2-mod-php5 graphviz
+$ editor /etc/apache2/ports.conf
+Listen 8090
+$ editor /etc/apache2/sites-enabled/000-default.conf
+<span class="nt">&lt;VirtualHost</span> <span class="err">*:8090</span><span class="nt">&gt;</span>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/webtools.company_domain.net
+  ErrorLog <span class="cp">${</span><span class="n">APACHE_LOG_DIR</span><span class="cp">}</span>/error.log
+  CustomLog <span class="cp">${</span><span class="n">APACHE_LOG_DIR</span><span class="cp">}</span>/access.log combined
+<span class="nt">&lt;/VirtualHost&gt;</span>
+</pre></div>
+
+
+<p>and set the gitlab's nginx to work as a proxy to my apache web-server:</p>
+<div class="highlight"><pre><span></span>$ editor /var/opt/gitlab/nginx/conf/webtools.company_domain.net
+server <span class="o">{</span>
+  listen *:80<span class="p">;</span>
+  server_name webtools.company_domain.net<span class="p">;</span>
+  access_log /var/log/webtools.company_domain.net.access.log<span class="p">;</span>
+  error_log /var/log/webtools.company_domain.net.error.log<span class="p">;</span>
+  location / <span class="o">{</span>
+    proxy_pass http://127.0.0.1:8090<span class="p">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+$ nano /etc/gitlab/gitlab.rb
+nginx<span class="o">[</span><span class="s1">&#39;custom_nginx_config&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;include /var/opt/gitlab/nginx/conf/webtools.company_domain.net;&quot;</span>
+</pre></div>
+
+
+<p>Now we shoould reconfigure gitlab to create the new nginx configuration file from our changes in <code>/etc/gitlab/gitlab.rb</code>:</p>
+<div class="highlight"><pre><span></span>$ gitlab-ctl reconfigure
+$ gitlab-ctl restart nginx
+</pre></div>
+
+
+<p>Now the only missing pieces is the actual php script. Since it's a prototype version of our graphviz web service, we only render svg formats:</p>
+<div class="highlight"><pre><span></span><span class="nx">$</span> <span class="nx">nano</span> <span class="o">/</span><span class="kd">var</span><span class="err">/www/webtools.company_domain.net/graphviz/index.php</span>
+<span class="cp">&lt;?php</span>
+  <span class="nv">$dot_content</span> <span class="o">=</span> <span class="nb">rawurldecode</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;QUERY_STRING&#39;</span><span class="p">]);</span>
+  <span class="nv">$dot_file</span> <span class="o">=</span> <span class="nb">tempnam</span><span class="p">(</span><span class="s2">&quot;/tmp&quot;</span><span class="p">,</span> <span class="s2">&quot;dot_&quot;</span><span class="p">);</span>
+  <span class="nb">file_put_contents</span><span class="p">(</span><span class="nv">$dot_file</span><span class="p">,</span> <span class="nv">$dot_content</span><span class="p">);</span>
+  <span class="nb">header</span><span class="p">(</span><span class="s1">&#39;Content-type: image/svg+xml&#39;</span><span class="p">);</span>
+  <span class="nb">system</span><span class="p">(</span><span class="s2">&quot;dot -Tsvg &quot;</span><span class="o">.</span><span class="nv">$dot_file</span><span class="p">);</span>
+  <span class="nb">unlink</span><span class="p">(</span><span class="nv">$dot_file</span><span class="p">);</span>
+<span class="cp">?&gt;</span>
+</pre></div>
+
+
+<p>Now, the following markdown script should nicely render as a svg image in our rendered markdown wiki pages:</p>
+<div class="highlight"><pre><span></span><span class="o">!</span><span class="p">[</span><span class="n">Alt</span> <span class="n">Text</span><span class="p">](</span><span class="nl">http</span><span class="p">:</span><span class="c1">//webtools.company_domain.net/graphviz/?</span>
+<span class="n">digraph</span> <span class="n">G</span> <span class="p">{</span>
+    <span class="n">aize</span> <span class="o">=</span><span class="s">&quot;4,4&quot;</span><span class="p">;</span>
+    <span class="n">main</span> <span class="p">[</span><span class="n">shape</span><span class="o">=</span><span class="n">box</span><span class="p">];</span>
+    <span class="n">main</span> <span class="o">-&gt;</span> <span class="n">parse</span> <span class="p">[</span><span class="n">weight</span><span class="o">=</span><span class="mi">8</span><span class="p">];</span>
+    <span class="n">parse</span> <span class="o">-&gt;</span> <span class="n">execute</span><span class="p">;</span>
+    <span class="n">main</span> <span class="o">-&gt;</span> <span class="n">init</span> <span class="p">[</span><span class="n">style</span><span class="o">=</span><span class="n">dotted</span><span class="p">];</span>
+    <span class="n">main</span> <span class="o">-&gt;</span> <span class="n">cleanup</span><span class="p">;</span>
+    <span class="n">execute</span> <span class="o">-&gt;</span> <span class="p">{</span> <span class="n">make_string</span><span class="p">;</span> <span class="n">printf</span><span class="p">};</span>
+    <span class="n">init</span> <span class="o">-&gt;</span> <span class="n">make_string</span><span class="p">;</span>
+    <span class="n">edge</span> <span class="p">[</span><span class="n">color</span><span class="o">=</span><span class="n">red</span><span class="p">];</span>
+    <span class="n">main</span> <span class="o">-&gt;</span> <span class="n">printf</span> <span class="p">[</span><span class="n">style</span><span class="o">=</span><span class="n">bold</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s">&quot;100 times&quot;</span><span class="p">];</span>
+    <span class="n">make_string</span> <span class="p">[</span><span class="n">label</span><span class="o">=</span><span class="s">&quot;make a string&quot;</span><span class="p">];</span>
+    <span class="n">node</span> <span class="p">[</span><span class="n">shape</span><span class="o">=</span><span class="n">box</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="n">filled</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s">&quot;.7 .3 1.0&quot;</span><span class="p">];</span>
+    <span class="n">execute</span> <span class="o">-&gt;</span> <span class="n">compare</span><span class="p">;</span>
+  <span class="p">})</span>
+</pre></div>
+
+
+<p>Hope it helps other people as well :-)</p>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/gitlab.html">gitlab</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/wiki.html">wiki</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/graphviz.html">graphviz</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/debian.html">debian</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/omnibus.html">omnibus</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/apache.html">apache</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/nginx.html">nginx</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/php.html">php</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/dot.html">dot</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/svg.html">svg</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/author.jpg" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
+                        <p class="author-description">
+                          
+            I Love to Read, Code and Explore the Possibilities.
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="pure-u-1 pure-u-md-1-2">
+
+                <div class="pure-g post-category-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/category/gist.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/category_gist_thumb.png" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/category/gist.html">Gist</a></h3>
+                        <p class="author-description">
+                          Useful snippets of code
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'bijanebrahimi';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+</body>
+</html>
