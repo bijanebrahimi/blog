@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Freebsd's Mount.conf</title>
+        <title>Freebsd's .mount.conf</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
@@ -54,10 +54,10 @@
         <div class="background-image-container">
 
             <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://bijanebrahimi.github.io/blog/assets/images/post_category_freebsd.png);">
-                <img src="http://bijanebrahimi.github.io/blog/assets/images/post_category_freebsd.png" alt="Freebsd's Mount.conf">
+                <img src="http://bijanebrahimi.github.io/blog/assets/images/post_category_freebsd.png" alt="Freebsd's .mount.conf">
                 <div class="title">
                 <h1>
-                    Freebsd's Mount.conf
+                    Freebsd's .mount.conf
                 </h1>
                 <h2>
                     How to boot FreeBSD's ISO image file from GRUB
@@ -70,32 +70,32 @@
     <div class="entry-content">
         <h1>Introduction</h1>
 <p>As I'm getting more and more familiar with the FreeBSD Operating System and
-it's wonderfull architeture and design, I found the need to start booting different
-versions of FreeBSD specially at work and since it's not a good Idea to install
+it's wonderfull architeture and design, I found the need to work with different
+versions of FreeBSD live (specially at work) and since it's not a good idea to install
 every single version I needed into a USB flash drive, I tried Grub to boot a given
 Freebsd ISO image (admittedly I'm still unfamiliar with the powers of FreeBSD's
 own boot loader program).</p>
 <h1>How Grub is booting an ISO image</h1>
-<p>Essentially what thegrub does, is loading the given ISO image using <code>loopback</code>
+<p>Essentially what the grub does, is loading the given ISO image using <code>loopback</code>
 command as a loop device and mount it in a special <code>(loop)</code> directory. That's
 pretty much all that grub does before loading the kernel into memory thus
 executing it. After passing the execution process to the kernel, the special loop device
-is lost and kernel at some point needs to mount it's root file system in order to
-complete it's boot process. This process of mounting the root filesystem 
+is lost and kernel at some point needs to remount it again in order to
+complete it's booting process. This process of mounting the root filesystem 
 may differ between operating systems. For example, Ubuntu uses a parameter passed
 to kernel named <code>iso-scan/filename</code> which essentially tells the kernel to look for
-which file to mount as an iso image file. Kernel does this by mounting every existing
+which file to mount as root filesystem. Kernel does this by mounting every existing
 partitions looking for this speific path and when it finds it, it mounts it as
-it's root filesystem and the process of booting the kernel continues.</p>
+root filesystem and the process of booting the kernel continues.</p>
 <h1>How to boot FreeBSD from an ISO image</h1>
 <p>As I searched the web, I found a few other people having the same problem booting
-FreeBSD from ISO images and there are a few interesting solutions like using a
-<code>bootonly</code> FreeBSD ISO image or <a href="http://mfsbsd.vx.sk/">mfsBSD</a> which is a set of
-scripts builting a special FreeBSD kernel loaded entirely into RAM thus free of
-mounting it's root filesystem at the first place. But I find different solution
-for my needs which needs no special FreeBSD ISO image.</p>
+FreeBSD from ISO images and found a few interesting solutions like
+<a href="http://mfsbsd.vx.sk/">mfsBSD</a> which is a set of scripts building a special
+FreeBSD kernel loaded entirely into RAM thus no need to mounting the root
+filesystem at the first place. But that wasn't my solution till I find FreeBSD's
+mount configuration file manual.</p>
 <h1>FreeBSD's <code>.mount.conf</code> To Rescue</h1>
-<p>Apparantly FreeBSD provides a kind of scriptable process of finding and mounting
+<p>FreeBSD provides a kind of scriptable process of finding and mounting
 the root filesystem via a file named <code>.mount.conf</code>. The process of mounting the
 root filesystem is fully described in the <a href="https://www.freebsd.org/cgi/man.cgi?query=mount.conf">man page</a>:</p>
 <p>What is interesting is that the kernel can follow the intructions in the <code>.mount.conf</code>
@@ -195,7 +195,8 @@ devfs              <span class="m">1</span>       <span class="m">1</span>      
 </pre></div>
 
 
-<p>Hope it helps other :-)</p>
+<p>Look that the old root filesystem (<code>/dev/da0s1</code>) is re-mounted on <code>/mnt</code> as
+described in manual. Hope it helps other :-)</p>
     </div>
 
     <footer>
