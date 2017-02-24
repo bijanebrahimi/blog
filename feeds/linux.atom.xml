@@ -139,7 +139,7 @@ from about 3 hours to almost 4 and a half hours.&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: The tests and battery benchmark did not placed in a controlled
 environment but it seems logical to expect similar effects.&lt;/p&gt;
-&lt;/blockquote&gt;</summary><category term="linux"></category><category term="powertop"></category><category term="power"></category></entry><entry><title>Multiseat Linux Desktop, Multiple X servers</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html" rel="alternate"></link><updated>2014-10-22T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-22:blog/multiseat-linux-desktop-multiple-x-servers.html</id><summary type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
+&lt;/blockquote&gt;</summary><category term="linux"></category><category term="powertop"></category><category term="power"></category></entry><entry><title>Multiseat Linux Desktop, Multiple X servers</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html" rel="alternate"></link><updated>2014-10-22T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-22:blog/multiseat-linux-desktop-multiple-x-servers.html</id><summary type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="{filename}/multiseat-linux-desktop.md"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
 &lt;h3&gt;Hardware Requirements&lt;/h3&gt;
 &lt;p&gt;for each user, we need seperate:&lt;/p&gt;
 &lt;ul&gt;
@@ -329,7 +329,7 @@ a monitor, and possibly headphones --Wikipedia&lt;/p&gt;
 &lt;h3&gt;GNU/Linux Solutions&lt;/h3&gt;
 &lt;p&gt;as it may be obvious, there are numbers of solution to do configure the GNU/Linux system to fit my need. so, in the following next articles (below links), i will explain these solution as i experienced them. i try to do them separately and independently, so you can skip ones you are not interested about. here are what i found:&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;&lt;a href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html"&gt;Multiple X servers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="{filename}/multiseat-linux-desktop-multiple-x-servers.md"&gt;Multiple X servers&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;Nested X servers (i will write about it very soon)&lt;/li&gt;
 &lt;li&gt;The Multi-seat display manager&lt;/li&gt;
 &lt;/ol&gt;</summary><category term="X11"></category><category term="config"></category></entry></feed>

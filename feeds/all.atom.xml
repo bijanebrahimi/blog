@@ -1,5 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-02-20T20:12:00+03:30</updated><entry><title>Graphviz in markdown</title><link href="http://bijanebrahimi.github.io/blog/graphviz-in-markdown.html" rel="alternate"></link><updated>2017-02-20T20:12:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-20:blog/graphviz-in-markdown.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-02-24T22:05:00+03:30</updated><entry><title>Freebsd's Mount.conf</title><link href="http://bijanebrahimi.github.io/blog/freebsds-mountconf.html" rel="alternate"></link><updated>2017-02-24T22:05:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-24:blog/freebsds-mountconf.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;As I'm getting more and more familiar with the FreeBSD Operating System and
+it's wonderfull architeture and design, I found the need to start booting different
+versions of FreeBSD specially at work and since it's not a good Idea to install
+every single version I needed into a USB flash drive, I tried Grub to boot a given
+Freebsd ISO image (admittedly I'm still unfamiliar with the powers of FreeBSD's
+own boot loader program).&lt;/p&gt;
+&lt;h1&gt;How Grub is booting an ISO image&lt;/h1&gt;
+&lt;p&gt;Essentially what thegrub does, is loading the given ISO image using &lt;code&gt;loopback&lt;/code&gt;
+command as a loop device and mount it in a special &lt;code&gt;(loop)&lt;/code&gt; directory. That's
+pretty much all that grub does before loading the kernel into memory thus
+executing it. After passing the execution process to the kernel, the special loop device
+is lost and kernel at some point needs to mount it's root file system in order to
+complete it's boot process. This process of mounting the root filesystem 
+may differ between operating systems. For example, Ubuntu uses a parameter passed
+to kernel named &lt;code&gt;iso-scan/filename&lt;/code&gt; which essentially tells the kernel to look for
+which file to mount as an iso image file. Kernel does this by mounting every existing
+partitions looking for this speific path and when it finds it, it mounts it as
+it's root filesystem and the process of booting the kernel continues.&lt;/p&gt;
+&lt;h1&gt;How to boot FreeBSD from an ISO image&lt;/h1&gt;
+&lt;p&gt;As I searched the web, I found a few other people having the same problem booting
+FreeBSD from ISO images and there are a few interesting solutions like using a
+&lt;code&gt;bootonly&lt;/code&gt; FreeBSD ISO image or &lt;a href="http://mfsbsd.vx.sk/"&gt;mfsBSD&lt;/a&gt; which is a set of
+scripts builting a special FreeBSD kernel loaded entirely into RAM thus free of
+mounting it's root filesystem at the first place. But I find different solution
+for my needs which needs no special FreeBSD ISO image.&lt;/p&gt;
+&lt;h1&gt;FreeBSD's &lt;code&gt;.mount.conf&lt;/code&gt; To Rescue&lt;/h1&gt;
+&lt;p&gt;Apparantly FreeBSD provides a kind of scriptable process of finding and mounting
+the root filesystem via a file named &lt;code&gt;.mount.conf&lt;/code&gt;. The process of mounting the
+root filesystem is fully described in the &lt;a href="https://www.freebsd.org/cgi/man.cgi?query=mount.conf"&gt;man page&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;What is interesting is that the kernel can follow the intructions in the &lt;code&gt;.mount.conf&lt;/code&gt;
+file in the root filesystem it mounts (if exists) and change it's current root
+filesystem accordingly:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;{FS}:{MOUNTPOINT} {OPTIONS}&lt;/code&gt;
+The kernel will try to mount this in an operation equivalent to:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;mount -t {FS} -o {OPTIONS} {MOUNTPOINT} /&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;If this is successfully mounted, further lines in .mount.conf
+are ignored.  If all lines in .mount.conf have been processed
+and no root file system has been successfully mounted, then
+the action specified by &lt;code&gt;.onfail&lt;/code&gt; is performed.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;.ask&lt;/code&gt; When the kernel processes this line, a &lt;code&gt;mountroot&amp;gt;&lt;/code&gt; command-
+line prompt is displayed. At this prompt, the operator can
+enter the the root mount.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;.md file&lt;/code&gt; Create a memory backed &lt;a href="https://www.freebsd.org/cgi/man.cgi?query=md"&gt;md(4)&lt;/a&gt; virtual disk, using file as the
+backing store.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;So what the really need to do is to put a mount config file in our USB flash drive's
+root directory which should contain a &lt;code&gt;md&lt;/code&gt; command creating a memory backed
+virtual disk from our FreeBSD's iso image and then mount it as our new root
+filesystem:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="na"&gt;.timeout&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;
+&lt;span class="na"&gt;.md&lt;/span&gt; &lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="no"&gt;iso&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="no"&gt;FreeBSD-11.0-RELEASE-amd64-dvd1.iso&lt;/span&gt;
+&lt;span class="na"&gt;.timeout&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;
+&lt;span class="nl"&gt;cd9660:&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="nf"&gt;dev&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="no"&gt;md&lt;/span&gt;&lt;span class="c"&gt;# ro&lt;/span&gt;
+&lt;span class="na"&gt;.ask&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;Important&lt;/strong&gt;: please note that when the kernel mounts the new rootfilesystem, 
+there should be a directory named &lt;code&gt;dev&lt;/code&gt; inside the new root filesystem for kernerl
+to remount the &lt;code&gt;devfs&lt;/code&gt; on it. The whole process fails (sadly with no proper 
+message) if the &lt;code&gt;dev&lt;/code&gt; doesn't exist.&lt;/p&gt;
+&lt;h1&gt;The Solution&lt;/h1&gt;
+&lt;p&gt;The following is the whole process plus formatting and installing grub from a
+debian-based linux distro:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Installing GRUB, Assuming /dev/sdb is the USB flash drive device&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mount /dev/sdb1 /mnt&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mkdir /mnt/boot&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; grub-install --boot-directory=/mnt/boot /dev/sdb&lt;/span&gt;
+
+&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Copy FreeBSD iso image and creating proper grub configuration file&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mkdir /mnt/iso&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cp ~/Downloads/FreeBSD-11.0-RELEASE-amd64-dvd1.iso /mnt/iso&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cat &amp;gt; /mnt/boot/grub/grub.cfg &amp;lt;&amp;lt; EOF&lt;/span&gt;
+&lt;span class="x"&gt;insmod loopback&lt;/span&gt;
+&lt;span class="x"&gt;insmod iso9660&lt;/span&gt;
+&lt;span class="x"&gt;insmod ufs2&lt;/span&gt;
+&lt;span class="x"&gt;insmod ntfs&lt;/span&gt;
+&lt;span class="x"&gt;menuentry &amp;quot;FreeBSD 11.0 amd64&amp;quot; &lt;/span&gt;&lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+&lt;span class="x"&gt;  set isofile=&amp;quot;/iso/FreeBSD-11.0-RELEASE-amd64-dvd1.iso&amp;quot;&lt;/span&gt;
+&lt;span class="x"&gt;  loopback loop (hd0,1)&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;isofile&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+&lt;span class="x"&gt;  kfreebsd  (loop)/boot/kernel/kernel&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+&lt;span class="x"&gt;EOF&lt;/span&gt;
+
+&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Create FreeBSD mount configuration file&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mkdir /mnt/dev&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cat &amp;gt; /mnt/.mount.conf &amp;lt;&amp;lt; EOF&lt;/span&gt;
+&lt;span class="x"&gt;.timeout 3&lt;/span&gt;
+&lt;span class="x"&gt;.md /iso/FreeBSD-11.0-RELEASE-amd64-dvd1.iso&lt;/span&gt;
+&lt;span class="x"&gt;.timeout 4&lt;/span&gt;
+&lt;span class="x"&gt;cd9660:/dev/md&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; ro&lt;/span&gt;
+&lt;span class="x"&gt;.ask&lt;/span&gt;
+&lt;span class="x"&gt;EOF&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That's It. Now after reboot and booting the USB flash drive, GRUB loads the
+freebsd kernel from it's &lt;code&gt;loopback&lt;/code&gt; device, and when FreeBSD kernel loads, it
+fails mounting the root filesystem and drops into a prompt command line asking
+for the root filesystem. We can Enter &lt;code&gt;?&lt;/code&gt; to first get a list of known devies
+and Then mount our USB flash drive partition as a temporary root filesystem
+allowing kernel to find our &lt;code&gt;.mount.conf&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mountroot&amp;gt; msdosfs:/dev/da0s1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This last step can be avoided by setting the &lt;code&gt;FreeBSD.vfs.root.mountfrom&lt;/code&gt; option
+from grub which I have not tested yet:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;set FreeBSD.vfs.root.mountfrom=msdosfs:/dev/da0s1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If nothing goes wrong (specially if you didn't forget to create a &lt;code&gt;dev&lt;/code&gt;
+directory in USB flash drive's root directory) you should login into your FreeBSD
+iso image:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ df
+Filesystem 1K-blocks    Used  Avail Capcity  Mounted on
+/dev/md0      &lt;span class="m"&gt;286146&lt;/span&gt; &lt;span class="m"&gt;2861416&lt;/span&gt;      &lt;span class="m"&gt;8&lt;/span&gt;    100%  /
+/dev/da0s1   &lt;span class="m"&gt;7561408&lt;/span&gt; &lt;span class="m"&gt;6621600&lt;/span&gt;  &lt;span class="m"&gt;99808&lt;/span&gt;     88%  /mnt
+devfs              &lt;span class="m"&gt;1&lt;/span&gt;       &lt;span class="m"&gt;1&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;    100%  /dev
+/dev/md1       &lt;span class="m"&gt;31260&lt;/span&gt;     &lt;span class="m"&gt;308&lt;/span&gt;  &lt;span class="m"&gt;28452&lt;/span&gt;      1%  /var
+/dev/md2       &lt;span class="m"&gt;19356&lt;/span&gt;      &lt;span class="m"&gt;28&lt;/span&gt;  &lt;span class="m"&gt;17780&lt;/span&gt;      0%  /tmp
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Hope it helps other :-)&lt;/p&gt;</summary><category term="freebsd"></category><category term="grub"></category><category term="iso"></category><category term="mount.conf"></category></entry><entry><title>Graphviz in markdown</title><link href="http://bijanebrahimi.github.io/blog/graphviz-in-markdown.html" rel="alternate"></link><updated>2017-02-20T20:12:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-20:blog/graphviz-in-markdown.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;There is a good tutorial on &lt;a href="https://github.com/TLmaK0/gravizo"&gt;How to include graphviz graphs in github&lt;/a&gt;. Basically it introduced me to an online web service which takes graphviz scripts as part of a url query string and renders it into an image type. It is a very good idea for many reasons. One, the graph is still plain text and searchable inside source files, Second, editing an already drawn graph inside a wiki page is now very easy and the dot files are pretty easy to write.&lt;/p&gt;
 &lt;h1&gt;Problem?&lt;/h1&gt;
 &lt;p&gt;So, what's the problem? As I said, It was a good idea (even our Project Manager liked it since we're about to move our project's knowledge base into a local Gitlab's server, way better than using &lt;a href="http://asciiflow.com"&gt;asciiflow.com&lt;/a&gt;). The Only problem was that It was an unnecessary dependency to use an remote web-service and I thought why not I build our own local version of it? So, I did.&lt;/p&gt;
@@ -658,7 +785,7 @@ from about 3 hours to almost 4 and a half hours.&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: The tests and battery benchmark did not placed in a controlled
 environment but it seems logical to expect similar effects.&lt;/p&gt;
-&lt;/blockquote&gt;</summary><category term="linux"></category><category term="powertop"></category><category term="power"></category></entry><entry><title>Multiseat Linux Desktop, Multiple X servers</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html" rel="alternate"></link><updated>2014-10-22T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-22:blog/multiseat-linux-desktop-multiple-x-servers.html</id><summary type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
+&lt;/blockquote&gt;</summary><category term="linux"></category><category term="powertop"></category><category term="power"></category></entry><entry><title>Multiseat Linux Desktop, Multiple X servers</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html" rel="alternate"></link><updated>2014-10-22T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-22:blog/multiseat-linux-desktop-multiple-x-servers.html</id><summary type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="{filename}/multiseat-linux-desktop.md"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
 &lt;h3&gt;Hardware Requirements&lt;/h3&gt;
 &lt;p&gt;for each user, we need seperate:&lt;/p&gt;
 &lt;ul&gt;
@@ -848,7 +975,7 @@ a monitor, and possibly headphones --Wikipedia&lt;/p&gt;
 &lt;h3&gt;GNU/Linux Solutions&lt;/h3&gt;
 &lt;p&gt;as it may be obvious, there are numbers of solution to do configure the GNU/Linux system to fit my need. so, in the following next articles (below links), i will explain these solution as i experienced them. i try to do them separately and independently, so you can skip ones you are not interested about. here are what i found:&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;&lt;a href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html"&gt;Multiple X servers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="{filename}/multiseat-linux-desktop-multiple-x-servers.md"&gt;Multiple X servers&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;Nested X servers (i will write about it very soon)&lt;/li&gt;
 &lt;li&gt;The Multi-seat display manager&lt;/li&gt;
 &lt;/ol&gt;</summary><category term="X11"></category><category term="config"></category></entry></feed>

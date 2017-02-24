@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Freebsd's Mount.conf</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/freebsd.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+</head>
+<body>
+
+    <div class="main-nav-container">
+
+        <div class="pure-g">
+            <div class="pure-u-1 pure-u-lg-2-3">
+                <div class="main-nav">
+                    <ul class="main-nav-list">
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/" class="pure-menu-link">Routines Excluded</a></li>
+
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/pages/bookmarks.html" class="pure-menu-link">Bookmarks</a></li>
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/category/books.html" class="pure-menu-link">Books</a></li>
+                        <li class="main-nav-item active"><a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="pure-menu-link">FreeBSD</a></li>
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="pure-menu-link">Gist</a></li>
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/category/git.html" class="pure-menu-link">Git</a></li>
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+                        <li class="main-nav-item"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
+                    </ul>
+                </div>
+             </div>
+
+             <div class="pure-u-1 pure-u-lg-1-3"></div>
+        </div>
+
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+            <div class="pure-u-3-4 meta-data">
+                <a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="category">FreeBSD</a><br />
+
+                <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+                &mdash; <abbr title="2017-02-24T22:05:00+03:30">Fri 24 February 2017</abbr>
+            </div>
+        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://bijanebrahimi.github.io/blog/assets/images/post_category_freebsd.png);">
+                <img src="http://bijanebrahimi.github.io/blog/assets/images/post_category_freebsd.png" alt="Freebsd's Mount.conf">
+                <div class="title">
+                <h1>
+                    Freebsd's Mount.conf
+                </h1>
+                <h2>
+                    How to boot FreeBSD's ISO image file from GRUB
+                </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <h1>Introduction</h1>
+<p>As I'm getting more and more familiar with the FreeBSD Operating System and
+it's wonderfull architeture and design, I found the need to start booting different
+versions of FreeBSD specially at work and since it's not a good Idea to install
+every single version I needed into a USB flash drive, I tried Grub to boot a given
+Freebsd ISO image (admittedly I'm still unfamiliar with the powers of FreeBSD's
+own boot loader program).</p>
+<h1>How Grub is booting an ISO image</h1>
+<p>Essentially what thegrub does, is loading the given ISO image using <code>loopback</code>
+command as a loop device and mount it in a special <code>(loop)</code> directory. That's
+pretty much all that grub does before loading the kernel into memory thus
+executing it. After passing the execution process to the kernel, the special loop device
+is lost and kernel at some point needs to mount it's root file system in order to
+complete it's boot process. This process of mounting the root filesystem 
+may differ between operating systems. For example, Ubuntu uses a parameter passed
+to kernel named <code>iso-scan/filename</code> which essentially tells the kernel to look for
+which file to mount as an iso image file. Kernel does this by mounting every existing
+partitions looking for this speific path and when it finds it, it mounts it as
+it's root filesystem and the process of booting the kernel continues.</p>
+<h1>How to boot FreeBSD from an ISO image</h1>
+<p>As I searched the web, I found a few other people having the same problem booting
+FreeBSD from ISO images and there are a few interesting solutions like using a
+<code>bootonly</code> FreeBSD ISO image or <a href="http://mfsbsd.vx.sk/">mfsBSD</a> which is a set of
+scripts builting a special FreeBSD kernel loaded entirely into RAM thus free of
+mounting it's root filesystem at the first place. But I find different solution
+for my needs which needs no special FreeBSD ISO image.</p>
+<h1>FreeBSD's <code>.mount.conf</code> To Rescue</h1>
+<p>Apparantly FreeBSD provides a kind of scriptable process of finding and mounting
+the root filesystem via a file named <code>.mount.conf</code>. The process of mounting the
+root filesystem is fully described in the <a href="https://www.freebsd.org/cgi/man.cgi?query=mount.conf">man page</a>:</p>
+<p>What is interesting is that the kernel can follow the intructions in the <code>.mount.conf</code>
+file in the root filesystem it mounts (if exists) and change it's current root
+filesystem accordingly:</p>
+<blockquote>
+<p><code>{FS}:{MOUNTPOINT} {OPTIONS}</code>
+The kernel will try to mount this in an operation equivalent to:</p>
+<p><code>mount -t {FS} -o {OPTIONS} {MOUNTPOINT} /</code></p>
+<p>If this is successfully mounted, further lines in .mount.conf
+are ignored.  If all lines in .mount.conf have been processed
+and no root file system has been successfully mounted, then
+the action specified by <code>.onfail</code> is performed.</p>
+<p><code>.ask</code> When the kernel processes this line, a <code>mountroot&gt;</code> command-
+line prompt is displayed. At this prompt, the operator can
+enter the the root mount.</p>
+<p><code>.md file</code> Create a memory backed <a href="https://www.freebsd.org/cgi/man.cgi?query=md">md(4)</a> virtual disk, using file as the
+backing store.</p>
+</blockquote>
+<p>So what the really need to do is to put a mount config file in our USB flash drive's
+root directory which should contain a <code>md</code> command creating a memory backed
+virtual disk from our FreeBSD's iso image and then mount it as our new root
+filesystem:</p>
+<div class="highlight"><pre><span></span><span class="na">.timeout</span> <span class="mi">3</span>
+<span class="na">.md</span> <span class="err">/</span><span class="no">iso</span><span class="err">/</span><span class="no">FreeBSD-11.0-RELEASE-amd64-dvd1.iso</span>
+<span class="na">.timeout</span> <span class="mi">4</span>
+<span class="nl">cd9660:</span><span class="err">/</span><span class="nf">dev</span><span class="err">/</span><span class="no">md</span><span class="c"># ro</span>
+<span class="na">.ask</span>
+</pre></div>
+
+
+<p><strong>Important</strong>: please note that when the kernel mounts the new rootfilesystem, 
+there should be a directory named <code>dev</code> inside the new root filesystem for kernerl
+to remount the <code>devfs</code> on it. The whole process fails (sadly with no proper 
+message) if the <code>dev</code> doesn't exist.</p>
+<h1>The Solution</h1>
+<p>The following is the whole process plus formatting and installing grub from a
+debian-based linux distro:</p>
+<div class="highlight"><pre><span></span><span class="err">#</span><span class="x"> Installing GRUB, Assuming /dev/sdb is the USB flash drive device</span>
+<span class="p">$</span><span class="x"> mount /dev/sdb1 /mnt</span>
+<span class="p">$</span><span class="x"> mkdir /mnt/boot</span>
+<span class="p">$</span><span class="x"> grub-install --boot-directory=/mnt/boot /dev/sdb</span>
+
+<span class="err">#</span><span class="x"> Copy FreeBSD iso image and creating proper grub configuration file</span>
+<span class="p">$</span><span class="x"> mkdir /mnt/iso</span>
+<span class="p">$</span><span class="x"> cp ~/Downloads/FreeBSD-11.0-RELEASE-amd64-dvd1.iso /mnt/iso</span>
+<span class="p">$</span><span class="x"> cat &gt; /mnt/boot/grub/grub.cfg &lt;&lt; EOF</span>
+<span class="x">insmod loopback</span>
+<span class="x">insmod iso9660</span>
+<span class="x">insmod ufs2</span>
+<span class="x">insmod ntfs</span>
+<span class="x">menuentry &quot;FreeBSD 11.0 amd64&quot; </span><span class="err">{</span><span class="x"></span>
+<span class="x">  set isofile=&quot;/iso/FreeBSD-11.0-RELEASE-amd64-dvd1.iso&quot;</span>
+<span class="x">  loopback loop (hd0,1)</span><span class="p">$</span><span class="nv">isofile</span><span class="x"></span>
+<span class="x">  kfreebsd  (loop)/boot/kernel/kernel</span>
+<span class="x">}</span>
+<span class="x">EOF</span>
+
+<span class="err">#</span><span class="x"> Create FreeBSD mount configuration file</span>
+<span class="p">$</span><span class="x"> mkdir /mnt/dev</span>
+<span class="p">$</span><span class="x"> cat &gt; /mnt/.mount.conf &lt;&lt; EOF</span>
+<span class="x">.timeout 3</span>
+<span class="x">.md /iso/FreeBSD-11.0-RELEASE-amd64-dvd1.iso</span>
+<span class="x">.timeout 4</span>
+<span class="x">cd9660:/dev/md</span><span class="err">#</span><span class="x"> ro</span>
+<span class="x">.ask</span>
+<span class="x">EOF</span>
+</pre></div>
+
+
+<p>That's It. Now after reboot and booting the USB flash drive, GRUB loads the
+freebsd kernel from it's <code>loopback</code> device, and when FreeBSD kernel loads, it
+fails mounting the root filesystem and drops into a prompt command line asking
+for the root filesystem. We can Enter <code>?</code> to first get a list of known devies
+and Then mount our USB flash drive partition as a temporary root filesystem
+allowing kernel to find our <code>.mount.conf</code> file:</p>
+<div class="highlight"><pre><span></span>mountroot&gt; msdosfs:/dev/da0s1
+</pre></div>
+
+
+<p>This last step can be avoided by setting the <code>FreeBSD.vfs.root.mountfrom</code> option
+from grub which I have not tested yet:</p>
+<div class="highlight"><pre><span></span>set FreeBSD.vfs.root.mountfrom=msdosfs:/dev/da0s1
+</pre></div>
+
+
+<p>If nothing goes wrong (specially if you didn't forget to create a <code>dev</code>
+directory in USB flash drive's root directory) you should login into your FreeBSD
+iso image:</p>
+<div class="highlight"><pre><span></span>$ df
+Filesystem 1K-blocks    Used  Avail Capcity  Mounted on
+/dev/md0      <span class="m">286146</span> <span class="m">2861416</span>      <span class="m">8</span>    100%  /
+/dev/da0s1   <span class="m">7561408</span> <span class="m">6621600</span>  <span class="m">99808</span>     88%  /mnt
+devfs              <span class="m">1</span>       <span class="m">1</span>      <span class="m">0</span>    100%  /dev
+/dev/md1       <span class="m">31260</span>     <span class="m">308</span>  <span class="m">28452</span>      1%  /var
+/dev/md2       <span class="m">19356</span>      <span class="m">28</span>  <span class="m">17780</span>      0%  /tmp
+</pre></div>
+
+
+<p>Hope it helps other :-)</p>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/freebsd.html">freebsd</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/grub.html">grub</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/iso.html">iso</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/mountconf.html">mount.conf</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/author.jpg" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
+                        <p class="author-description">
+                          
+            I Love to Read, Code and Explore the Possibilities.
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'bijanebrahimi';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+</body>
+</html>
