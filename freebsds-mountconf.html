@@ -142,14 +142,14 @@ debian-based linux distro:</p>
 <span class="err">#</span><span class="x"> Copy FreeBSD iso image and creating proper grub configuration file</span>
 <span class="p">$</span><span class="x"> mkdir /mnt/iso</span>
 <span class="p">$</span><span class="x"> cp ~/Downloads/FreeBSD-11.0-RELEASE-amd64-dvd1.iso /mnt/iso</span>
-<span class="p">$</span><span class="x"> cat &gt; /mnt/boot/grub/grub.cfg &lt;&lt; EOF</span>
+<span class="p">$</span><span class="x"> cat &gt; /mnt/boot/grub/grub.cfg &lt;&lt;EOF</span>
 <span class="x">insmod loopback</span>
 <span class="x">insmod iso9660</span>
 <span class="x">insmod ufs2</span>
 <span class="x">insmod ntfs</span>
 <span class="x">menuentry &quot;FreeBSD 11.0 amd64&quot; </span><span class="err">{</span><span class="x"></span>
 <span class="x">  set isofile=&quot;/iso/FreeBSD-11.0-RELEASE-amd64-dvd1.iso&quot;</span>
-<span class="x">  loopback loop (hd0,1)</span><span class="p">$</span><span class="nv">isofile</span><span class="x"></span>
+<span class="x">  loopback loop (hd0,1)\</span><span class="p">$</span><span class="nv">isofile</span><span class="x"></span>
 <span class="x">  kfreebsd  (loop)/boot/kernel/kernel</span>
 <span class="x">}</span>
 <span class="x">EOF</span>
