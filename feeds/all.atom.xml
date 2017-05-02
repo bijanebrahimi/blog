@@ -1,5 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-02-24T22:05:00+03:30</updated><entry><title>Freebsd's .mount.conf</title><link href="http://bijanebrahimi.github.io/blog/freebsds-mountconf.html" rel="alternate"></link><updated>2017-02-24T22:05:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-24:blog/freebsds-mountconf.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-04-02T22:20:00+04:30</updated><entry><title>Looking at The Evolution of the Unix Time-sharing System</title><link href="http://bijanebrahimi.github.io/blog/looking-at-the-evolution-of-the-unix-time-sharing-system.html" rel="alternate"></link><published>2017-04-02T22:20:00+04:30</published><updated>2017-04-02T22:20:00+04:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-04-02:/blog/looking-at-the-evolution-of-the-unix-time-sharing-system.html</id><summary type="html">&lt;h1&gt;Evolution of the Unix Time-Sharing System&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;&lt;a href="http://www.read.seas.harvard.edu/~kohler/class/aosref/ritchie84evolution.pdf"&gt;The Evolution of the Unix Time-Sharing System&lt;/a&gt;&lt;/strong&gt; is an article by &lt;strong&gt;Denis Ritchie&lt;/strong&gt;
+describing the early history of the &lt;strong&gt;UNIX&lt;/strong&gt; operating system, including creation and
+design of some of (almost) unique features of the the operating system such as it's filesystem,
+process controlls, I …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Evolution of the Unix Time-Sharing System&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;&lt;a href="http://www.read.seas.harvard.edu/~kohler/class/aosref/ritchie84evolution.pdf"&gt;The Evolution of the Unix Time-Sharing System&lt;/a&gt;&lt;/strong&gt; is an article by &lt;strong&gt;Denis Ritchie&lt;/strong&gt;
+describing the early history of the &lt;strong&gt;UNIX&lt;/strong&gt; operating system, including creation and
+design of some of (almost) unique features of the the operating system such as it's filesystem,
+process controlls, I/O redirection and a few more. Surprisingly, almost 50 years later,
+we're experiencing almost the same features (ofc with many more new cool stuff) but it's
+fascinating to see how much of the design still is within the current Unix-based operating
+systems such as &lt;strong&gt;linux&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;While I'm highly recommending reading the original article, I find it fun to track some
+of mysteries I was facing at work lately:&lt;/p&gt;
+&lt;h1&gt;Zombie Town&lt;/h1&gt;
+&lt;p&gt;With adaption of new &lt;code&gt;fork&lt;/code&gt; system call, forking (&lt;code&gt;fork&lt;/code&gt;) a new process and executing (&lt;code&gt;exec&lt;/code&gt;)
+the child command has become somewhat of an standard. Investitaging the actual process, reminded
+me of chasing a &lt;strong&gt;BUG&lt;/strong&gt; which mysteriousy brought down some of our &lt;strong&gt;BSD&lt;/strong&gt; machines at work.
+It turned out, somehow one f our daemons running as root is producing &lt;strong&gt;zombie&lt;/strong&gt; processes without
+attending them. Although a zombie process is merely just a few structs in kernel memory, leaving
+them unattended may lead to unexpected behaviors. In our case, the zombie processes caused the
+&lt;code&gt;root&lt;/code&gt; user to exceed it's maximum running processes limit (&lt;code&gt;kern.maxprocperuid&lt;/code&gt;) causing
+the system to stop working. So what was the issue?&lt;/p&gt;
+&lt;p&gt;Ever wondered what actually happens between forking a new process, clonning the current process
+to an almost exact copy of it's own and actually executing the child command? and what actually
+can go wrong between these two calls? Well, the process mentioned above is the same routine the
+&lt;a href="https://github.com/freebsd/freebsd/blob/master/lib/libc/gen/popen.c"&gt;popen&lt;/a&gt; function does on &lt;a href="https://github.com/freebsd/freebsd/tree/master/lib/libc"&gt;FreeBSD libc&lt;/a&gt; library. It forks the process, closes all of it's parent
+open file descriptors and executing the child command. Since before calling &lt;code&gt;_execv&lt;/code&gt; command, we're
+still running the same code as parent, if the code crashes, it crashes like the parent process
+crashed, not the child command.&lt;/p&gt;
+&lt;p&gt;Still I'm not quiet sure why the code crashes in the child process calling &lt;code&gt;_close&lt;/code&gt; before
+executing the &lt;code&gt;_execv&lt;/code&gt; system call but a quick fix was to install a &lt;code&gt;SIGCHLD&lt;/code&gt; handler, closing
+the child zombie process.&lt;/p&gt;
+&lt;h1&gt;Know your Builtins&lt;/h1&gt;
+&lt;p&gt;As ritchie continues, when addapting the new multiprocessing capability with design of the
+new &lt;code&gt;fork&lt;/code&gt; system call, they discovered that the &lt;code&gt;chdir&lt;/code&gt; command stopeed working. Investigation
+through the process, they relasized now that when shell forks the &lt;code&gt;chdir&lt;/code&gt; procss, it executed
+fine and actually did change the current working directory but since it's not changing it's 
+parent process (the running shell), after termination, the shell is still in the same directory
+as before.&lt;/p&gt;
+&lt;p&gt;I actually found a similar &lt;strong&gt;BUG&lt;/strong&gt; in one of our programs a few month before, when a fellow
+programmer modified a shell script adding pull path names to every commands including the
+&lt;code&gt;cd&lt;/code&gt; command. since &lt;code&gt;/bin/cd&lt;/code&gt; is a binary and can't effect the parent shell process (the same
+reason above), the script was end up doing it's stuff in a wrong directory. so it's
+&lt;strong&gt;Important&lt;/strong&gt; to notice that &lt;code&gt;cd&lt;/code&gt; command is actually a built-in shell command, capable of
+changing current shell working directory:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="nb"&gt;cd&lt;/span&gt;
+&lt;span class="nb"&gt;cd&lt;/span&gt; is a shell &lt;span class="nb"&gt;builtin&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So, what's the use of the &lt;code&gt;cd&lt;/code&gt; binary command? I'm not quiet sure but one &lt;a href="https://unix.stackexchange.com/a/50060"&gt;example&lt;/a&gt;  I find
+was to check which directories we have access to visit:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;find . -type d -exec &lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="o"&gt;{}&lt;/span&gt; &lt;span class="se"&gt;\;&lt;/span&gt; -print
+&lt;/pre&gt;&lt;/div&gt;</content><category term="unix"></category><category term="design"></category><category term="ritchie"></category><category term="thompson"></category><category term="linux"></category><category term="article"></category></entry><entry><title>Freebsd's .mount.conf</title><link href="http://bijanebrahimi.github.io/blog/freebsds-mountconf.html" rel="alternate"></link><published>2017-02-24T22:05:00+03:30</published><updated>2017-02-24T22:05:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-24:/blog/freebsds-mountconf.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;As I'm getting more and more familiar with the FreeBSD Operating System and
+it's wonderfull architeture and design, I found the need to work with different
+versions of FreeBSD live (specially at work) and since it's not a good idea to install
+every single version I needed into a …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;As I'm getting more and more familiar with the FreeBSD Operating System and
 it's wonderfull architeture and design, I found the need to work with different
 versions of FreeBSD live (specially at work) and since it's not a good idea to install
@@ -73,14 +131,14 @@ debian-based linux distro:&lt;/p&gt;
 &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Copy FreeBSD iso image and creating proper grub configuration file&lt;/span&gt;
 &lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mkdir /mnt/iso&lt;/span&gt;
 &lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cp ~/Downloads/FreeBSD-11.0-RELEASE-amd64-dvd1.iso /mnt/iso&lt;/span&gt;
-&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cat &amp;gt; /mnt/boot/grub/grub.cfg &amp;lt;&amp;lt;EOF&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cat &amp;gt; /mnt/boot/grub/grub.cfg &amp;lt;&amp;lt; EOF&lt;/span&gt;
 &lt;span class="x"&gt;insmod loopback&lt;/span&gt;
 &lt;span class="x"&gt;insmod iso9660&lt;/span&gt;
 &lt;span class="x"&gt;insmod ufs2&lt;/span&gt;
 &lt;span class="x"&gt;insmod ntfs&lt;/span&gt;
 &lt;span class="x"&gt;menuentry &amp;quot;FreeBSD 11.0 amd64&amp;quot; &lt;/span&gt;&lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
 &lt;span class="x"&gt;  set isofile=&amp;quot;/iso/FreeBSD-11.0-RELEASE-amd64-dvd1.iso&amp;quot;&lt;/span&gt;
-&lt;span class="x"&gt;  loopback loop (hd0,1)\&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;isofile&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+&lt;span class="x"&gt;  loopback loop (hd0,1)&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;isofile&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
 &lt;span class="x"&gt;  kfreebsd  (loop)/boot/kernel/kernel&lt;/span&gt;
 &lt;span class="x"&gt;}&lt;/span&gt;
 &lt;span class="x"&gt;EOF&lt;/span&gt;
@@ -127,7 +185,8 @@ devfs              &lt;span class="m"&gt;1&lt;/span&gt;       &lt;span class="m"
 
 
 &lt;p&gt;Look that the old root filesystem (&lt;code&gt;/dev/da0s1&lt;/code&gt;) is re-mounted on &lt;code&gt;/mnt&lt;/code&gt; as
-described in manual. Hope it helps other :-)&lt;/p&gt;</summary><category term="freebsd"></category><category term="grub"></category><category term="iso"></category><category term="mount.conf"></category></entry><entry><title>Graphviz in markdown</title><link href="http://bijanebrahimi.github.io/blog/graphviz-in-markdown.html" rel="alternate"></link><updated>2017-02-20T20:12:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-20:blog/graphviz-in-markdown.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+described in manual. Hope it helps other :-)&lt;/p&gt;</content><category term="freebsd"></category><category term="grub"></category><category term="iso"></category><category term="mount.conf"></category></entry><entry><title>Graphviz in markdown</title><link href="http://bijanebrahimi.github.io/blog/graphviz-in-markdown.html" rel="alternate"></link><published>2017-02-20T20:12:00+03:30</published><updated>2017-02-20T20:12:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-20:/blog/graphviz-in-markdown.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;There is a good tutorial on &lt;a href="https://github.com/TLmaK0/gravizo"&gt;How to include graphviz graphs in github&lt;/a&gt;. Basically it introduced me to an online web service which takes graphviz scripts as part of a url query string and renders it into an image type. It is a very good idea for many reasons …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;There is a good tutorial on &lt;a href="https://github.com/TLmaK0/gravizo"&gt;How to include graphviz graphs in github&lt;/a&gt;. Basically it introduced me to an online web service which takes graphviz scripts as part of a url query string and renders it into an image type. It is a very good idea for many reasons. One, the graph is still plain text and searchable inside source files, Second, editing an already drawn graph inside a wiki page is now very easy and the dot files are pretty easy to write.&lt;/p&gt;
 &lt;h1&gt;Problem?&lt;/h1&gt;
 &lt;p&gt;So, what's the problem? As I said, It was a good idea (even our Project Manager liked it since we're about to move our project's knowledge base into a local Gitlab's server, way better than using &lt;a href="http://asciiflow.com"&gt;asciiflow.com&lt;/a&gt;). The Only problem was that It was an unnecessary dependency to use an remote web-service and I thought why not I build our own local version of it? So, I did.&lt;/p&gt;
@@ -203,13 +262,18 @@ $ gitlab-ctl restart nginx
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Hope it helps other people as well :-)&lt;/p&gt;</summary><category term="gitlab"></category><category term="wiki"></category><category term="graphviz"></category><category term="debian"></category><category term="omnibus"></category><category term="apache"></category><category term="nginx"></category><category term="php"></category><category term="dot"></category><category term="svg"></category></entry><entry><title>Books I Read in 2016</title><link href="http://bijanebrahimi.github.io/blog/books-i-read-in-2016.html" rel="alternate"></link><updated>2017-02-17T14:40:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-17:blog/books-i-read-in-2016.html</id><summary type="html">&lt;p&gt;The List isn't long. same as the last year, I was spending my last months in the military service. I think there are a couple of books missing from the list which I might forgot them for the moment of creating this post. Also I hope I to find the time in the next year to also keep track of the useful articles since I'm mainly reading them instead of hard cover books.&lt;/p&gt;
+&lt;p&gt;Hope it helps other people as well :-)&lt;/p&gt;</content><category term="gitlab"></category><category term="wiki"></category><category term="graphviz"></category><category term="debian"></category><category term="omnibus"></category><category term="apache"></category><category term="nginx"></category><category term="php"></category><category term="dot"></category><category term="svg"></category></entry><entry><title>Books I Read in 2016</title><link href="http://bijanebrahimi.github.io/blog/books-i-read-in-2016.html" rel="alternate"></link><published>2017-02-17T14:40:00+03:30</published><updated>2017-02-17T14:40:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-17:/blog/books-i-read-in-2016.html</id><summary type="html">&lt;p&gt;The List isn't long. same as the last year, I was spending my last months in the military service. I think there are a couple of books missing from the list which I might forgot them for the moment of creating this post. Also I hope I to find the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;The List isn't long. same as the last year, I was spending my last months in the military service. I think there are a couple of books missing from the list which I might forgot them for the moment of creating this post. Also I hope I to find the time in the next year to also keep track of the useful articles since I'm mainly reading them instead of hard cover books.&lt;/p&gt;
 &lt;h2&gt;Computer &amp;amp; Programming&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;Head First C&lt;/li&gt;
 &lt;li&gt;Scalable C by Pieter Hintjens&lt;/li&gt;
 &lt;li&gt;The Design and Implementation of the FreeBSD by Marshall Kirk McKusick (only a few chapters)&lt;/li&gt;
-&lt;/ul&gt;</summary></entry><entry><title>GCC Cross-Compiler</title><link href="http://bijanebrahimi.github.io/blog/gcc-cross-compiler.html" rel="alternate"></link><updated>2017-02-17T12:04:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-17:blog/gcc-cross-compiler.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;/ul&gt;</content></entry><entry><title>GCC Cross-Compiler</title><link href="http://bijanebrahimi.github.io/blog/gcc-cross-compiler.html" rel="alternate"></link><published>2017-02-17T12:04:00+03:30</published><updated>2017-02-17T12:04:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-17:/blog/gcc-cross-compiler.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A cross compiler is a compiler capable of creating executable code for a platform other than the one on which the compiler is running. For example, a compiler that runs on a Windows 7 PC but generates code that runs on Android smartphone is a cross compiler.&lt;/p&gt;
+&lt;p&gt;--&lt;a href="https://en.wikipedia.org/wiki/Crosscompiler"&gt;Wikipedia&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Before …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;blockquote&gt;
 &lt;p&gt;A cross compiler is a compiler capable of creating executable code for a platform other than the one on which the compiler is running. For example, a compiler that runs on a Windows 7 PC but generates code that runs on Android smartphone is a cross compiler.&lt;/p&gt;
 &lt;p&gt;--&lt;a href="https://en.wikipedia.org/wiki/Crosscompiler"&gt;Wikipedia&lt;/a&gt;&lt;/p&gt;
@@ -318,7 +382,8 @@ $ sudo make install
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;You can see the whole compile process in my &lt;a href="https://gist.github.com/bijanebrahimi/62596745808f8667c40ff91b07d9e7b8"&gt;github gist&lt;/a&gt;.&lt;/p&gt;</summary><category term="gist"></category><category term="gcc"></category><category term="cross-compiler"></category><category term="freebsd"></category><category term="linux"></category><category term="compiler"></category></entry><entry><title>Git Submodules</title><link href="http://bijanebrahimi.github.io/blog/git-submodules.html" rel="alternate"></link><updated>2017-02-06T12:22:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-06:blog/git-submodules.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;You can see the whole compile process in my &lt;a href="https://gist.github.com/bijanebrahimi/62596745808f8667c40ff91b07d9e7b8"&gt;github gist&lt;/a&gt;.&lt;/p&gt;</content><category term="gist"></category><category term="gcc"></category><category term="cross-compiler"></category><category term="freebsd"></category><category term="linux"></category><category term="compiler"></category></entry><entry><title>Git Submodules</title><link href="http://bijanebrahimi.github.io/blog/git-submodules.html" rel="alternate"></link><published>2017-02-06T12:22:00+03:30</published><updated>2017-02-06T12:22:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-06:/blog/git-submodules.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;There are many good articles and blog posts on the Interenet describing how to migrate from svn to git repository. There are a lot of advantages to migrate to git, (&lt;a href="nvie.com/posts/a-successful-git-branching-model"&gt;git-flow&lt;/a&gt; to metion one) but there are also a few draw-backs. For example svn supports &lt;a href="http://svnbook.red-bean.com/en/1.7/svn.serverconfig.pathbasedauthz.html"&gt;Path-Based Authorization&lt;/a&gt; meaning great …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;There are many good articles and blog posts on the Interenet describing how to migrate from svn to git repository. There are a lot of advantages to migrate to git, (&lt;a href="nvie.com/posts/a-successful-git-branching-model"&gt;git-flow&lt;/a&gt; to metion one) but there are also a few draw-backs. For example svn supports &lt;a href="http://svnbook.red-bean.com/en/1.7/svn.serverconfig.pathbasedauthz.html"&gt;Path-Based Authorization&lt;/a&gt; meaning great control over who sees what parts of the project. Unfortunately git does not provide such mechanism meaning to overcome this task, we should split such files or directories into separate git repositories to restrict access per project and yet keep the project as a whole. In this post I explain how to use git submdules to do that.&lt;/p&gt;
 &lt;h1&gt;Git-Flow using submodules&lt;/h1&gt;
 &lt;p&gt;Imagine the following scenario in which we have a shared library named &lt;strong&gt;lib-shared&lt;/strong&gt; and two projects named &lt;strong&gt;protocol-x&lt;/strong&gt; and &lt;strong&gt;shell-y&lt;/strong&gt; which different developers have access to one of them.&lt;/p&gt;
@@ -394,7 +459,7 @@ $ git push --tags
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_01.svg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_01.svg"&gt;&lt;/p&gt;
 &lt;p&gt;Now to follow our git-flow, we need to fork a new branch named &lt;strong&gt;dev&lt;/strong&gt; from master branch. What we should do  first is to create a dev branch in all of our sub-projects using &lt;code&gt;git submodule foreach&lt;/code&gt; which executes given commands in each of our (initialized) submodules:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /home/manager/projects/super-project
 $ git checkout -b dev master
@@ -408,7 +473,7 @@ $ git push origin --tags
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_02.svg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_02.svg"&gt;&lt;/p&gt;
 &lt;p&gt;Now it's time for our developers to clone the super project and changes some code. our developer &lt;strong&gt;kevin&lt;/strong&gt; is the maintainer of the shell-y and only have access to our shared library beside his project so he should avoid trying to get protocol-x project:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ make /home/kevin/projects/kevin-project
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; ~/kevin/projects/kevin-project
@@ -422,7 +487,7 @@ $ git submodule update --remote
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_03.svg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_03.svg"&gt;&lt;/p&gt;
 &lt;p&gt;To make a change in lib-shared, he needs to fork a new feature-branch from lib-shared's dev branch and simply pushes his branch to remote and notify the manager:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cd libs/lib-shared
 git checkout -b feature-authors remotes/origin/dev
@@ -443,13 +508,13 @@ git push origin feature-authors
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_04.svg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_04.svg"&gt;&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;+&lt;/code&gt; sign beside lib-shared submodule shows that this subodule has changes which super-project does not added yet. the &lt;code&gt;-&lt;/code&gt; sign beside protocol-x submodule indictes that this module has not been initialized. Since his changes to lib-shared has not been accepted yet, he should revert update this submodule to point at the right hash commit which dev knows:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ git submodule update
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_05.svg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_05.svg"&gt;&lt;/p&gt;
 &lt;p&gt;Now The manager is notified and should review kevin's changes and decide if it's good enough to be merged into lib-shared's dev branch:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /home/manager/projects/super-project/libs/lib-shared
 $ git pull origin
@@ -461,7 +526,7 @@ $ git merge --no-ff feature-authors -m &lt;span class="s2"&gt;&amp;quot;merged f
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_06.svg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_06.svg"&gt;&lt;/p&gt;
 &lt;p&gt;Now lib-shared has reached v0.1-dev-3 should be included in super-project's dev branch:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /home/manager/projects/super-project
 $ git submodule status
@@ -482,7 +547,7 @@ $ git push origin dev --recurse-submodules&lt;span class="o"&gt;=&lt;/span&gt;on
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_07.svg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_07.svg"&gt;&lt;/p&gt;
 &lt;p&gt;Now kevin can fetch new changes in dev:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /home/kevin/projects/kevin-project
 $ git pull origin dev
@@ -490,7 +555,7 @@ $ git submodule update --remote
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_08.svg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_08.svg"&gt;&lt;/p&gt;
 &lt;p&gt;Merging branches in super-project is a little tricky. When merging dev branch into master, we should always check not to change &lt;code&gt;.gitmodules&lt;/code&gt; between merges. To do that we use &lt;code&gt;--no-commit&lt;/code&gt; argument just to do merge the, and before &lt;code&gt;git commit&lt;/code&gt; we should revert any changing comming from dev to master into &lt;code&gt;.gitmodules&lt;/code&gt;:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /home/manager/projects/super-project
 $ git checkout master
@@ -523,9 +588,19 @@ $ git push origin master
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_09.svg" /&gt;&lt;/p&gt;</summary><category term="git"></category><category term="svn"></category><category term="git submodules"></category></entry><entry><title>py3status Configuration</title><link href="http://bijanebrahimi.github.io/blog/py3status-configuration.html" rel="alternate"></link><updated>2016-03-14T22:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-03-14:blog/py3status-configuration.html</id><summary type="html">&lt;p&gt;Edited: Follow changes via my &lt;a href="https://github.com/bijanebrahimi/py3status-config"&gt;Github&lt;/a&gt; repository.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_09.svg"&gt;&lt;/p&gt;</content><category term="git"></category><category term="svn"></category><category term="git submodules"></category></entry><entry><title>py3status Configuration</title><link href="http://bijanebrahimi.github.io/blog/py3status-configuration.html" rel="alternate"></link><published>2016-03-14T22:35:00+03:30</published><updated>2016-03-14T22:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-03-14:/blog/py3status-configuration.html</id><summary type="html">&lt;p&gt;Edited: Follow changes via my &lt;a href="https://github.com/bijanebrahimi/py3status-config"&gt;Github&lt;/a&gt; repository.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Screenshot&lt;/strong&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;img alt="py3status Configuration" src="https://bijanebrahimi.github.io/py3status-config/images/py3status.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="py3status Configuration" src="https://bijanebrahimi.github.io/py3status-config/images/py3status.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Dependencies&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/ultrabug/py3status"&gt;py3status&lt;/a&gt; is an extensible i3status wrapper written in python.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-flag"&gt;&lt;/i&gt; &lt;a href="https://fortawesome.github.io/Font-Awesome/"&gt;Font Awesome&lt;/a&gt;: Font Icons for i3-bar&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-camera"&gt;&lt;/i&gt; &lt;a href="https://github.com/naelstrof/maim"&gt;maim&lt;/a&gt;: a utility that takes screenshots of your desktop&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-lock"&gt;&lt;/i&gt; &lt;a href="http://i3wm.org/i3lock/"&gt;i3lock&lt;/a&gt;: is a simple screen locker like slock.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-picture-o"&gt;&lt;/i&gt; &lt;a href="https://github.com/bijanebrahimi/waffle"&gt;waffle&lt;/a&gt;: to randomly download/change wallpaper.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-calendar"&gt;&lt;/i&gt; &lt;a href="https://gahshomar.github.io/gahshomar/"&gt;gahshomar&lt;/a&gt; is a …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;Edited: Follow changes via my &lt;a href="https://github.com/bijanebrahimi/py3status-config"&gt;Github&lt;/a&gt; repository.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Screenshot&lt;/strong&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="py3status Configuration" src="https://bijanebrahimi.github.io/py3status-config/images/py3status.png"&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Dependencies&lt;/strong&gt;:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://github.com/ultrabug/py3status"&gt;py3status&lt;/a&gt; is an extensible i3status wrapper written in python.&lt;/li&gt;
@@ -535,7 +610,12 @@ $ git push origin master
 &lt;li&gt;&lt;i class="fa fa-picture-o"&gt;&lt;/i&gt; &lt;a href="https://github.com/bijanebrahimi/waffle"&gt;waffle&lt;/a&gt;: to randomly download/change wallpaper.&lt;/li&gt;
 &lt;li&gt;&lt;i class="fa fa-calendar"&gt;&lt;/i&gt; &lt;a href="https://gahshomar.github.io/gahshomar/"&gt;gahshomar&lt;/a&gt; is a calendar with simplicity in design and elegance in execution.&lt;/li&gt;
 &lt;li&gt;&lt;i class="fa fa-music"&gt;&lt;/i&gt; &lt;a href="http://audacious-media-player.org/"&gt;audacious&lt;/a&gt; Music Player (needs qdbus and audacious mpris plugins installed).&lt;/li&gt;
-&lt;/ul&gt;</summary><category term="linux"></category><category term="i3"></category><category term="py3status"></category><category term="i3status"></category><category term="font-awesome"></category></entry><entry><title>Books I Read in 2015</title><link href="http://bijanebrahimi.github.io/blog/books-i-read-in-2015.html" rel="alternate"></link><updated>2016-03-13T12:09:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-03-13:blog/books-i-read-in-2015.html</id><summary type="html">&lt;p&gt;The List isn't long. in fact I spend the entire year in a military camp doing my
+&lt;/ul&gt;</content><category term="linux"></category><category term="i3"></category><category term="py3status"></category><category term="i3status"></category><category term="font-awesome"></category></entry><entry><title>Books I Read in 2015</title><link href="http://bijanebrahimi.github.io/blog/books-i-read-in-2015.html" rel="alternate"></link><published>2016-03-13T12:09:00+03:30</published><updated>2016-03-13T12:09:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-03-13:/blog/books-i-read-in-2015.html</id><summary type="html">&lt;p&gt;The List isn't long. in fact I spend the entire year in a military camp doing my
+final year of military service. my resolution for the year to read Books
+I wished to read but didn't have the time and I enjoyed reading every one of them.&lt;/p&gt;
+&lt;h2&gt;Novels&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Divergent Series …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;The List isn't long. in fact I spend the entire year in a military camp doing my
 final year of military service. my resolution for the year to read Books
 I wished to read but didn't have the time and I enjoyed reading every one of them.&lt;/p&gt;
 &lt;h2&gt;Novels&lt;/h2&gt;
@@ -554,7 +634,12 @@ I wished to read but didn't have the time and I enjoyed reading every one of the
 &lt;li&gt;Clean Code by Robert C. Martin&lt;/li&gt;
 &lt;li&gt;Effective Python by Brett Slatkin&lt;/li&gt;
 &lt;li&gt;Pro Git by Scott Chacon&lt;/li&gt;
-&lt;/ul&gt;</summary><category term="Book"></category><category term="Divergent"></category><category term="Insurgent"></category><category term="Allegiant"></category><category term="Veronica Roth"></category><category term="Lord of the Rings"></category><category term="J.R.R Tolkien"></category><category term="Dan Brown"></category><category term="Lost Symbol"></category><category term="Inferno"></category><category term="Beloved"></category><category term="Toni Morrison"></category><category term="The fault in our stars"></category><category term="The Abundance of Katherines"></category><category term="John Green"></category><category term="The first man"></category><category term="Albert Camus"></category><category term="Clean Code"></category><category term="Robert C. Martin"></category><category term="Effective Python"></category><category term="Brett Slatkin"></category><category term="Pro Git"></category><category term="Scott Chacon"></category></entry><entry><title>A dropdown Tiling Terminal for i3-wm</title><link href="http://bijanebrahimi.github.io/blog/a-dropdown-tiling-terminal-for-i3-wm.html" rel="alternate"></link><updated>2016-02-27T14:27:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-27:blog/a-dropdown-tiling-terminal-for-i3-wm.html</id><summary type="html">&lt;p&gt;&lt;a href="http://i3wm.org/docs/userguide.html#_scratchpad"&gt;Scratchpad&lt;/a&gt; is one of the
+&lt;/ul&gt;</content><category term="Book"></category><category term="Divergent"></category><category term="Insurgent"></category><category term="Allegiant"></category><category term="Veronica Roth"></category><category term="Lord of the Rings"></category><category term="J.R.R Tolkien"></category><category term="Dan Brown"></category><category term="Lost Symbol"></category><category term="Inferno"></category><category term="Beloved"></category><category term="Toni Morrison"></category><category term="The fault in our stars"></category><category term="The Abundance of Katherines"></category><category term="John Green"></category><category term="The first man"></category><category term="Albert Camus"></category><category term="Clean Code"></category><category term="Robert C. Martin"></category><category term="Effective Python"></category><category term="Brett Slatkin"></category><category term="Pro Git"></category><category term="Scott Chacon"></category></entry><entry><title>A dropdown Tiling Terminal for i3-wm</title><link href="http://bijanebrahimi.github.io/blog/a-dropdown-tiling-terminal-for-i3-wm.html" rel="alternate"></link><published>2016-02-27T14:27:00+03:30</published><updated>2016-02-27T14:27:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-27:/blog/a-dropdown-tiling-terminal-for-i3-wm.html</id><summary type="html">&lt;p&gt;&lt;a href="http://i3wm.org/docs/userguide.html#_scratchpad"&gt;Scratchpad&lt;/a&gt; is one of the
+coolest, and unique features in &lt;a href="http://i3wm.org"&gt;i3&lt;/a&gt;. Scratchpad is basically a
+hidden workspace that you can send your programs into it.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;There is no way to open that workspace. Instead, when using &lt;code&gt;scratchpad show&lt;/code&gt;,
+the window will be shown again, as a floating window, centered on …&lt;/p&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://i3wm.org/docs/userguide.html#_scratchpad"&gt;Scratchpad&lt;/a&gt; is one of the
 coolest, and unique features in &lt;a href="http://i3wm.org"&gt;i3&lt;/a&gt;. Scratchpad is basically a
 hidden workspace that you can send your programs into it.&lt;/p&gt;
 &lt;blockquote&gt;
@@ -581,7 +666,15 @@ and retrieve them one by one by hitting &lt;code&gt;Super+F1&lt;/code&gt; and on
 can toggle &lt;strong&gt;Terminator&lt;/strong&gt;:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="x"&gt;bindsym &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;mod&lt;/span&gt;&lt;span class="x"&gt;+Shift+F1 move container to scratchpad&lt;/span&gt;
 &lt;span class="x"&gt;bindsym &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;mod&lt;/span&gt;&lt;span class="x"&gt;+F1 [class=&amp;quot;^((?!Terminator).)*&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt;&amp;quot;] scratchpad show&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="linux"></category><category term="terminal"></category><category term="terminator"></category><category term="i3"></category><category term="scratchpad"></category></entry><entry><title>rofi-todo</title><link href="http://bijanebrahimi.github.io/blog/rofi-todo.html" rel="alternate"></link><updated>2016-02-26T18:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-26:blog/rofi-todo.html</id><summary type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="linux"></category><category term="terminal"></category><category term="terminator"></category><category term="i3"></category><category term="scratchpad"></category></entry><entry><title>rofi-todo</title><link href="http://bijanebrahimi.github.io/blog/rofi-todo.html" rel="alternate"></link><published>2016-02-26T18:15:00+03:30</published><updated>2016-02-26T18:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-26:/blog/rofi-todo.html</id><summary type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;It's a popup window switcher roughly based on &lt;a href="http://code.google.com/p/superswitcher/"&gt;superswitcher&lt;/a&gt;,
+requiring only xlib and pango&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Rofi has multiple modes.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;RUN&lt;/strong&gt;: Shows a list of executables in $PATH and can launch them (optional in a terminal).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DRUN&lt;/strong&gt;: Same as the run launches, but the list is created …&lt;/li&gt;&lt;/ol&gt;</summary><content type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;It's a popup window switcher roughly based on &lt;a href="http://code.google.com/p/superswitcher/"&gt;superswitcher&lt;/a&gt;,
 requiring only xlib and pango&lt;/p&gt;
@@ -605,7 +698,7 @@ executable and run the following:&lt;/p&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="rofi-todo" src="http://bijanebrahimi.github.io/blog/assets/images/rofi_todolist-rofi_todo.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="rofi-todo" src="http://bijanebrahimi.github.io/blog/assets/images/rofi_todolist-rofi_todo.png"&gt;&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
 &lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;~/.rofi_todos
@@ -646,7 +739,11 @@ executable and run the following:&lt;/p&gt;
 - To &lt;strong&gt;Delete one&lt;/strong&gt;, Just Select the one and hit Enter&lt;/p&gt;
 &lt;p&gt;If you're already using rofi, just add &lt;code&gt;TODO&lt;/code&gt; modi to your existing command-line:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;rofi -modi DRun,Run,Window,TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t -show TODO
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="linux"></category><category term="rofi"></category><category term="rofi-todo"></category><category term="rofi-script"></category><category term="bash"></category><category term="project"></category></entry><entry><title>Extending The Battery Life in Linux</title><link href="http://bijanebrahimi.github.io/blog/extending-the-battery-life-in-linux.html" rel="alternate"></link><updated>2016-02-25T14:20:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-25:blog/extending-the-battery-life-in-linux.html</id><summary type="html">&lt;p&gt;Before Running any tunning, the average estimated lifetime of my battery was
+&lt;/pre&gt;&lt;/div&gt;</content><category term="linux"></category><category term="rofi"></category><category term="rofi-todo"></category><category term="rofi-script"></category><category term="bash"></category><category term="project"></category></entry><entry><title>Extending The Battery Life in Linux</title><link href="http://bijanebrahimi.github.io/blog/extending-the-battery-life-in-linux.html" rel="alternate"></link><published>2016-02-25T14:20:00+03:30</published><updated>2016-02-25T14:20:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-25:/blog/extending-the-battery-life-in-linux.html</id><summary type="html">&lt;p&gt;Before Running any tunning, the average estimated lifetime of my battery was
+about 3 hours (below image). Through this post we learn how to extend it to
+almost 4 and a half hours. It's more than 50 percent increase!&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: I'm currently using a lenovo G50 laptop with Quad-Core AMD …&lt;/p&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;p&gt;Before Running any tunning, the average estimated lifetime of my battery was
 about 3 hours (below image). Through this post we learn how to extend it to
 almost 4 and a half hours. It's more than 50 percent increase!&lt;/p&gt;
 &lt;blockquote&gt;
@@ -656,7 +753,7 @@ with a 4-cell battery and running &lt;code&gt;i3-wm&lt;/code&gt;, a lightweight 
 So depending on your hardware and programs you have running and your daily usage
 pattern, the results may vary for you.&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;&lt;img alt="Gnome Battery Bench" src="http://bijanebrahimi.github.io/blog/assets/images/extend_linux_battery_life-battery_bench_before_tunning.png" title="Gnome Battery Bench - Before Tunning" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Gnome Battery Bench" src="http://bijanebrahimi.github.io/blog/assets/images/extend_linux_battery_life-battery_bench_before_tunning.png" title="Gnome Battery Bench - Before Tunning"&gt;&lt;/p&gt;
 &lt;p&gt;First, run &lt;code&gt;powertop&lt;/code&gt; to find out which devices/processes are draining power the most.
 In The &lt;code&gt;Overview Tab&lt;/code&gt; you can actually see what processes/devices are draining
 how much power and By applying the Good option in &lt;code&gt;Tunables Tab&lt;/code&gt;, powertop
@@ -782,11 +879,22 @@ WantedBy=multi-user.target
 &lt;h1&gt;Conclusion&lt;/h1&gt;
 &lt;p&gt;The result is very satisfactory. In daily usage, my battery life went up
 from about 3 hours to almost 4 and a half hours.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Gnome Battery Bench" src="http://bijanebrahimi.github.io/blog/assets/images/extend_linux_battery_life-battery_bench_after_tunning.png" title="Gnome Battery Bench - After Tunning" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Gnome Battery Bench" src="http://bijanebrahimi.github.io/blog/assets/images/extend_linux_battery_life-battery_bench_after_tunning.png" title="Gnome Battery Bench - After Tunning"&gt;&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: The tests and battery benchmark did not placed in a controlled
 environment but it seems logical to expect similar effects.&lt;/p&gt;
-&lt;/blockquote&gt;</summary><category term="linux"></category><category term="powertop"></category><category term="power"></category></entry><entry><title>Multiseat Linux Desktop, Multiple X servers</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html" rel="alternate"></link><updated>2014-10-22T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-22:blog/multiseat-linux-desktop-multiple-x-servers.html</id><summary type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="{filename}/multiseat-linux-desktop.md"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
+&lt;/blockquote&gt;</content><category term="linux"></category><category term="powertop"></category><category term="power"></category></entry><entry><title>Multiseat Linux Desktop, Multiple X servers</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html" rel="alternate"></link><published>2014-10-22T10:35:00+03:30</published><updated>2014-10-22T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-22:/blog/multiseat-linux-desktop-multiple-x-servers.html</id><summary type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="{filename}/multiseat-linux-desktop.md"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
+&lt;h3&gt;Hardware Requirements&lt;/h3&gt;
+&lt;p&gt;for each user, we need seperate:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;mouse&lt;/li&gt;
+&lt;li&gt;keyboard&lt;/li&gt;
+&lt;li&gt;monitor&lt;/li&gt;
+&lt;li&gt;Video Card&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;each Monitor will be attached to a seperate Video Card.&lt;/p&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="{filename}/multiseat-linux-desktop.md"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
 &lt;h3&gt;Hardware Requirements&lt;/h3&gt;
 &lt;p&gt;for each user, we need seperate:&lt;/p&gt;
 &lt;ul&gt;
@@ -965,7 +1073,7 @@ EndSection
 
 &lt;p&gt;if anything happend,read the log files and search the web.&lt;/p&gt;
 &lt;h3&gt;Configure Display Managers&lt;/h3&gt;
-&lt;p&gt;it is possible to configure your Display Manager (like KDM or GDM) to behave properly with Multiseat configuration at boot-up, but since i dont use any Display Manager, i can not tell you exactly how to do it. search the web for that matter. you can do it the easy way by configuring your Display Manager rc file or the hard way by editing the &lt;code&gt;/etc/inittab&lt;/code&gt; file if you have systemV.&lt;/p&gt;</summary><category term="X11"></category><category term="config"></category><category term="xephyr"></category></entry><entry><title>Multiseat Linux Desktop</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html" rel="alternate"></link><updated>2014-10-21T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-21:blog/multiseat-linux-desktop.html</id><summary type="html">&lt;p&gt;here is the story. my 3 years old nephew (which i love him so much) is so curious about computers. every time he comes to visit (which is not rarely), he insist on helping me with my computer works. of course he thinks he is helping but i can't have him messing my projects. so i wondered if i can (peacefully) share the computer with him. i searched and i found out about &lt;a href="en.wikipedia.org/wiki/Multiseat_configuration"&gt;Multiseat&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;it is possible to configure your Display Manager (like KDM or GDM) to behave properly with Multiseat configuration at boot-up, but since i dont use any Display Manager, i can not tell you exactly how to do it. search the web for that matter. you can do it the easy way by configuring your Display Manager rc file or the hard way by editing the &lt;code&gt;/etc/inittab&lt;/code&gt; file if you have systemV.&lt;/p&gt;</content><category term="X11"></category><category term="config"></category><category term="xephyr"></category></entry><entry><title>Multiseat Linux Desktop</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html" rel="alternate"></link><published>2014-10-21T10:35:00+03:30</published><updated>2014-10-21T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-21:/blog/multiseat-linux-desktop.html</id><summary type="html">&lt;p&gt;here is the story. my 3 years old nephew (which i love him so much) is so curious about computers. every time he comes to visit (which is not rarely), he insist on helping me with my computer works. of course he thinks he is helping but i can't have …&lt;/p&gt;</summary><content type="html">&lt;p&gt;here is the story. my 3 years old nephew (which i love him so much) is so curious about computers. every time he comes to visit (which is not rarely), he insist on helping me with my computer works. of course he thinks he is helping but i can't have him messing my projects. so i wondered if i can (peacefully) share the computer with him. i searched and i found out about &lt;a href="en.wikipedia.org/wiki/Multiseat_configuration"&gt;Multiseat&lt;/a&gt;.&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;A multiseat, multi-station or multiterminal configuration is a single computer which supports
 multiple independent local users at the same time. In modern usage the terms refer to multiple
@@ -979,4 +1087,4 @@ a monitor, and possibly headphones --Wikipedia&lt;/p&gt;
 &lt;li&gt;&lt;a href="{filename}/multiseat-linux-desktop-multiple-x-servers.md"&gt;Multiple X servers&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;Nested X servers (i will write about it very soon)&lt;/li&gt;
 &lt;li&gt;The Multi-seat display manager&lt;/li&gt;
-&lt;/ol&gt;</summary><category term="X11"></category><category term="config"></category></entry></feed>
+&lt;/ol&gt;</content><category term="X11"></category><category term="config"></category></entry></feed>

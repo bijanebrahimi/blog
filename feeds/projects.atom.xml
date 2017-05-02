@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/projects.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2016-03-14T22:35:00+03:30</updated><entry><title>py3status Configuration</title><link href="http://bijanebrahimi.github.io/blog/py3status-configuration.html" rel="alternate"></link><updated>2016-03-14T22:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-03-14:blog/py3status-configuration.html</id><summary type="html">&lt;p&gt;Edited: Follow changes via my &lt;a href="https://github.com/bijanebrahimi/py3status-config"&gt;Github&lt;/a&gt; repository.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - Projects</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/projects.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2016-03-14T22:35:00+03:30</updated><entry><title>py3status Configuration</title><link href="http://bijanebrahimi.github.io/blog/py3status-configuration.html" rel="alternate"></link><published>2016-03-14T22:35:00+03:30</published><updated>2016-03-14T22:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-03-14:/blog/py3status-configuration.html</id><summary type="html">&lt;p&gt;Edited: Follow changes via my &lt;a href="https://github.com/bijanebrahimi/py3status-config"&gt;Github&lt;/a&gt; repository.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Screenshot&lt;/strong&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;img alt="py3status Configuration" src="https://bijanebrahimi.github.io/py3status-config/images/py3status.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="py3status Configuration" src="https://bijanebrahimi.github.io/py3status-config/images/py3status.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Dependencies&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/ultrabug/py3status"&gt;py3status&lt;/a&gt; is an extensible i3status wrapper written in python.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-flag"&gt;&lt;/i&gt; &lt;a href="https://fortawesome.github.io/Font-Awesome/"&gt;Font Awesome&lt;/a&gt;: Font Icons for i3-bar&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-camera"&gt;&lt;/i&gt; &lt;a href="https://github.com/naelstrof/maim"&gt;maim&lt;/a&gt;: a utility that takes screenshots of your desktop&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-lock"&gt;&lt;/i&gt; &lt;a href="http://i3wm.org/i3lock/"&gt;i3lock&lt;/a&gt;: is a simple screen locker like slock.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-picture-o"&gt;&lt;/i&gt; &lt;a href="https://github.com/bijanebrahimi/waffle"&gt;waffle&lt;/a&gt;: to randomly download/change wallpaper.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-calendar"&gt;&lt;/i&gt; &lt;a href="https://gahshomar.github.io/gahshomar/"&gt;gahshomar&lt;/a&gt; is a …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;Edited: Follow changes via my &lt;a href="https://github.com/bijanebrahimi/py3status-config"&gt;Github&lt;/a&gt; repository.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Screenshot&lt;/strong&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="py3status Configuration" src="https://bijanebrahimi.github.io/py3status-config/images/py3status.png"&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Dependencies&lt;/strong&gt;:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://github.com/ultrabug/py3status"&gt;py3status&lt;/a&gt; is an extensible i3status wrapper written in python.&lt;/li&gt;
@@ -11,7 +21,15 @@
 &lt;li&gt;&lt;i class="fa fa-picture-o"&gt;&lt;/i&gt; &lt;a href="https://github.com/bijanebrahimi/waffle"&gt;waffle&lt;/a&gt;: to randomly download/change wallpaper.&lt;/li&gt;
 &lt;li&gt;&lt;i class="fa fa-calendar"&gt;&lt;/i&gt; &lt;a href="https://gahshomar.github.io/gahshomar/"&gt;gahshomar&lt;/a&gt; is a calendar with simplicity in design and elegance in execution.&lt;/li&gt;
 &lt;li&gt;&lt;i class="fa fa-music"&gt;&lt;/i&gt; &lt;a href="http://audacious-media-player.org/"&gt;audacious&lt;/a&gt; Music Player (needs qdbus and audacious mpris plugins installed).&lt;/li&gt;
-&lt;/ul&gt;</summary><category term="linux"></category><category term="i3"></category><category term="py3status"></category><category term="i3status"></category><category term="font-awesome"></category></entry><entry><title>rofi-todo</title><link href="http://bijanebrahimi.github.io/blog/rofi-todo.html" rel="alternate"></link><updated>2016-02-26T18:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-26:blog/rofi-todo.html</id><summary type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
+&lt;/ul&gt;</content><category term="linux"></category><category term="i3"></category><category term="py3status"></category><category term="i3status"></category><category term="font-awesome"></category></entry><entry><title>rofi-todo</title><link href="http://bijanebrahimi.github.io/blog/rofi-todo.html" rel="alternate"></link><published>2016-02-26T18:15:00+03:30</published><updated>2016-02-26T18:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-26:/blog/rofi-todo.html</id><summary type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;It's a popup window switcher roughly based on &lt;a href="http://code.google.com/p/superswitcher/"&gt;superswitcher&lt;/a&gt;,
+requiring only xlib and pango&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Rofi has multiple modes.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;RUN&lt;/strong&gt;: Shows a list of executables in $PATH and can launch them (optional in a terminal).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DRUN&lt;/strong&gt;: Same as the run launches, but the list is created …&lt;/li&gt;&lt;/ol&gt;</summary><content type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;It's a popup window switcher roughly based on &lt;a href="http://code.google.com/p/superswitcher/"&gt;superswitcher&lt;/a&gt;,
 requiring only xlib and pango&lt;/p&gt;
@@ -35,7 +53,7 @@ executable and run the following:&lt;/p&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="rofi-todo" src="http://bijanebrahimi.github.io/blog/assets/images/rofi_todolist-rofi_todo.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="rofi-todo" src="http://bijanebrahimi.github.io/blog/assets/images/rofi_todolist-rofi_todo.png"&gt;&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
 &lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;~/.rofi_todos
@@ -76,4 +94,4 @@ executable and run the following:&lt;/p&gt;
 - To &lt;strong&gt;Delete one&lt;/strong&gt;, Just Select the one and hit Enter&lt;/p&gt;
 &lt;p&gt;If you're already using rofi, just add &lt;code&gt;TODO&lt;/code&gt; modi to your existing command-line:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;rofi -modi DRun,Run,Window,TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t -show TODO
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="linux"></category><category term="rofi"></category><category term="rofi-todo"></category><category term="rofi-script"></category><category term="bash"></category><category term="project"></category></entry></feed>
+&lt;/pre&gt;&lt;/div&gt;</content><category term="linux"></category><category term="rofi"></category><category term="rofi-todo"></category><category term="rofi-script"></category><category term="bash"></category><category term="project"></category></entry></feed>

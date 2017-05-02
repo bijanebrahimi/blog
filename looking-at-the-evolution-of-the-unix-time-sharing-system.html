@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Multiseat Linux Desktop</title>
+        <title>Looking at The Evolution of the Unix Time-sharing System</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
@@ -39,7 +39,7 @@
     <a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="category">Linux</a><br />
 
     <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
-    &mdash; <abbr title="2014-10-21T10:35:00+03:30">Tue 21 October 2014</abbr>
+    &mdash; <abbr title="2017-04-02T22:20:00+04:30">Sun 02 April 2017</abbr>
 </div>        </div>
     </div>
 
@@ -47,38 +47,81 @@
         <div class="background-image-container">
 
             <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg);">
-                <img src="http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg" alt="Multiseat Linux Desktop">
+                <img src="http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg" alt="Looking at The Evolution of the Unix Time-sharing System">
                 <div class="title">
                 <h1>
-                    Multiseat Linux Desktop
+                    Looking at The Evolution of the Unix Time-sharing System
                 </h1>
+                <h2>
+                    How Unix design influenced an entire history of operating systems
+                </h2>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="entry-content">
-        <p>here is the story. my 3 years old nephew (which i love him so much) is so curious about computers. every time he comes to visit (which is not rarely), he insist on helping me with my computer works. of course he thinks he is helping but i can't have him messing my projects. so i wondered if i can (peacefully) share the computer with him. i searched and i found out about <a href="en.wikipedia.org/wiki/Multiseat_configuration">Multiseat</a>.</p>
-<blockquote>
-<p>A multiseat, multi-station or multiterminal configuration is a single computer which supports
-multiple independent local users at the same time. In modern usage the terms refer to multiple
-users using one personal computer, each with their own console, consisting of a keyboard a mouse,
-a monitor, and possibly headphones --Wikipedia</p>
-</blockquote>
-<p>so obviously that was the solution. time to get my hands dirty on the code :)</p>
-<h3>GNU/Linux Solutions</h3>
-<p>as it may be obvious, there are numbers of solution to do configure the GNU/Linux system to fit my need. so, in the following next articles (below links), i will explain these solution as i experienced them. i try to do them separately and independently, so you can skip ones you are not interested about. here are what i found:</p>
-<ol>
-<li><a href="{filename}/multiseat-linux-desktop-multiple-x-servers.md">Multiple X servers</a></li>
-<li>Nested X servers (i will write about it very soon)</li>
-<li>The Multi-seat display manager</li>
-</ol>
+        <h1>Evolution of the Unix Time-Sharing System</h1>
+<p><strong><a href="http://www.read.seas.harvard.edu/~kohler/class/aosref/ritchie84evolution.pdf">The Evolution of the Unix Time-Sharing System</a></strong> is an article by <strong>Denis Ritchie</strong>
+describing the early history of the <strong>UNIX</strong> operating system, including creation and
+design of some of (almost) unique features of the the operating system such as it's filesystem,
+process controlls, I/O redirection and a few more. Surprisingly, almost 50 years later,
+we're experiencing almost the same features (ofc with many more new cool stuff) but it's
+fascinating to see how much of the design still is within the current Unix-based operating
+systems such as <strong>linux</strong>.</p>
+<p>While I'm highly recommending reading the original article, I find it fun to track some
+of mysteries I was facing at work lately:</p>
+<h1>Zombie Town</h1>
+<p>With adaption of new <code>fork</code> system call, forking (<code>fork</code>) a new process and executing (<code>exec</code>)
+the child command has become somewhat of an standard. Investitaging the actual process, reminded
+me of chasing a <strong>BUG</strong> which mysteriousy brought down some of our <strong>BSD</strong> machines at work.
+It turned out, somehow one f our daemons running as root is producing <strong>zombie</strong> processes without
+attending them. Although a zombie process is merely just a few structs in kernel memory, leaving
+them unattended may lead to unexpected behaviors. In our case, the zombie processes caused the
+<code>root</code> user to exceed it's maximum running processes limit (<code>kern.maxprocperuid</code>) causing
+the system to stop working. So what was the issue?</p>
+<p>Ever wondered what actually happens between forking a new process, clonning the current process
+to an almost exact copy of it's own and actually executing the child command? and what actually
+can go wrong between these two calls? Well, the process mentioned above is the same routine the
+<a href="https://github.com/freebsd/freebsd/blob/master/lib/libc/gen/popen.c">popen</a> function does on <a href="https://github.com/freebsd/freebsd/tree/master/lib/libc">FreeBSD libc</a> library. It forks the process, closes all of it's parent
+open file descriptors and executing the child command. Since before calling <code>_execv</code> command, we're
+still running the same code as parent, if the code crashes, it crashes like the parent process
+crashed, not the child command.</p>
+<p>Still I'm not quiet sure why the code crashes in the child process calling <code>_close</code> before
+executing the <code>_execv</code> system call but a quick fix was to install a <code>SIGCHLD</code> handler, closing
+the child zombie process.</p>
+<h1>Know your Builtins</h1>
+<p>As ritchie continues, when addapting the new multiprocessing capability with design of the
+new <code>fork</code> system call, they discovered that the <code>chdir</code> command stopeed working. Investigation
+through the process, they relasized now that when shell forks the <code>chdir</code> procss, it executed
+fine and actually did change the current working directory but since it's not changing it's 
+parent process (the running shell), after termination, the shell is still in the same directory
+as before.</p>
+<p>I actually found a similar <strong>BUG</strong> in one of our programs a few month before, when a fellow
+programmer modified a shell script adding pull path names to every commands including the
+<code>cd</code> command. since <code>/bin/cd</code> is a binary and can't effect the parent shell process (the same
+reason above), the script was end up doing it's stuff in a wrong directory. so it's
+<strong>Important</strong> to notice that <code>cd</code> command is actually a built-in shell command, capable of
+changing current shell working directory:</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">type</span> <span class="nb">cd</span>
+<span class="nb">cd</span> is a shell <span class="nb">builtin</span>
+</pre></div>
+
+
+<p>So, what's the use of the <code>cd</code> binary command? I'm not quiet sure but one <a href="https://unix.stackexchange.com/a/50060">example</a>  I find
+was to check which directories we have access to visit:</p>
+<div class="highlight"><pre><span></span>find . -type d -exec <span class="nb">cd</span> <span class="o">{}</span> <span class="se">\;</span> -print
+</pre></div>
     </div>
 
     <footer>
         <div class="tags">
-            <a href="http://bijanebrahimi.github.io/blog/tag/x11.html">X11</a>
-            <a href="http://bijanebrahimi.github.io/blog/tag/config.html">config</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/unix.html">unix</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/design.html">design</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/ritchie.html">ritchie</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/thompson.html">thompson</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/linux.html">linux</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/article.html">article</a>
         </div>
         <div class="pure-g post-footer">
             <div class="pure-u-1 pure-u-md-1-2">

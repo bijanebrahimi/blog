@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/freebsd.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-02-24T22:05:00+03:30</updated><entry><title>Freebsd's .mount.conf</title><link href="http://bijanebrahimi.github.io/blog/freebsds-mountconf.html" rel="alternate"></link><updated>2017-02-24T22:05:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-24:blog/freebsds-mountconf.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - FreeBSD</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/freebsd.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-02-24T22:05:00+03:30</updated><entry><title>Freebsd's .mount.conf</title><link href="http://bijanebrahimi.github.io/blog/freebsds-mountconf.html" rel="alternate"></link><published>2017-02-24T22:05:00+03:30</published><updated>2017-02-24T22:05:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-24:/blog/freebsds-mountconf.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;As I'm getting more and more familiar with the FreeBSD Operating System and
+it's wonderfull architeture and design, I found the need to work with different
+versions of FreeBSD live (specially at work) and since it's not a good idea to install
+every single version I needed into a …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;As I'm getting more and more familiar with the FreeBSD Operating System and
 it's wonderfull architeture and design, I found the need to work with different
 versions of FreeBSD live (specially at work) and since it's not a good idea to install
@@ -73,14 +77,14 @@ debian-based linux distro:&lt;/p&gt;
 &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Copy FreeBSD iso image and creating proper grub configuration file&lt;/span&gt;
 &lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mkdir /mnt/iso&lt;/span&gt;
 &lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cp ~/Downloads/FreeBSD-11.0-RELEASE-amd64-dvd1.iso /mnt/iso&lt;/span&gt;
-&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cat &amp;gt; /mnt/boot/grub/grub.cfg &amp;lt;&amp;lt;EOF&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cat &amp;gt; /mnt/boot/grub/grub.cfg &amp;lt;&amp;lt; EOF&lt;/span&gt;
 &lt;span class="x"&gt;insmod loopback&lt;/span&gt;
 &lt;span class="x"&gt;insmod iso9660&lt;/span&gt;
 &lt;span class="x"&gt;insmod ufs2&lt;/span&gt;
 &lt;span class="x"&gt;insmod ntfs&lt;/span&gt;
 &lt;span class="x"&gt;menuentry &amp;quot;FreeBSD 11.0 amd64&amp;quot; &lt;/span&gt;&lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
 &lt;span class="x"&gt;  set isofile=&amp;quot;/iso/FreeBSD-11.0-RELEASE-amd64-dvd1.iso&amp;quot;&lt;/span&gt;
-&lt;span class="x"&gt;  loopback loop (hd0,1)\&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;isofile&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+&lt;span class="x"&gt;  loopback loop (hd0,1)&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;isofile&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
 &lt;span class="x"&gt;  kfreebsd  (loop)/boot/kernel/kernel&lt;/span&gt;
 &lt;span class="x"&gt;}&lt;/span&gt;
 &lt;span class="x"&gt;EOF&lt;/span&gt;
@@ -127,4 +131,4 @@ devfs              &lt;span class="m"&gt;1&lt;/span&gt;       &lt;span class="m"
 
 
 &lt;p&gt;Look that the old root filesystem (&lt;code&gt;/dev/da0s1&lt;/code&gt;) is re-mounted on &lt;code&gt;/mnt&lt;/code&gt; as
-described in manual. Hope it helps other :-)&lt;/p&gt;</summary><category term="freebsd"></category><category term="grub"></category><category term="iso"></category><category term="mount.conf"></category></entry></feed>
+described in manual. Hope it helps other :-)&lt;/p&gt;</content><category term="freebsd"></category><category term="grub"></category><category term="iso"></category><category term="mount.conf"></category></entry></feed>
