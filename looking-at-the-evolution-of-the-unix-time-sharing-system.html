@@ -90,7 +90,7 @@ crashed, not the child command.</p>
 <p>Still I'm not quiet sure why the code crashes in the child process calling <code>_close</code> before
 executing the <code>_execv</code> system call but a quick fix was to install a <code>SIGCHLD</code> handler, closing
 the child zombie process.</p>
-<h1>Know your Builtins</h1>
+<h1>Know Thy Builtins</h1>
 <p>As ritchie continues, when addapting the new multiprocessing capability with design of the
 new <code>fork</code> system call, they discovered that the <code>chdir</code> command stopeed working. Investigation
 through the process, they relasized now that when shell forks the <code>chdir</code> procss, it executed
@@ -110,7 +110,7 @@ changing current shell working directory:</p>
 
 <p>So, what's the use of the <code>cd</code> binary command? I'm not quiet sure but one <a href="https://unix.stackexchange.com/a/50060">example</a>  I find
 was to check which directories we have access to visit:</p>
-<div class="highlight"><pre><span></span>find . -type d -exec <span class="nb">cd</span> <span class="o">{}</span> <span class="se">\;</span> -print
+<div class="highlight"><pre><span></span>find . -type d -exec /bin/cd <span class="o">{}</span> <span class="se">\;</span> -print
 </pre></div>
     </div>
 

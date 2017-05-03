@@ -32,7 +32,7 @@ crashed, not the child command.&lt;/p&gt;
 &lt;p&gt;Still I'm not quiet sure why the code crashes in the child process calling &lt;code&gt;_close&lt;/code&gt; before
 executing the &lt;code&gt;_execv&lt;/code&gt; system call but a quick fix was to install a &lt;code&gt;SIGCHLD&lt;/code&gt; handler, closing
 the child zombie process.&lt;/p&gt;
-&lt;h1&gt;Know your Builtins&lt;/h1&gt;
+&lt;h1&gt;Know Thy Builtins&lt;/h1&gt;
 &lt;p&gt;As ritchie continues, when addapting the new multiprocessing capability with design of the
 new &lt;code&gt;fork&lt;/code&gt; system call, they discovered that the &lt;code&gt;chdir&lt;/code&gt; command stopeed working. Investigation
 through the process, they relasized now that when shell forks the &lt;code&gt;chdir&lt;/code&gt; procss, it executed
@@ -52,7 +52,7 @@ changing current shell working directory:&lt;/p&gt;
 
 &lt;p&gt;So, what's the use of the &lt;code&gt;cd&lt;/code&gt; binary command? I'm not quiet sure but one &lt;a href="https://unix.stackexchange.com/a/50060"&gt;example&lt;/a&gt;  I find
 was to check which directories we have access to visit:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;find . -type d -exec &lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="o"&gt;{}&lt;/span&gt; &lt;span class="se"&gt;\;&lt;/span&gt; -print
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;find . -type d -exec /bin/cd &lt;span class="o"&gt;{}&lt;/span&gt; &lt;span class="se"&gt;\;&lt;/span&gt; -print
 &lt;/pre&gt;&lt;/div&gt;</content><category term="unix"></category><category term="design"></category><category term="ritchie"></category><category term="thompson"></category><category term="linux"></category><category term="article"></category></entry><entry><title>Extending The Battery Life in Linux</title><link href="http://bijanebrahimi.github.io/blog/extending-the-battery-life-in-linux.html" rel="alternate"></link><published>2016-02-25T14:20:00+03:30</published><updated>2016-02-25T14:20:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-25:/blog/extending-the-battery-life-in-linux.html</id><summary type="html">&lt;p&gt;Before Running any tunning, the average estimated lifetime of my battery was
 about 3 hours (below image). Through this post we learn how to extend it to
 almost 4 and a half hours. It's more than 50 percent increase!&lt;/p&gt;
