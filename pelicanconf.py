@@ -38,7 +38,7 @@ DEFAULT_PAGINATION = 5
 #RELATIVE_URLS = True
 
 # THEME related configs
-THEME = 'pelican-medius'
+THEME = 'template'
 MEDIUS_AUTHORS = {
     'Bijan': {
         'description': """

@@ -2,7 +2,7 @@ PY?=python3
 PELICAN?=pelican
 PELICANOPTS=
 
-BASEDIR=$(CURDIR)
+BASEDIR=$(.CURDIR)
 INPUTDIR=$(BASEDIR)/content
 OUTPUTDIR=$(BASEDIR)/output
 CONFFILE=$(BASEDIR)/pelicanconf.py
@@ -28,14 +28,14 @@ DROPBOX_DIR=~/Dropbox/Public/
 GITHUB_PAGES_BRANCH=gh-pages
 
 DEBUG ?= 0
-ifeq ($(DEBUG), 1)
+.if $(DEBUG) == 1
 	PELICANOPTS += -D
-endif
+.endif
 
 RELATIVE ?= 0
-ifeq ($(RELATIVE), 1)
+.if $(RELATIVE) == 1
 	PELICANOPTS += --relative-urls
-endif
+.endif
 
 help:
 	@echo 'Makefile for a pelican Web site                                           '
@@ -71,26 +71,26 @@ regenerate:
 	$(PELICAN) -r $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS)
 
 serve:
-ifdef PORT
+.ifdef PORT
 	cd $(OUTPUTDIR) && $(PY) -m pelican.server $(PORT)
-else
+.else
 	cd $(OUTPUTDIR) && $(PY) -m pelican.server
-endif
+.endif
 
 serve-global:
-ifdef SERVER
+.ifdef SERVER
 	cd $(OUTPUTDIR) && $(PY) -m pelican.server 80 $(SERVER)
-else
+.else
 	cd $(OUTPUTDIR) && $(PY) -m pelican.server 80 0.0.0.0
-endif
+.endif
 
 
 devserver:
-ifdef PORT
+.ifdef PORT
 	$(BASEDIR)/develop_server.sh restart $(PORT)
-else
+.else
 	$(BASEDIR)/develop_server.sh restart
-endif
+.endif
 
 stopserver:
 	$(BASEDIR)/develop_server.sh stop
