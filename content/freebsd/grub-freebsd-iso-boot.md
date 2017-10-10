@@ -1,7 +1,5 @@
 Title: Freebsd's .mount.conf
 SubTitle: How to boot FreeBSD's ISO image file from GRUB
-Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_freebsd.png
-Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_freebsd.png
 Date: 2017-02-24 22:05
 Category: FreeBSD
 Tags: freebsd, grub, iso, mount.conf

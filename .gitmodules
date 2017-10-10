@@ -1,0 +1,3 @@
+[submodule "theme"]
+	path = template
+	url = git@github.com:onur/medius.git

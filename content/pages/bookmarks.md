@@ -1,7 +1,5 @@
 Title: Bookmarks
 SubTitle: a collection of articles and projects I find very interesting
-Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
-Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
 Date: 2017-02-24 11:36
 
 

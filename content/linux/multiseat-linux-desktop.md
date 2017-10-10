@@ -1,7 +1,5 @@
 title: Multiseat Linux Desktop
 SubTitle:
-Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
-Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux_thumb.jpg
 Date: 2014-10-21 10:35
 Category: Linux
 tags: X11, config

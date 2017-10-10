@@ -1,7 +1,5 @@
 Title: rofi-todo
 SubTitle: a rofi script to do the dirty job
-Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
-Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux_thumb.jpg
 Date: 2016-02-26 18:15
 Category: Projects
 Tags: linux, rofi, rofi-todo, rofi-script, bash, project

@@ -1,7 +1,5 @@
 Title: Books I Read in 2015
 SubTitle: List of books I like to share
-Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_book.jpg
-Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_book_thumb.jpg
 Date: 2016-03-13 12:09
 Category: Books
 Tags: Book, Divergent, Insurgent, Allegiant, Veronica Roth, Lord of the Rings, J.R.R Tolkien, Dan Brown, Lost Symbol, Inferno, Beloved, Toni Morrison, The fault in our stars, The Abundance of Katherines, John Green, The first man, Albert Camus, Clean Code, Robert C. Martin, Effective Python, Brett Slatkin, Pro Git, Scott Chacon

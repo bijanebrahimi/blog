@@ -27,8 +27,7 @@ AUTHOR_FEED_RSS = None
 LINKS = (('Fork Me on Github', 'https://github.com/bijanebrahimi/blog'),)
 
 # Social widget
-SOCIAL = (('Twitter', 'https://twitter.com/xxbijanxx'),
-          ('Github', 'https://github.com/bijanebrahimi'),)
+SOCIAL = (('Github', 'https://github.com/bijanebrahimi'),)
 
 DEFAULT_PAGINATION = 5
 
@@ -45,31 +44,13 @@ MEDIUS_AUTHORS = {
         'description': """
             I Love to Read, Code and Explore the Possibilities.
         """,
-        'cover': 'http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg',
-        'image': 'http://bijanebrahimi.github.io/blog/assets/images/author.jpg',
-        'links': (('github', 'https://github.com/bijanebrahimi'),
-                  ('twitter-square', 'https://twitter.com/xxbijanxx')),
+        'image': 'http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd',
+        'links': (('github', 'https://github.com/bijanebrahimi'),),
     }
 }
 MEDIUS_CATEGORIES = {
     'Projects': {
         'description': 'You can follow me also at github.com/bijanebrahimi',
-        'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_projects_thumb.png'
-    },
-    'Gist': {
-        'description': 'Useful snippets of code',
-        'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_gist_thumb.png'
-    },
-    'Linux': {
-        'description': 'Linux Related Stuff',
-        'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_linux_thumb.png'
-    },
-    'Books': {
-        'description': 'List of Books I read or like to read',
-        'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_book_thumb.png'
-    },
-    'Git': {
-        'description': 'Git related stuff',
-        'thumbnail': 'http://bijanebrahimi.github.io/blog/assets/images/category_git_thumb.png'
-    },
+        'thumbnail': 'http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd'
+    }
 }

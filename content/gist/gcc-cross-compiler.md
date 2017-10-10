@@ -1,7 +1,5 @@
 Title: GCC Cross-Compiler
 SubTitle: a gcc cross-compiler for freebsd in linux
-Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
-Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
 Date: 2017-02-17 12:04
 Category: Gist
 Tags: gist, gcc, cross-compiler, freebsd, linux, compiler

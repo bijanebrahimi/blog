@@ -1,7 +1,5 @@
 Title: Extending The Battery Life in Linux
 SubTitle: A Walkthrough to How I managed to extend my laptop battery life
-Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
-Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux_thumb.jpg
 Date: 2016-02-25 14:20
 Category: Linux
 Tags: linux, powertop, power

@@ -1,7 +1,5 @@
 Title: py3status Configuration
 SubTitle: Using Font Awesome
-Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
-Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux_thumb.jpg
 Date: 2016-03-14 22:35
 Category: Projects
 Tags: linux, i3, py3status, i3status, font-awesome

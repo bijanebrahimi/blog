@@ -1,7 +1,5 @@
 title: Multiseat Linux Desktop, Multiple X servers
 SubTitle: A Walkthrough to How I managed to run my first multiseat solution
-Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
-Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux_thumb.jpg
 Date: 2014-10-22 10:35
 Category: Linux
 tags: X11, config, xephyr

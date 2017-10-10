@@ -1,7 +1,5 @@
 Title: Books I Read in 2016
 SubTitle: List of books I like to share
-Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_book.jpg
-Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_book_thumb.jpg
 Date: 2017-02-17 14:40
 Category: Books
 Tags: 

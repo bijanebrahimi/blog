@@ -1,7 +1,5 @@
 Title: Graphviz in markdown
 SubTitle: Or How I use dot graph in Gitlab's Markdown formatted files
-Cover: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
-Thumbnail: http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg
 Date: 2017-02-20 20:12
 Category: Gist
 Tags: gitlab, wiki, graphviz, debian, omnibus, apache, nginx, php, dot, svg
