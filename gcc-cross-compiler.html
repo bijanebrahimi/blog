@@ -24,8 +24,8 @@
             <li class="pure-menu-item pure-menu-selected"><a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="pure-menu-link">Gist</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/git.html" class="pure-menu-link">Git</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="pure-menu-link">OpenBSD</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
-            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/unix.html" class="pure-menu-link">Unix</a></li>
         </ul>
     </div>
 
@@ -33,9 +33,6 @@
 <div class="page-container">
     <div class="entry-content">
         <div class="post-meta pure-g">
-            <div class="pure-u">
-                <a href="http://bijanebrahimi.github.io/blog/category/gist.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/category_gist_thumb.png " class="post-avatar" alt="Gist"></a>
-            </div>
 <div class="pure-u-3-4 meta-data">
     <a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="category">Gist</a><br />
 
@@ -47,15 +44,10 @@
     <div class="article-header-container">
         <div class="background-image-container">
 
-            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg);">
-                <img src="http://bijanebrahimi.github.io/blog/assets/images/post_category_linux.jpg" alt="GCC Cross-Compiler">
-                <div class="title">
-                <h1>
-                    GCC Cross-Compiler
-                </h1>
-                <h2>
-                    a gcc cross-compiler for freebsd in linux
-                </h2>
+            <div class="background-image-small">
+                <div class="title-container">
+                    <h1>GCC Cross-Compiler</h1>
+                    <h4>a gcc cross-compiler for freebsd in linux</h4>
                 </div>
             </div>
         </div>
@@ -80,8 +72,8 @@
 
 <p>And since, we don't wan to mix our cross-compile toolchains with our native binaries, we install our cross-compiler toolchains in the <code>/usr/cross-build</code> directory:</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">PREFIX</span><span class="o">=</span>/usr/cross-build
-$ <span class="nb">export</span> <span class="nv">TARGET_PREFIX</span><span class="o">=</span>$PREFIX/$TARGET
-$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span>$PATH:$PREFIX/bin
+$ <span class="nb">export</span> <span class="nv">TARGET_PREFIX</span><span class="o">=</span><span class="nv">$PREFIX</span>/<span class="nv">$TARGET</span>
+$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$PREFIX</span>/bin
 </pre></div>
 
 
@@ -96,7 +88,7 @@ $ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</
 $ wget https://ftp.gnu.org/gnu/binutils/binutils-2.27.tar.gz
 $ tar zxvf binutils-2.27.tar.gz
 $ <span class="nb">cd</span> build-binutils
-$ ../binutils-2.27/configure --target<span class="o">=</span>$TARGET --prefix<span class="o">=</span>$PREFIX -v
+$ ../binutils-2.27/configure --target<span class="o">=</span><span class="nv">$TARGET</span> --prefix<span class="o">=</span><span class="nv">$PREFIX</span> -v
 $ make -j 4
 $ sudo make install
 </pre></div>
@@ -111,7 +103,7 @@ $ sudo make install
 $ wget https://ftp.gnu.org/gnu/gmp/gmp-6.1.1.tar.xz
 $ tar xvf gmp-6.1.1.tar.xz
 $ <span class="nb">cd</span> build-gmp
-$ ../gmp-6.1.1/configure --prefix<span class="o">=</span>$PREFIX --enable-shared --enable-static --enable-mpbsd --enable-fft --enable-cxx --host<span class="o">=</span>$TARGET
+$ ../gmp-6.1.1/configure --prefix<span class="o">=</span><span class="nv">$PREFIX</span> --enable-shared --enable-static --enable-mpbsd --enable-fft --enable-cxx --host<span class="o">=</span><span class="nv">$TARGET</span>
 $ make -j 4
 $ sudo make install
 $ <span class="nb">cd</span> ..
@@ -120,7 +112,7 @@ $ mkdir build-mpfr
 $ wget https://ftp.gnu.org/gnu/mpfr/mpfr-3.1.5.tar.xz
 $ tar xvf mpfr-3.1.5.tar.xz
 $ <span class="nb">cd</span> build-mpfr
-$ ../mpfr-3.1.5/configure --prefix<span class="o">=</span>$PREFIX  --with-gnu-ld --with-gmp<span class="o">=</span>$PREFIX --enable-static --enable-shared --host<span class="o">=</span>$TARGET
+$ ../mpfr-3.1.5/configure --prefix<span class="o">=</span><span class="nv">$PREFIX</span>  --with-gnu-ld --with-gmp<span class="o">=</span><span class="nv">$PREFIX</span> --enable-static --enable-shared --host<span class="o">=</span><span class="nv">$TARGET</span>
 $ make -j 4
 $ sudo make install
 $ <span class="nb">cd</span> ..
@@ -129,7 +121,7 @@ $ mkdir build-mpci
 $ wget https://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz
 $ tar zxvf mpc-1.0.3.tar.gz
 $ <span class="nb">cd</span> build-mpc
-$ ../mpc-1.0.3/configure --prefix<span class="o">=</span>$PREFIX --with-gnu-ld --with-gmp<span class="o">=</span>$PREFIX --with-mpfr<span class="o">=</span>$PREFIX --enable-static --enable-shared --host<span class="o">=</span>$TARGET
+$ ../mpc-1.0.3/configure --prefix<span class="o">=</span><span class="nv">$PREFIX</span> --with-gnu-ld --with-gmp<span class="o">=</span><span class="nv">$PREFIX</span> --with-mpfr<span class="o">=</span><span class="nv">$PREFIX</span> --enable-static --enable-shared --host<span class="o">=</span><span class="nv">$TARGET</span>
 $ make -j 4
 $ sudo make install
 $ <span class="nb">cd</span> ..
@@ -141,8 +133,8 @@ $ <span class="nb">cd</span> ..
 $ wget https://ftp.gnu.org/gnu/gcc/gcc-6.2.0/gcc-6.2.0.tar.gz
 $ tar zxvf gcc-6.2.0.tar.gz
 $ <span class="nb">cd</span> build-gcc
-$ ../gcc-6.2.0/configure --without-headers --with-gnu-as --with-gnu-ld --enable-languages<span class="o">=</span>c,c++ --disable-nls --enable-libssp --enable-gold --enable-ld --target<span class="o">=</span>$TARGET --prefix<span class="o">=</span>$PREFIX --with-gmp<span class="o">=</span>$PREFIX --with-mpc<span class="o">=</span>$PREFIX --with-mpfr<span class="o">=</span>$PREFIX --disable-libgomp
-$ <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>$PREFIX/lib make -j 4
+$ ../gcc-6.2.0/configure --without-headers --with-gnu-as --with-gnu-ld --enable-languages<span class="o">=</span>c,c++ --disable-nls --enable-libssp --enable-gold --enable-ld --target<span class="o">=</span><span class="nv">$TARGET</span> --prefix<span class="o">=</span><span class="nv">$PREFIX</span> --with-gmp<span class="o">=</span><span class="nv">$PREFIX</span> --with-mpc<span class="o">=</span><span class="nv">$PREFIX</span> --with-mpfr<span class="o">=</span><span class="nv">$PREFIX</span> --disable-libgomp
+$ <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$PREFIX</span>/lib make -j 4
 $ sudo make install
 </pre></div>
 
@@ -156,7 +148,7 @@ $ sudo make install
 <div class="highlight"><pre><span></span>$ gcc main.c -o helloworld-linux
 $ file helloword-linux
 main: ELF 64-bit LSB executable, x86-64, version <span class="m">1</span> <span class="o">(</span>SYSV<span class="o">)</span>, dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, <span class="k">for</span> GNU/Linux 2.6.32, BuildID<span class="o">[</span>sha1<span class="o">]=</span>ca5ba57ac722ef8521d50ee8ecbbdca4b44a76e1, not stripped
-$ <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>$PREFIX/lib amd64-marcel-freebsd9.2-gcc helloworld.c -o helloworld-freebsd
+$ <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$PREFIX</span>/lib amd64-marcel-freebsd9.2-gcc helloworld.c -o helloworld-freebsd
 $ file helloworld-freebsd
 main: ELF 64-bit LSB executable, x86-64, version <span class="m">1</span> <span class="o">(</span>FreeBSD<span class="o">)</span>, dynamically linked, interpreter /libexec/ld-elf.so.1, <span class="k">for</span> FreeBSD 9.2, not stripped
 </pre></div>
@@ -165,7 +157,7 @@ main: ELF 64-bit LSB executable, x86-64, version <span class="m">1</span> <span 
 <p>If you need a cross-compile version of gdb, simply compile the gdb for the target machine like above:</p>
 <div class="highlight"><pre><span></span>$ wget https://ftp.gnu.org/gnu/gdb/gdb-7.11.tar.xz
 $ tar xvf gdb-7.11.tar.xz
-$ ../gdb-7.11.1/configure --prefix<span class="o">=</span>$PREFIX --target<span class="o">=</span>$TARGET
+$ ../gdb-7.11.1/configure --prefix<span class="o">=</span><span class="nv">$PREFIX</span> --target<span class="o">=</span><span class="nv">$TARGET</span>
 $ make -j 4
 $ sudo make install
 </pre></div>
@@ -187,7 +179,7 @@ $ sudo make install
             <div class="pure-u-1 pure-u-md-1-2">
                 <div class="pure-g poster-info">
                     <div class="pure-u">
-                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/author.jpg" alt=""></a>
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd" alt=""></a>
                     </div>
                     <div class="pure-u-3-4">
                         <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
@@ -201,21 +193,6 @@ $ sudo make install
             </div>
 
 
-            <div class="pure-u-1 pure-u-md-1-2">
-
-                <div class="pure-g post-category-info">
-                    <div class="pure-u">
-                        <a href="http://bijanebrahimi.github.io/blog/category/gist.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/category_gist_thumb.png" alt=""></a>
-                    </div>
-                    <div class="pure-u-3-4">
-                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/category/gist.html">Gist</a></h3>
-                        <p class="author-description">
-                          Useful snippets of code
-                        </p>
-                    </div>
-                </div>
-
-            </div>
 
         </div>
 
@@ -247,8 +224,8 @@ $ sudo make install
         <a href="http://bijanebrahimi.github.io/blog/category/gist.html">Gist</a>
         <a href="http://bijanebrahimi.github.io/blog/category/git.html">Git</a>
         <a href="http://bijanebrahimi.github.io/blog/category/linux.html">Linux</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html">OpenBSD</a>
         <a href="http://bijanebrahimi.github.io/blog/category/projects.html">Projects</a>
-        <a href="http://bijanebrahimi.github.io/blog/category/unix.html">Unix</a>
         <a href="https://github.com/bijanebrahimi/blog">Fork Me on Github</a>
 
     </footer>

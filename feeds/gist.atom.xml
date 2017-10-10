@@ -99,8 +99,8 @@ $ gitlab-ctl restart nginx
 
 &lt;p&gt;And since, we don't wan to mix our cross-compile toolchains with our native binaries, we install our cross-compiler toolchains in the &lt;code&gt;/usr/cross-build&lt;/code&gt; directory:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PREFIX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/usr/cross-build
-$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;TARGET_PREFIX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX/$TARGET
-$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;$PATH:$PREFIX/bin
+$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;TARGET_PREFIX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
+$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PATH&lt;/span&gt;:&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/bin
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -115,7 +115,7 @@ $ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/spa
 $ wget https://ftp.gnu.org/gnu/binutils/binutils-2.27.tar.gz
 $ tar zxvf binutils-2.27.tar.gz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-binutils
-$ ../binutils-2.27/configure --target&lt;span class="o"&gt;=&lt;/span&gt;$TARGET --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX -v
+$ ../binutils-2.27/configure --target&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt; --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; -v
 $ make -j 4
 $ sudo make install
 &lt;/pre&gt;&lt;/div&gt;
@@ -130,7 +130,7 @@ $ sudo make install
 $ wget https://ftp.gnu.org/gnu/gmp/gmp-6.1.1.tar.xz
 $ tar xvf gmp-6.1.1.tar.xz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-gmp
-$ ../gmp-6.1.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --enable-shared --enable-static --enable-mpbsd --enable-fft --enable-cxx --host&lt;span class="o"&gt;=&lt;/span&gt;$TARGET
+$ ../gmp-6.1.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --enable-shared --enable-static --enable-mpbsd --enable-fft --enable-cxx --host&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
 $ make -j 4
 $ sudo make install
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
@@ -139,7 +139,7 @@ $ mkdir build-mpfr
 $ wget https://ftp.gnu.org/gnu/mpfr/mpfr-3.1.5.tar.xz
 $ tar xvf mpfr-3.1.5.tar.xz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-mpfr
-$ ../mpfr-3.1.5/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX  --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;$TARGET
+$ ../mpfr-3.1.5/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;  --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
 $ make -j 4
 $ sudo make install
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
@@ -148,7 +148,7 @@ $ mkdir build-mpci
 $ wget https://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz
 $ tar zxvf mpc-1.0.3.tar.gz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-mpc
-$ ../mpc-1.0.3/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;$TARGET
+$ ../mpc-1.0.3/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
 $ make -j 4
 $ sudo make install
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
@@ -160,8 +160,8 @@ $ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
 $ wget https://ftp.gnu.org/gnu/gcc/gcc-6.2.0/gcc-6.2.0.tar.gz
 $ tar zxvf gcc-6.2.0.tar.gz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-gcc
-$ ../gcc-6.2.0/configure --without-headers --with-gnu-as --with-gnu-ld --enable-languages&lt;span class="o"&gt;=&lt;/span&gt;c,c++ --disable-nls --enable-libssp --enable-gold --enable-ld --target&lt;span class="o"&gt;=&lt;/span&gt;$TARGET --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-mpc&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --disable-libgomp
-$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX/lib make -j 4
+$ ../gcc-6.2.0/configure --without-headers --with-gnu-as --with-gnu-ld --enable-languages&lt;span class="o"&gt;=&lt;/span&gt;c,c++ --disable-nls --enable-libssp --enable-gold --enable-ld --target&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt; --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-mpc&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --disable-libgomp
+$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/lib make -j 4
 $ sudo make install
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -175,7 +175,7 @@ $ sudo make install
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcc main.c -o helloworld-linux
 $ file helloword-linux
 main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;SYSV&lt;span class="o"&gt;)&lt;/span&gt;, dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, &lt;span class="k"&gt;for&lt;/span&gt; GNU/Linux 2.6.32, BuildID&lt;span class="o"&gt;[&lt;/span&gt;sha1&lt;span class="o"&gt;]=&lt;/span&gt;ca5ba57ac722ef8521d50ee8ecbbdca4b44a76e1, not stripped
-$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX/lib amd64-marcel-freebsd9.2-gcc helloworld.c -o helloworld-freebsd
+$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/lib amd64-marcel-freebsd9.2-gcc helloworld.c -o helloworld-freebsd
 $ file helloworld-freebsd
 main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;FreeBSD&lt;span class="o"&gt;)&lt;/span&gt;, dynamically linked, interpreter /libexec/ld-elf.so.1, &lt;span class="k"&gt;for&lt;/span&gt; FreeBSD 9.2, not stripped
 &lt;/pre&gt;&lt;/div&gt;
@@ -184,7 +184,7 @@ main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/spa
 &lt;p&gt;If you need a cross-compile version of gdb, simply compile the gdb for the target machine like above:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ wget https://ftp.gnu.org/gnu/gdb/gdb-7.11.tar.xz
 $ tar xvf gdb-7.11.tar.xz
-$ ../gdb-7.11.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --target&lt;span class="o"&gt;=&lt;/span&gt;$TARGET
+$ ../gdb-7.11.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --target&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
 $ make -j 4
 $ sudo make install
 &lt;/pre&gt;&lt;/div&gt;

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Books I Read in 2017</title>
+        <title>OpenBSD 6.2 Upgrade</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
         <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
-        <link href="http://bijanebrahimi.github.io/blog/feeds/books.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/openbsd.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
 </head>
 <body>
 
@@ -19,13 +19,13 @@
             <li class="pure-menu-item"></li>
 
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/pages/bookmarks.html" class="pure-menu-link">Bookmarks</a></li>
-            <li class="pure-menu-item pure-menu-selected"><a href="http://bijanebrahimi.github.io/blog/category/books.html" class="pure-menu-link">Books</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/books.html" class="pure-menu-link">Books</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="pure-menu-link">FreeBSD</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="pure-menu-link">Gist</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/git.html" class="pure-menu-link">Git</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="pure-menu-link">OpenBSD</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
-            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/unix.html" class="pure-menu-link">Unix</a></li>
         </ul>
     </div>
 
@@ -33,49 +33,88 @@
 <div class="page-container">
     <div class="entry-content">
         <div class="post-meta pure-g">
-            <div class="pure-u">
-                <a href="http://bijanebrahimi.github.io/blog/category/books.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/category_book_thumb.png " class="post-avatar" alt="Books"></a>
-            </div>
 <div class="pure-u-3-4 meta-data">
-    <a href="http://bijanebrahimi.github.io/blog/category/books.html" class="category">Books</a><br />
+    <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="category">OpenBSD</a><br />
 
     <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
-    &mdash; <abbr title="2017-04-17T14:40:00+04:30">Mon 17 April 2017</abbr>
+    &mdash; <abbr title="2017-10-10T22:49:00+03:30">Tue 10 October 2017</abbr>
 </div>        </div>
     </div>
 
     <div class="article-header-container">
         <div class="background-image-container">
 
-            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://bijanebrahimi.github.io/blog/assets/images/post_category_book.jpg);">
-                <img src="http://bijanebrahimi.github.io/blog/assets/images/post_category_book.jpg" alt="Books I Read in 2017">
-                <div class="title">
-                <h1>
-                    Books I Read in 2017
-                </h1>
-                <h2>
-                    List of books I like to share
-                </h2>
+            <div class="background-image-small">
+                <div class="title-container">
+                    <h1>OpenBSD 6.2 Upgrade</h1>
+                    <h4>The story of my first OpenBSD upgrade</h4>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="entry-content">
-        <p>The List isn't long. same as the last year, I was spending my last months in the military service. I think there are a couple of books missing from the list which I might forgot them for the moment of creating this post. Also I hope I to find the time in the next year to also keep track of the useful articles since I'm mainly reading them instead of hard cover books.</p>
-<h2>Computer &amp; Programming</h2>
+        <p>The Upgrading Process is stupidly easy. The process is <a href="https://www.openbsd.org/faq/upgrade62.html">well documented</a> for each release
+and is available after the release of binary packages and when install images are out but
+before going any further, please read the OpenBSD 6.2 <a href="4">new features</a> for the list of
+changes and improvements. </p>
+<p>The process is split into two separate processes:</p>
 <ul>
-<li>Linux System Programming</li>
-<li>The Design and Implementation of the FreeBSD by Marshall Kirk McKusick (only a few chapters)</li>
+<li>First, You should upgrade the base system using one of two possibles. Using a bootable disk
+image or using the manual process which is not recommended.</li>
+<li>Second, Upgrading the binary packages.</li>
 </ul>
+<p>I choose Upgrading via a bootable media since it is the highly recommended way:</p>
+<div class="highlight"><pre><span></span><span class="nv">$curl</span> -o install62.fs https://openbsd.mirror.netelligent.ca/pub/OpenBSD/6.2/amd64/install62.fs
+</pre></div>
+
+
+<p>Writing the image to the USB stick was a matter of executing <code>dd</code> command (as always):</p>
+<div class="highlight"><pre><span></span>$ sysctl hw.disknames
+hw.disknames<span class="o">=</span>sd0:da0bedc25009303c,cd0:,sd1:9e5b01f8dc3ea3f3
+$ doas dd <span class="k">if</span><span class="o">=</span>install62.fs <span class="nv">of</span><span class="o">=</span>/dev/rsd1c <span class="nv">bs</span><span class="o">=</span>1m
+</pre></div>
+
+
+<p>Again, if you're unfamiliar with anything like OpenBSD way of <a href="https://www.openbsd.org/faq/faq14.html">dealing with storage devices</a> and
+other things, please consider reading the entire <a href="https://www.openbsd.org/faq/">FAQ</a>. It really pays off, I promise ;-)</p>
+<p>Now the next move is follow the pre-upgrade which I actually forgot. For my currect
+setup, it was only to manually remove the man pages to avoid having old manpages in
+the new system after successfull upgrade:</p>
+<div class="highlight"><pre><span></span>$ doas rm -rf /usr/share/man/
+</pre></div>
+
+
+<p>Now, Just rebooted the machine and booted from the USB stick and Press (U)pgrade and that was it.
+After confirming the keyboard layout and my laptop's primary disk where my OpenBSD installation
+resides, the process of Upgrading <strong>The Base System</strong> was done. After completion and rebooting
+the machine, the first thing the new OS did was retrieving the newer firmwares which I skipped
+since at the time, I had no (reliable) Internet connection, but don't worry, you can do it later:</p>
+<div class="highlight"><pre><span></span>$ uname -a
+OpenBSD localhost.lenovo 6.2 GENERIC.MP#134 amd64
+$ doas fw_update
+</pre></div>
+
+
+<p>Now, it's time to <strong>update the binary packages</strong> since their dependencies on the base system has
+just been upgraded. But that was just one command away:</p>
+<div class="highlight"><pre><span></span>$ doas pkg_add -u
+</pre></div>
+
+
+<p>That was it. Hope to write more about OpenBSD in the near future.</p>
     </div>
 
     <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/openbsd.html">openbsd</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/upgrade.html">upgrade</a>
+        </div>
         <div class="pure-g post-footer">
             <div class="pure-u-1 pure-u-md-1-2">
                 <div class="pure-g poster-info">
                     <div class="pure-u">
-                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/author.jpg" alt=""></a>
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd" alt=""></a>
                     </div>
                     <div class="pure-u-3-4">
                         <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
@@ -89,21 +128,6 @@
             </div>
 
 
-            <div class="pure-u-1 pure-u-md-1-2">
-
-                <div class="pure-g post-category-info">
-                    <div class="pure-u">
-                        <a href="http://bijanebrahimi.github.io/blog/category/books.html"><img src="http://bijanebrahimi.github.io/blog/assets/images/category_book_thumb.png" alt=""></a>
-                    </div>
-                    <div class="pure-u-3-4">
-                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/category/books.html">Books</a></h3>
-                        <p class="author-description">
-                          List of Books I read or like to read
-                        </p>
-                    </div>
-                </div>
-
-            </div>
 
         </div>
 
@@ -135,8 +159,8 @@
         <a href="http://bijanebrahimi.github.io/blog/category/gist.html">Gist</a>
         <a href="http://bijanebrahimi.github.io/blog/category/git.html">Git</a>
         <a href="http://bijanebrahimi.github.io/blog/category/linux.html">Linux</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html">OpenBSD</a>
         <a href="http://bijanebrahimi.github.io/blog/category/projects.html">Projects</a>
-        <a href="http://bijanebrahimi.github.io/blog/category/unix.html">Unix</a>
         <a href="https://github.com/bijanebrahimi/blog">Fork Me on Github</a>
 
     </footer>

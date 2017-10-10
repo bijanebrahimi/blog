@@ -1,64 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-04-17T14:40:00+04:30</updated><entry><title>Books I Read in 2017</title><link href="http://bijanebrahimi.github.io/blog/books-i-read-in-2017.html" rel="alternate"></link><published>2017-04-17T14:40:00+04:30</published><updated>2017-04-17T14:40:00+04:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-04-17:/blog/books-i-read-in-2017.html</id><summary type="html">&lt;p&gt;The List isn't long. same as the last year, I was spending my last months in the military service. I think there are a couple of books missing from the list which I might forgot them for the moment of creating this post. Also I hope I to find the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;The List isn't long. same as the last year, I was spending my last months in the military service. I think there are a couple of books missing from the list which I might forgot them for the moment of creating this post. Also I hope I to find the time in the next year to also keep track of the useful articles since I'm mainly reading them instead of hard cover books.&lt;/p&gt;
-&lt;h2&gt;Computer &amp;amp; Programming&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-10-10T22:49:00+03:30</updated><entry><title>OpenBSD 6.2 Upgrade</title><link href="http://bijanebrahimi.github.io/blog/openbsd-62-upgrade.html" rel="alternate"></link><published>2017-10-10T22:49:00+03:30</published><updated>2017-10-10T22:49:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-10:/blog/openbsd-62-upgrade.html</id><summary type="html">&lt;p&gt;The Upgrading Process is stupidly easy. The process is &lt;a href="https://www.openbsd.org/faq/upgrade62.html"&gt;well documented&lt;/a&gt; for each release
+and is available after the release of binary packages and when install images are out but
+before going any further, please read the OpenBSD 6.2 &lt;a href="4"&gt;new features&lt;/a&gt; for the list of
+changes and improvements. &lt;/p&gt;
+&lt;p&gt;The …&lt;/p&gt;</summary><content type="html">&lt;p&gt;The Upgrading Process is stupidly easy. The process is &lt;a href="https://www.openbsd.org/faq/upgrade62.html"&gt;well documented&lt;/a&gt; for each release
+and is available after the release of binary packages and when install images are out but
+before going any further, please read the OpenBSD 6.2 &lt;a href="4"&gt;new features&lt;/a&gt; for the list of
+changes and improvements. &lt;/p&gt;
+&lt;p&gt;The process is split into two separate processes:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Linux System Programming&lt;/li&gt;
-&lt;li&gt;The Design and Implementation of the FreeBSD by Marshall Kirk McKusick (only a few chapters)&lt;/li&gt;
-&lt;/ul&gt;</content></entry><entry><title>Looking at The Evolution of the Unix Time-sharing System</title><link href="http://bijanebrahimi.github.io/blog/looking-at-the-evolution-of-the-unix-time-sharing-system.html" rel="alternate"></link><published>2017-04-02T22:20:00+04:30</published><updated>2017-04-02T22:20:00+04:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-04-02:/blog/looking-at-the-evolution-of-the-unix-time-sharing-system.html</id><summary type="html">&lt;h1&gt;Evolution of the Unix Time-Sharing System&lt;/h1&gt;
-&lt;p&gt;&lt;strong&gt;&lt;a href="http://www.read.seas.harvard.edu/~kohler/class/aosref/ritchie84evolution.pdf"&gt;The Evolution of the Unix Time-Sharing System&lt;/a&gt;&lt;/strong&gt; is an article by &lt;strong&gt;Denis Ritchie&lt;/strong&gt;
-describing the early history of the &lt;strong&gt;UNIX&lt;/strong&gt; operating system, including creation and
-design of some of (almost) unique features of the the operating system such as it's filesystem,
-process controlls, I …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Evolution of the Unix Time-Sharing System&lt;/h1&gt;
-&lt;p&gt;&lt;strong&gt;&lt;a href="http://www.read.seas.harvard.edu/~kohler/class/aosref/ritchie84evolution.pdf"&gt;The Evolution of the Unix Time-Sharing System&lt;/a&gt;&lt;/strong&gt; is an article by &lt;strong&gt;Denis Ritchie&lt;/strong&gt;
-describing the early history of the &lt;strong&gt;UNIX&lt;/strong&gt; operating system, including creation and
-design of some of (almost) unique features of the the operating system such as it's filesystem,
-process controlls, I/O redirection and a few more. Surprisingly, almost 50 years later,
-we're experiencing almost the same features (ofc with many more new cool stuff) but it's
-fascinating to see how much of the design still is within the current Unix-based operating
-systems such as &lt;strong&gt;linux&lt;/strong&gt;.&lt;/p&gt;
-&lt;p&gt;While I'm highly recommending reading the original article, I find it fun to track some
-of mysteries I was facing at work lately:&lt;/p&gt;
-&lt;h1&gt;Zombie Town&lt;/h1&gt;
-&lt;p&gt;With adaption of new &lt;code&gt;fork&lt;/code&gt; system call, forking (&lt;code&gt;fork&lt;/code&gt;) a new process and executing (&lt;code&gt;exec&lt;/code&gt;)
-the child command has become somewhat of an standard. Investitaging the actual process, reminded
-me of chasing a &lt;strong&gt;BUG&lt;/strong&gt; which mysteriousy brought down some of our &lt;strong&gt;BSD&lt;/strong&gt; machines at work.
-It turned out, somehow one f our daemons running as root is producing &lt;strong&gt;zombie&lt;/strong&gt; processes without
-attending them. Although a zombie process is merely just a few structs in kernel memory, leaving
-them unattended may lead to unexpected behaviors. In our case, the zombie processes caused the
-&lt;code&gt;root&lt;/code&gt; user to exceed it's maximum running processes limit (&lt;code&gt;kern.maxprocperuid&lt;/code&gt;) causing
-the system to stop working. So what was the issue?&lt;/p&gt;
-&lt;p&gt;Ever wondered what actually happens between forking a new process, clonning the current process
-to an almost exact copy of it's own and actually executing the child command? and what actually
-can go wrong between these two calls? Well, the process mentioned above is the same routine the
-&lt;a href="https://github.com/freebsd/freebsd/blob/master/lib/libc/gen/popen.c"&gt;popen&lt;/a&gt; function does on &lt;a href="https://github.com/freebsd/freebsd/tree/master/lib/libc"&gt;FreeBSD libc&lt;/a&gt; library. It forks the process, closes all of it's parent
-open file descriptors and executing the child command. Since before calling &lt;code&gt;_execv&lt;/code&gt; command, we're
-still running the same code as parent, if the code crashes, it crashes like the parent process
-crashed, not the child command.&lt;/p&gt;
-&lt;p&gt;Still I'm not quiet sure why the code crashes in the child process calling &lt;code&gt;_close&lt;/code&gt; before
-executing the &lt;code&gt;_execv&lt;/code&gt; system call but a quick fix was to install a &lt;code&gt;SIGCHLD&lt;/code&gt; handler, closing
-the child zombie process.&lt;/p&gt;
-&lt;h1&gt;Know Thy Builtins&lt;/h1&gt;
-&lt;p&gt;As ritchie continues, when addapting the new multiprocessing capability with design of the
-new &lt;code&gt;fork&lt;/code&gt; system call, they discovered that the &lt;code&gt;chdir&lt;/code&gt; command stopeed working. Investigation
-through the process, they relasized now that when shell forks the &lt;code&gt;chdir&lt;/code&gt; procss, it executed
-fine and actually did change the current working directory but since it's not changing it's 
-parent process (the running shell), after termination, the shell is still in the same directory
-as before.&lt;/p&gt;
-&lt;p&gt;I actually found a similar &lt;strong&gt;BUG&lt;/strong&gt; in one of our programs a few month before, when a fellow
-programmer modified a shell script adding pull path names to every commands including the
-&lt;code&gt;cd&lt;/code&gt; command. since &lt;code&gt;/bin/cd&lt;/code&gt; is a binary and can't effect the parent shell process (the same
-reason above), the script was end up doing it's stuff in a wrong directory. so it's
-&lt;strong&gt;Important&lt;/strong&gt; to notice that &lt;code&gt;cd&lt;/code&gt; command is actually a built-in shell command, capable of
-changing current shell working directory:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="nb"&gt;cd&lt;/span&gt;
-&lt;span class="nb"&gt;cd&lt;/span&gt; is a shell &lt;span class="nb"&gt;builtin&lt;/span&gt;
+&lt;li&gt;First, You should upgrade the base system using one of two possibles. Using a bootable disk
+image or using the manual process which is not recommended.&lt;/li&gt;
+&lt;li&gt;Second, Upgrading the binary packages.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I choose Upgrading via a bootable media since it is the highly recommended way:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;$curl&lt;/span&gt; -o install62.fs https://openbsd.mirror.netelligent.ca/pub/OpenBSD/6.2/amd64/install62.fs
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;So, what's the use of the &lt;code&gt;cd&lt;/code&gt; binary command? I'm not quiet sure but one &lt;a href="https://unix.stackexchange.com/a/50060"&gt;example&lt;/a&gt;  I find
-was to check which directories we have access to visit:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;find . -type d -exec /bin/cd &lt;span class="o"&gt;{}&lt;/span&gt; &lt;span class="se"&gt;\;&lt;/span&gt; -print
-&lt;/pre&gt;&lt;/div&gt;</content><category term="unix"></category><category term="design"></category><category term="ritchie"></category><category term="thompson"></category><category term="linux"></category><category term="article"></category></entry><entry><title>Freebsd's .mount.conf</title><link href="http://bijanebrahimi.github.io/blog/freebsds-mountconf.html" rel="alternate"></link><published>2017-02-24T22:05:00+03:30</published><updated>2017-02-24T22:05:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-24:/blog/freebsds-mountconf.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Writing the image to the USB stick was a matter of executing &lt;code&gt;dd&lt;/code&gt; command (as always):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sysctl hw.disknames
+hw.disknames&lt;span class="o"&gt;=&lt;/span&gt;sd0:da0bedc25009303c,cd0:,sd1:9e5b01f8dc3ea3f3
+$ doas dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;install62.fs &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/rsd1c &lt;span class="nv"&gt;bs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1m
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Again, if you're unfamiliar with anything like OpenBSD way of &lt;a href="https://www.openbsd.org/faq/faq14.html"&gt;dealing with storage devices&lt;/a&gt; and
+other things, please consider reading the entire &lt;a href="https://www.openbsd.org/faq/"&gt;FAQ&lt;/a&gt;. It really pays off, I promise ;-)&lt;/p&gt;
+&lt;p&gt;Now the next move is follow the pre-upgrade which I actually forgot. For my currect
+setup, it was only to manually remove the man pages to avoid having old manpages in
+the new system after successfull upgrade:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ doas rm -rf /usr/share/man/
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, Just rebooted the machine and booted from the USB stick and Press (U)pgrade and that was it.
+After confirming the keyboard layout and my laptop's primary disk where my OpenBSD installation
+resides, the process of Upgrading &lt;strong&gt;The Base System&lt;/strong&gt; was done. After completion and rebooting
+the machine, the first thing the new OS did was retrieving the newer firmwares which I skipped
+since at the time, I had no (reliable) Internet connection, but don't worry, you can do it later:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ uname -a
+OpenBSD localhost.lenovo 6.2 GENERIC.MP#134 amd64
+$ doas fw_update
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, it's time to &lt;strong&gt;update the binary packages&lt;/strong&gt; since their dependencies on the base system has
+just been upgraded. But that was just one command away:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ doas pkg_add -u
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That was it. Hope to write more about OpenBSD in the near future.&lt;/p&gt;</content><category term="openbsd"></category><category term="upgrade"></category></entry><entry><title>Freebsd's .mount.conf</title><link href="http://bijanebrahimi.github.io/blog/freebsds-mountconf.html" rel="alternate"></link><published>2017-02-24T22:05:00+03:30</published><updated>2017-02-24T22:05:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-24:/blog/freebsds-mountconf.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;As I'm getting more and more familiar with the FreeBSD Operating System and
 it's wonderfull architeture and design, I found the need to work with different
 versions of FreeBSD live (specially at work) and since it's not a good idea to install
@@ -296,8 +289,8 @@ $ gitlab-ctl restart nginx
 
 &lt;p&gt;And since, we don't wan to mix our cross-compile toolchains with our native binaries, we install our cross-compiler toolchains in the &lt;code&gt;/usr/cross-build&lt;/code&gt; directory:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PREFIX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/usr/cross-build
-$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;TARGET_PREFIX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX/$TARGET
-$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;$PATH:$PREFIX/bin
+$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;TARGET_PREFIX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
+$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PATH&lt;/span&gt;:&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/bin
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -312,7 +305,7 @@ $ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/spa
 $ wget https://ftp.gnu.org/gnu/binutils/binutils-2.27.tar.gz
 $ tar zxvf binutils-2.27.tar.gz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-binutils
-$ ../binutils-2.27/configure --target&lt;span class="o"&gt;=&lt;/span&gt;$TARGET --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX -v
+$ ../binutils-2.27/configure --target&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt; --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; -v
 $ make -j 4
 $ sudo make install
 &lt;/pre&gt;&lt;/div&gt;
@@ -327,7 +320,7 @@ $ sudo make install
 $ wget https://ftp.gnu.org/gnu/gmp/gmp-6.1.1.tar.xz
 $ tar xvf gmp-6.1.1.tar.xz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-gmp
-$ ../gmp-6.1.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --enable-shared --enable-static --enable-mpbsd --enable-fft --enable-cxx --host&lt;span class="o"&gt;=&lt;/span&gt;$TARGET
+$ ../gmp-6.1.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --enable-shared --enable-static --enable-mpbsd --enable-fft --enable-cxx --host&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
 $ make -j 4
 $ sudo make install
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
@@ -336,7 +329,7 @@ $ mkdir build-mpfr
 $ wget https://ftp.gnu.org/gnu/mpfr/mpfr-3.1.5.tar.xz
 $ tar xvf mpfr-3.1.5.tar.xz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-mpfr
-$ ../mpfr-3.1.5/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX  --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;$TARGET
+$ ../mpfr-3.1.5/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;  --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
 $ make -j 4
 $ sudo make install
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
@@ -345,7 +338,7 @@ $ mkdir build-mpci
 $ wget https://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz
 $ tar zxvf mpc-1.0.3.tar.gz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-mpc
-$ ../mpc-1.0.3/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;$TARGET
+$ ../mpc-1.0.3/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
 $ make -j 4
 $ sudo make install
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
@@ -357,8 +350,8 @@ $ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
 $ wget https://ftp.gnu.org/gnu/gcc/gcc-6.2.0/gcc-6.2.0.tar.gz
 $ tar zxvf gcc-6.2.0.tar.gz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-gcc
-$ ../gcc-6.2.0/configure --without-headers --with-gnu-as --with-gnu-ld --enable-languages&lt;span class="o"&gt;=&lt;/span&gt;c,c++ --disable-nls --enable-libssp --enable-gold --enable-ld --target&lt;span class="o"&gt;=&lt;/span&gt;$TARGET --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-mpc&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --disable-libgomp
-$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX/lib make -j 4
+$ ../gcc-6.2.0/configure --without-headers --with-gnu-as --with-gnu-ld --enable-languages&lt;span class="o"&gt;=&lt;/span&gt;c,c++ --disable-nls --enable-libssp --enable-gold --enable-ld --target&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt; --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-mpc&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --disable-libgomp
+$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/lib make -j 4
 $ sudo make install
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -372,7 +365,7 @@ $ sudo make install
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcc main.c -o helloworld-linux
 $ file helloword-linux
 main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;SYSV&lt;span class="o"&gt;)&lt;/span&gt;, dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, &lt;span class="k"&gt;for&lt;/span&gt; GNU/Linux 2.6.32, BuildID&lt;span class="o"&gt;[&lt;/span&gt;sha1&lt;span class="o"&gt;]=&lt;/span&gt;ca5ba57ac722ef8521d50ee8ecbbdca4b44a76e1, not stripped
-$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX/lib amd64-marcel-freebsd9.2-gcc helloworld.c -o helloworld-freebsd
+$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/lib amd64-marcel-freebsd9.2-gcc helloworld.c -o helloworld-freebsd
 $ file helloworld-freebsd
 main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;FreeBSD&lt;span class="o"&gt;)&lt;/span&gt;, dynamically linked, interpreter /libexec/ld-elf.so.1, &lt;span class="k"&gt;for&lt;/span&gt; FreeBSD 9.2, not stripped
 &lt;/pre&gt;&lt;/div&gt;
@@ -381,7 +374,7 @@ main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/spa
 &lt;p&gt;If you need a cross-compile version of gdb, simply compile the gdb for the target machine like above:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ wget https://ftp.gnu.org/gnu/gdb/gdb-7.11.tar.xz
 $ tar xvf gdb-7.11.tar.xz
-$ ../gdb-7.11.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;$PREFIX --target&lt;span class="o"&gt;=&lt;/span&gt;$TARGET
+$ ../gdb-7.11.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --target&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
 $ make -j 4
 $ sudo make install
 &lt;/pre&gt;&lt;/div&gt;
