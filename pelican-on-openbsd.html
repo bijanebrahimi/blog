@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Pelican on OpenBSD</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/openbsd.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="http://bijanebrahimi.github.io/blog/" class="pure-menu-heading  pure-menu-link">Routines Excluded</a>
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"></li>
+
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/pages/bookmarks.html" class="pure-menu-link">Bookmarks</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/books.html" class="pure-menu-link">Books</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="pure-menu-link">FreeBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="pure-menu-link">Gist</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/git.html" class="pure-menu-link">Git</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="pure-menu-link">OpenBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
+        </ul>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="category">OpenBSD</a><br />
+
+    <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+    &mdash; <abbr title="2017-10-13T22:49:00+03:30">Fri 13 October 2017</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image-small">
+                <div class="title-container">
+                    <h1>Pelican on OpenBSD</h1>
+                    <h4>How to make Pelican's Makefile BSD friendly</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <p>If you haven't introduced to Pelican yet, you should probably read from this
+blog:</p>
+<blockquote>
+<p>Pelican is a static site generator, written in Python, that requires no
+database or server-side logic.</p>
+<p><a href="https://blog.getpelican.com/">blog.getpelican.com</a></p>
+</blockquote>
+<p>By creating a pelican project, a Mekfile will be created (by your confirmation)
+to ease the process of writing and publishing your posts, However the format of
+this Makefile is in GNU Make format and you'll get the following errors if you
+run it on your BSD (FreeBSD and OpenBSD as I am aware of):</p>
+<div class="highlight"><pre><span></span>$ make devserver
+No closing parenthesis in archive specification
+*** Parse error in /path/to/pelican/project: Error in archive specification: <span class="s2">&quot;(0, 1)&quot;</span> <span class="o">(</span>Makefile:31<span class="o">)</span>
+*** Parse error: Need an operator in <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:33<span class="o">)</span>
+No closing parenthesis in archive specification
+*** Parse error: Error in archive specification: <span class="s2">&quot;(0, 1)&quot;</span> <span class="o">(</span>Makefile:36<span class="o">)</span>
+*** Parse error: Need an operator in <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:38<span class="o">)</span>
+*** Parse error: Need an operator in <span class="s1">&#39;PORT&#39;</span> <span class="o">(</span>Makefile:74<span class="o">)</span>
+*** Parse error: Need an operator in <span class="s1">&#39;else&#39;</span> <span class="o">(</span>Makefile:76<span class="o">)</span>
+*** Parse error: Need an operator in <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:78<span class="o">)</span>
+*** Parse error: Need an operator in <span class="s1">&#39;SERVER&#39;</span> <span class="o">(</span>Makefile:81<span class="o">)</span>
+*** Parse error: Need an operator in <span class="s1">&#39;else&#39;</span> <span class="o">(</span>Makefile:83<span class="o">)</span>
+*** Parse error: Need an operator in <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:85<span class="o">)</span>
+*** Parse error: Need an operator in <span class="s1">&#39;PORT&#39;</span> <span class="o">(</span>Makefile:89<span class="o">)</span>
+*** Parse error: Need an operator in <span class="s1">&#39;else&#39;</span> <span class="o">(</span>Makefile:91<span class="o">)</span>
+*** Parse error: Need an operator in <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:93<span class="o">)</span>
+</pre></div>
+
+
+<p>There's plentty of good resources online, referencing the differences. For
+portable makefiles, you should probably read <a href="https://www.gnu.org/software/make/manual/html_node/Features.html">Features of GNU make</a> and 
+<a href="https://www.gnu.org/software/make/manual/html_node/Missing.html">Features of GNU make</a> and of course, The OpenBSD's <a href="https://man.openbsd.org/make.1">make(1)</a> and The
+FreeBSD's <a href="https://www.freebsd.org/cgi/man.cgi?query=make(1)">make(1)</a></p>
+<p>The following patch illustrates the changes and I hope it helps others:</p>
+<div class="highlight"><pre><span></span><span class="gh">diff --git a/Makefile b/Makefile</span>
+<span class="gh">index d1ddf80..d87b1e9 100644</span>
+<span class="gd">--- a/Makefile</span>
+<span class="gi">+++ b/Makefile</span>
+<span class="gu">@@ -2,7 +2,7 @@ PY?=python3</span>
+ PELICAN?=pelican
+ PELICANOPTS=
+
+<span class="gd">-BASEDIR=$(CURDIR)</span>
+<span class="gi">+BASEDIR=$(.CURDIR)</span>
+ INPUTDIR=$(BASEDIR)/content
+ OUTPUTDIR=$(BASEDIR)/output
+ CONFFILE=$(BASEDIR)/pelicanconf.py
+<span class="gu">@@ -28,14 +28,14 @@ DROPBOX_DIR=~/Dropbox/Public/</span>
+ GITHUB_PAGES_BRANCH=gh-pages
+
+ DEBUG ?= 0
+<span class="gd">-ifeq ($(DEBUG), 1)</span>
+<span class="gi">+.if $(DEBUG) == 1</span>
+        PELICANOPTS += -D
+<span class="gd">-endif</span>
+<span class="gi">+.endif</span>
+
+ RELATIVE ?= 0
+<span class="gd">-ifeq ($(RELATIVE), 1)</span>
+<span class="gi">+.if $(RELATIVE) == 1</span>
+        PELICANOPTS += --relative-urls
+<span class="gd">-endif</span>
+<span class="gi">+.endif</span>
+
+ help:
+        @echo &#39;Makefile for a pelican Web site                                           &#39;
+<span class="gu">@@ -71,26 +71,26 @@ regenerate:</span>
+        $(PELICAN) -r $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS)
+
+ serve:
+<span class="gd">-ifdef PORT</span>
+<span class="gi">+.ifdef PORT</span>
+        cd $(OUTPUTDIR) &amp;&amp; $(PY) -m pelican.server $(PORT)
+<span class="gd">-else</span>
+<span class="gi">+.else</span>
+        cd $(OUTPUTDIR) &amp;&amp; $(PY) -m pelican.server
+<span class="gd">-endif</span>
+<span class="gi">+.endif</span>
+
+ serve-global:
+<span class="gd">-ifdef SERVER</span>
+<span class="gi">+.ifdef SERVER</span>
+        cd $(OUTPUTDIR) &amp;&amp; $(PY) -m pelican.server 80 $(SERVER)
+<span class="gd">-else</span>
+<span class="gi">+.else</span>
+        cd $(OUTPUTDIR) &amp;&amp; $(PY) -m pelican.server 80 0.0.0.0
+<span class="gd">-endif</span>
+<span class="gi">+.endif</span>
+
+
+ devserver:
+<span class="gd">-ifdef PORT</span>
+<span class="gi">+.ifdef PORT</span>
+        $(BASEDIR)/develop_server.sh restart $(PORT)
+<span class="gd">-else</span>
+<span class="gi">+.else</span>
+        $(BASEDIR)/develop_server.sh restart
+<span class="gd">-endif</span>
+<span class="gi">+.endif</span>
+
+ stopserver:
+        $(BASEDIR)/develop_server.sh stop
+</pre></div>
+
+
+<p>More to Read:</p>
+<ul>
+<li><a href="https://www.quora.com/What-is-the-difference-between-GNU-Makefile-and-BSD-Makefile">What is the difference between GNU Makefile and BSD Makefile?</a></li>
+</ul>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/bsd.html">bsd</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/openbsd.html">openbsd</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/pelican.html">pelican</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/makefile.html">Makefile</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/python.html">python</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
+                        <p class="author-description">
+                          
+            I Love to Read, Code and Explore the Possibilities.
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'bijanebrahimi';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="http://bijanebrahimi.github.io/blog/" title="Routines Excluded">Routines Excluded</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/books.html">Books</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/freebsd.html">FreeBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/gist.html">Gist</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/git.html">Git</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/linux.html">Linux</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html">OpenBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/projects.html">Projects</a>
+        <a href="https://github.com/bijanebrahimi/blog">Fork Me on Github</a>
+
+    </footer>
+
+</body>
+</html>

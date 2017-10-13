@@ -1,5 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - OpenBSD</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/openbsd.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-10-10T22:49:00+03:30</updated><entry><title>OpenBSD 6.2 Upgrade</title><link href="http://bijanebrahimi.github.io/blog/openbsd-62-upgrade.html" rel="alternate"></link><published>2017-10-10T22:49:00+03:30</published><updated>2017-10-10T22:49:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-10:/blog/openbsd-62-upgrade.html</id><summary type="html">&lt;p&gt;The Upgrading Process is stupidly easy. The process is &lt;a href="https://www.openbsd.org/faq/upgrade62.html"&gt;well documented&lt;/a&gt; for each release
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - OpenBSD</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/openbsd.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-10-13T22:49:00+03:30</updated><entry><title>Pelican on OpenBSD</title><link href="http://bijanebrahimi.github.io/blog/pelican-on-openbsd.html" rel="alternate"></link><published>2017-10-13T22:49:00+03:30</published><updated>2017-10-13T22:49:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-13:/blog/pelican-on-openbsd.html</id><summary type="html">&lt;p&gt;If you haven't introduced to Pelican yet, you should probably read from this
+blog:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Pelican is a static site generator, written in Python, that requires no
+database or server-side logic.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://blog.getpelican.com/"&gt;blog.getpelican.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;By creating a pelican project, a Mekfile will be created (by your confirmation)
+to ease the process …&lt;/p&gt;</summary><content type="html">&lt;p&gt;If you haven't introduced to Pelican yet, you should probably read from this
+blog:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Pelican is a static site generator, written in Python, that requires no
+database or server-side logic.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://blog.getpelican.com/"&gt;blog.getpelican.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;By creating a pelican project, a Mekfile will be created (by your confirmation)
+to ease the process of writing and publishing your posts, However the format of
+this Makefile is in GNU Make format and you'll get the following errors if you
+run it on your BSD (FreeBSD and OpenBSD as I am aware of):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ make devserver
+No closing parenthesis in archive specification
+*** Parse error in /path/to/pelican/project: Error in archive specification: &lt;span class="s2"&gt;&amp;quot;(0, 1)&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:31&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:33&lt;span class="o"&gt;)&lt;/span&gt;
+No closing parenthesis in archive specification
+*** Parse error: Error in archive specification: &lt;span class="s2"&gt;&amp;quot;(0, 1)&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:36&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:38&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;PORT&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:74&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;else&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:76&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:78&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;SERVER&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:81&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;else&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:83&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:85&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;PORT&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:89&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;else&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:91&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:93&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;There's plentty of good resources online, referencing the differences. For
+portable makefiles, you should probably read &lt;a href="https://www.gnu.org/software/make/manual/html_node/Features.html"&gt;Features of GNU make&lt;/a&gt; and 
+&lt;a href="https://www.gnu.org/software/make/manual/html_node/Missing.html"&gt;Features of GNU make&lt;/a&gt; and of course, The OpenBSD's &lt;a href="https://man.openbsd.org/make.1"&gt;make(1)&lt;/a&gt; and The
+FreeBSD's &lt;a href="https://www.freebsd.org/cgi/man.cgi?query=make(1)"&gt;make(1)&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The following patch illustrates the changes and I hope it helps others:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gh"&gt;diff --git a/Makefile b/Makefile&lt;/span&gt;
+&lt;span class="gh"&gt;index d1ddf80..d87b1e9 100644&lt;/span&gt;
+&lt;span class="gd"&gt;--- a/Makefile&lt;/span&gt;
+&lt;span class="gi"&gt;+++ b/Makefile&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -2,7 +2,7 @@ PY?=python3&lt;/span&gt;
+ PELICAN?=pelican
+ PELICANOPTS=
+
+&lt;span class="gd"&gt;-BASEDIR=$(CURDIR)&lt;/span&gt;
+&lt;span class="gi"&gt;+BASEDIR=$(.CURDIR)&lt;/span&gt;
+ INPUTDIR=$(BASEDIR)/content
+ OUTPUTDIR=$(BASEDIR)/output
+ CONFFILE=$(BASEDIR)/pelicanconf.py
+&lt;span class="gu"&gt;@@ -28,14 +28,14 @@ DROPBOX_DIR=~/Dropbox/Public/&lt;/span&gt;
+ GITHUB_PAGES_BRANCH=gh-pages
+
+ DEBUG ?= 0
+&lt;span class="gd"&gt;-ifeq ($(DEBUG), 1)&lt;/span&gt;
+&lt;span class="gi"&gt;+.if $(DEBUG) == 1&lt;/span&gt;
+        PELICANOPTS += -D
+&lt;span class="gd"&gt;-endif&lt;/span&gt;
+&lt;span class="gi"&gt;+.endif&lt;/span&gt;
+
+ RELATIVE ?= 0
+&lt;span class="gd"&gt;-ifeq ($(RELATIVE), 1)&lt;/span&gt;
+&lt;span class="gi"&gt;+.if $(RELATIVE) == 1&lt;/span&gt;
+        PELICANOPTS += --relative-urls
+&lt;span class="gd"&gt;-endif&lt;/span&gt;
+&lt;span class="gi"&gt;+.endif&lt;/span&gt;
+
+ help:
+        @echo &amp;#39;Makefile for a pelican Web site                                           &amp;#39;
+&lt;span class="gu"&gt;@@ -71,26 +71,26 @@ regenerate:&lt;/span&gt;
+        $(PELICAN) -r $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS)
+
+ serve:
+&lt;span class="gd"&gt;-ifdef PORT&lt;/span&gt;
+&lt;span class="gi"&gt;+.ifdef PORT&lt;/span&gt;
+        cd $(OUTPUTDIR) &amp;amp;&amp;amp; $(PY) -m pelican.server $(PORT)
+&lt;span class="gd"&gt;-else&lt;/span&gt;
+&lt;span class="gi"&gt;+.else&lt;/span&gt;
+        cd $(OUTPUTDIR) &amp;amp;&amp;amp; $(PY) -m pelican.server
+&lt;span class="gd"&gt;-endif&lt;/span&gt;
+&lt;span class="gi"&gt;+.endif&lt;/span&gt;
+
+ serve-global:
+&lt;span class="gd"&gt;-ifdef SERVER&lt;/span&gt;
+&lt;span class="gi"&gt;+.ifdef SERVER&lt;/span&gt;
+        cd $(OUTPUTDIR) &amp;amp;&amp;amp; $(PY) -m pelican.server 80 $(SERVER)
+&lt;span class="gd"&gt;-else&lt;/span&gt;
+&lt;span class="gi"&gt;+.else&lt;/span&gt;
+        cd $(OUTPUTDIR) &amp;amp;&amp;amp; $(PY) -m pelican.server 80 0.0.0.0
+&lt;span class="gd"&gt;-endif&lt;/span&gt;
+&lt;span class="gi"&gt;+.endif&lt;/span&gt;
+
+
+ devserver:
+&lt;span class="gd"&gt;-ifdef PORT&lt;/span&gt;
+&lt;span class="gi"&gt;+.ifdef PORT&lt;/span&gt;
+        $(BASEDIR)/develop_server.sh restart $(PORT)
+&lt;span class="gd"&gt;-else&lt;/span&gt;
+&lt;span class="gi"&gt;+.else&lt;/span&gt;
+        $(BASEDIR)/develop_server.sh restart
+&lt;span class="gd"&gt;-endif&lt;/span&gt;
+&lt;span class="gi"&gt;+.endif&lt;/span&gt;
+
+ stopserver:
+        $(BASEDIR)/develop_server.sh stop
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;More to Read:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.quora.com/What-is-the-difference-between-GNU-Makefile-and-BSD-Makefile"&gt;What is the difference between GNU Makefile and BSD Makefile?&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><category term="bsd"></category><category term="openbsd"></category><category term="pelican"></category><category term="Makefile"></category><category term="python"></category></entry><entry><title>OpenBSD 6.2 Upgrade</title><link href="http://bijanebrahimi.github.io/blog/openbsd-62-upgrade.html" rel="alternate"></link><published>2017-10-10T22:49:00+03:30</published><updated>2017-10-10T22:49:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-10:/blog/openbsd-62-upgrade.html</id><summary type="html">&lt;p&gt;The Upgrading Process is stupidly easy. The process is &lt;a href="https://www.openbsd.org/faq/upgrade62.html"&gt;well documented&lt;/a&gt; for each release
 and is available after the release of binary packages and when install images are out but
 before going any further, please read the OpenBSD 6.2 &lt;a href="4"&gt;new features&lt;/a&gt; for the list of
 changes and improvements. &lt;/p&gt;
