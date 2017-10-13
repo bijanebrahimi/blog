@@ -33,6 +33,8 @@ DEFAULT_PAGINATION = 5
 
 # Plugins
 # PLUGINS = ['sitemap', 'headerid']
+PLUGIN_PATHS = ['plugins']
+PLUGINS = ['liquid_tags.graphviz']
 
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
