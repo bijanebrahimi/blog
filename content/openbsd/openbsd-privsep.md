@@ -1,4 +1,4 @@
-Title: Priveleged Seperated Processes
+Title: Privileged Seperated Processes
 SubTitle: Part I: talking to the other side
 Date: 2017-10-24 20:17
 Category: OpenBSD
