@@ -1,0 +1,1322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-10-24T20:17:00+03:30</updated><entry><title>Priveleged Seperated Processes</title><link href="http://bijanebrahimi.github.io/blog/priveleged-seperated-processes.html" rel="alternate"></link><published>2017-10-24T20:17:00+03:30</published><updated>2017-10-24T20:17:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-24:/blog/priveleged-seperated-processes.html</id><summary type="html">&lt;h2&gt;An Intorduction&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In computer programming and computer security, privilege separation is a
+technique in which a program is divided into parts which are limited to the
+specific privileges they require in order to perform a specific task. This is
+used to mitigate the potential damage of a computer security vulnerability …&lt;/p&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;h2&gt;An Intorduction&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In computer programming and computer security, privilege separation is a
+technique in which a program is divided into parts which are limited to the
+specific privileges they require in order to perform a specific task. This is
+used to mitigate the potential damage of a computer security vulnerability.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/Privilege_separation"&gt;Privilege Separation&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;There are &lt;a href="http://www.openbsd.org/papers/ven05-deraadt/"&gt;many great resources&lt;/a&gt; describing the architecture of a priviledge
+separated process and the need for such architecrues, which I'm sure you already
+read or will ;-)&lt;/p&gt;
+&lt;p&gt;What I'm really interested in, is the way the priviledged separated processes
+are able to talk to each other. Hope you haveare already familliar with Unix
+IPCs, but if you don't, here's &lt;a href="http://beej.us/guide/bgipc/"&gt;Beej's Guide to Unix IPC&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;This is (hopefully) the first of a few posts about writing privsep processes.
+Hope it helps.&lt;/p&gt;
+&lt;h2&gt;socketpair(2)&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The socketpair() call creates an unnamed pair of connected sockets in the
+specified domain d, of the specified type, and using the optionally
+specified protocol.  The descriptors used in referencing the new sockets
+are returned in sv[0] and sv&lt;a href="https://en.wikipedia.org/wiki/Privilege_separation"&gt;1&lt;/a&gt;.  The two sockets are indistinguishable.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Unlike &lt;a href="http://man.openbsd.org/pipe.2"&gt;pipe(2)&lt;/a&gt; which are uni-directional way of sending messages,
+&lt;a href="http://man.openbsd.org/socket.2"&gt;socket(2)&lt;/a&gt; are bi-directional, which means they are perfect for processes to talk
+back to each others. &lt;a href="http://man.openbsd.org/socketpair.2"&gt;socketpair(2)&lt;/a&gt; will create two of them for us. each
+connected to the other using the specified Protocol.&lt;/p&gt;
+&lt;p&gt;&lt;span class="graphviz" style="text-align: center;"&gt;&lt;img src="data:image/png;base64,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"&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The above, Illustrates a socketpair of type &lt;code&gt;UNIX Sockets&lt;/code&gt; shared by the aprent
+and the child. Since the sockets are indistinguishable, there's no difference
+which uses which.&lt;/p&gt;
+&lt;p&gt;The following snippet, Creates a socket pair and pass it to the child:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;err.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;sys/wait.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;sys/types.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;sys/socket.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+
+&lt;span class="cp"&gt;#define MAX_BUF_SIZE      128&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;child_process&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;fd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;parent_process&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;fd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;pid_t&lt;/span&gt; &lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+
+&lt;span class="kt"&gt;int&lt;/span&gt;
+&lt;span class="nf"&gt;main&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;pid_t&lt;/span&gt; &lt;span class="n"&gt;child_pid&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;fd&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;socketpair&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AF_UNIX&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SOCK_STREAM&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;PF_UNSPEC&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fd&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;errx&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Failed to open socketpair&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;child_pid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;fork&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;errx&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Failed to fork the process&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;child_pid&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;parent_process&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fd&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;child_pid&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;child_process&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fd&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="cm"&gt;/* Not reachable */&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt;
+&lt;span class="nf"&gt;child_process&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;fd&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;MAX_BUF_SIZE&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+
+    &lt;span class="n"&gt;snprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;MAX_BUF_SIZE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Hello World&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;MAX_BUF_SIZE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;errx&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Failed to write Message&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt;
+&lt;span class="nf"&gt;parent_process&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;fd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;pid_t&lt;/span&gt; &lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;status&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;ssize_t&lt;/span&gt; &lt;span class="n"&gt;nbytes&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;MAX_BUF_SIZE&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;nbytes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;read&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;MAX_BUF_SIZE&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Failed to read&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nbytes&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;nbytes&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sc"&gt;&amp;#39;\0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="n"&gt;printf&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Received &lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt;%s&lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt; from the Child&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="n"&gt;waitpid&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;WAIT_ANY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;WEXITSTATUS&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And the output is:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcc -o privsep main.c
+$ ./main
+Received &lt;span class="s2"&gt;&amp;quot;Hello World&amp;quot;&lt;/span&gt; from the Child
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Tips:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Since the child process shares rge same memory address with it's parent, it
+has access to all the descriptors the parent has opened, so it is a good
+practice to close all unnecessary descriptors (like standard I/O) before
+actually running the child's logic after calling the &lt;code&gt;fork(2)&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In the next post, I will introduce the &lt;code&gt;imsg_init(3)&lt;/code&gt;. The OpenBSD way of
+writing privsep processes.&lt;/p&gt;</content><category term="openbsd"></category><category term="imsg_init"></category><category term="socket_pair"></category><category term="privsep"></category></entry><entry><title>Pelican on OpenBSD</title><link href="http://bijanebrahimi.github.io/blog/pelican-on-openbsd.html" rel="alternate"></link><published>2017-10-13T22:49:00+03:30</published><updated>2017-10-13T22:49:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-13:/blog/pelican-on-openbsd.html</id><summary type="html">&lt;p&gt;If you haven't introduced to Pelican yet, you should probably read from this
+blog:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Pelican is a static site generator, written in Python, that requires no
+database or server-side logic.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://blog.getpelican.com/"&gt;blog.getpelican.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;By creating a pelican project, a Mekfile will be created (by your confirmation)
+to ease the process …&lt;/p&gt;</summary><content type="html">&lt;p&gt;If you haven't introduced to Pelican yet, you should probably read from this
+blog:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Pelican is a static site generator, written in Python, that requires no
+database or server-side logic.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://blog.getpelican.com/"&gt;blog.getpelican.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;By creating a pelican project, a Mekfile will be created (by your confirmation)
+to ease the process of writing and publishing your posts, However the format of
+this Makefile is in GNU Make format and you'll get the following errors if you
+run it on your BSD (FreeBSD and OpenBSD as I am aware of):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ make devserver
+No closing parenthesis in archive specification
+*** Parse error in /path/to/pelican/project: Error in archive specification: &lt;span class="s2"&gt;&amp;quot;(0, 1)&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:31&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:33&lt;span class="o"&gt;)&lt;/span&gt;
+No closing parenthesis in archive specification
+*** Parse error: Error in archive specification: &lt;span class="s2"&gt;&amp;quot;(0, 1)&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:36&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:38&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;PORT&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:74&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;else&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:76&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:78&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;SERVER&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:81&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;else&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:83&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:85&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;PORT&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:89&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;else&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:91&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:93&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;There's plentty of good resources online, referencing the differences. For
+portable makefiles, you should probably read &lt;a href="https://www.gnu.org/software/make/manual/html_node/Features.html"&gt;Features of GNU make&lt;/a&gt; and 
+&lt;a href="https://www.gnu.org/software/make/manual/html_node/Missing.html"&gt;Features of GNU make&lt;/a&gt; and of course, The OpenBSD's &lt;a href="https://man.openbsd.org/make.1"&gt;make(1)&lt;/a&gt; and The
+FreeBSD's &lt;a href="https://www.freebsd.org/cgi/man.cgi?query=make(1)"&gt;make(1)&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The following patch illustrates the changes and I hope it helps others:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gh"&gt;diff --git a/Makefile b/Makefile&lt;/span&gt;
+&lt;span class="gh"&gt;index d1ddf80..d87b1e9 100644&lt;/span&gt;
+&lt;span class="gd"&gt;--- a/Makefile&lt;/span&gt;
+&lt;span class="gi"&gt;+++ b/Makefile&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -2,7 +2,7 @@ PY?=python3&lt;/span&gt;
+ PELICAN?=pelican
+ PELICANOPTS=
+
+&lt;span class="gd"&gt;-BASEDIR=$(CURDIR)&lt;/span&gt;
+&lt;span class="gi"&gt;+BASEDIR=$(.CURDIR)&lt;/span&gt;
+ INPUTDIR=$(BASEDIR)/content
+ OUTPUTDIR=$(BASEDIR)/output
+ CONFFILE=$(BASEDIR)/pelicanconf.py
+&lt;span class="gu"&gt;@@ -28,14 +28,14 @@ DROPBOX_DIR=~/Dropbox/Public/&lt;/span&gt;
+ GITHUB_PAGES_BRANCH=gh-pages
+
+ DEBUG ?= 0
+&lt;span class="gd"&gt;-ifeq ($(DEBUG), 1)&lt;/span&gt;
+&lt;span class="gi"&gt;+.if $(DEBUG) == 1&lt;/span&gt;
+        PELICANOPTS += -D
+&lt;span class="gd"&gt;-endif&lt;/span&gt;
+&lt;span class="gi"&gt;+.endif&lt;/span&gt;
+
+ RELATIVE ?= 0
+&lt;span class="gd"&gt;-ifeq ($(RELATIVE), 1)&lt;/span&gt;
+&lt;span class="gi"&gt;+.if $(RELATIVE) == 1&lt;/span&gt;
+        PELICANOPTS += --relative-urls
+&lt;span class="gd"&gt;-endif&lt;/span&gt;
+&lt;span class="gi"&gt;+.endif&lt;/span&gt;
+
+ help:
+        @echo &amp;#39;Makefile for a pelican Web site                                           &amp;#39;
+&lt;span class="gu"&gt;@@ -71,26 +71,26 @@ regenerate:&lt;/span&gt;
+        $(PELICAN) -r $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS)
+
+ serve:
+&lt;span class="gd"&gt;-ifdef PORT&lt;/span&gt;
+&lt;span class="gi"&gt;+.ifdef PORT&lt;/span&gt;
+        cd $(OUTPUTDIR) &amp;amp;&amp;amp; $(PY) -m pelican.server $(PORT)
+&lt;span class="gd"&gt;-else&lt;/span&gt;
+&lt;span class="gi"&gt;+.else&lt;/span&gt;
+        cd $(OUTPUTDIR) &amp;amp;&amp;amp; $(PY) -m pelican.server
+&lt;span class="gd"&gt;-endif&lt;/span&gt;
+&lt;span class="gi"&gt;+.endif&lt;/span&gt;
+
+ serve-global:
+&lt;span class="gd"&gt;-ifdef SERVER&lt;/span&gt;
+&lt;span class="gi"&gt;+.ifdef SERVER&lt;/span&gt;
+        cd $(OUTPUTDIR) &amp;amp;&amp;amp; $(PY) -m pelican.server 80 $(SERVER)
+&lt;span class="gd"&gt;-else&lt;/span&gt;
+&lt;span class="gi"&gt;+.else&lt;/span&gt;
+        cd $(OUTPUTDIR) &amp;amp;&amp;amp; $(PY) -m pelican.server 80 0.0.0.0
+&lt;span class="gd"&gt;-endif&lt;/span&gt;
+&lt;span class="gi"&gt;+.endif&lt;/span&gt;
+
+
+ devserver:
+&lt;span class="gd"&gt;-ifdef PORT&lt;/span&gt;
+&lt;span class="gi"&gt;+.ifdef PORT&lt;/span&gt;
+        $(BASEDIR)/develop_server.sh restart $(PORT)
+&lt;span class="gd"&gt;-else&lt;/span&gt;
+&lt;span class="gi"&gt;+.else&lt;/span&gt;
+        $(BASEDIR)/develop_server.sh restart
+&lt;span class="gd"&gt;-endif&lt;/span&gt;
+&lt;span class="gi"&gt;+.endif&lt;/span&gt;
+
+ stopserver:
+        $(BASEDIR)/develop_server.sh stop
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;More to Read:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.quora.com/What-is-the-difference-between-GNU-Makefile-and-BSD-Makefile"&gt;What is the difference between GNU Makefile and BSD Makefile?&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><category term="bsd"></category><category term="openbsd"></category><category term="pelican"></category><category term="Makefile"></category><category term="python"></category></entry><entry><title>OpenBSD 6.2 Upgrade</title><link href="http://bijanebrahimi.github.io/blog/openbsd-62-upgrade.html" rel="alternate"></link><published>2017-10-10T22:49:00+03:30</published><updated>2017-10-10T22:49:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-10:/blog/openbsd-62-upgrade.html</id><summary type="html">&lt;p&gt;The Upgrading Process is stupidly easy. The process is &lt;a href="https://www.openbsd.org/faq/upgrade62.html"&gt;well documented&lt;/a&gt; for each release
+and is available after the release of binary packages and when install images are out but
+before going any further, please read the OpenBSD 6.2 &lt;a href="4"&gt;new features&lt;/a&gt; for the list of
+changes and improvements. &lt;/p&gt;
+&lt;p&gt;The …&lt;/p&gt;</summary><content type="html">&lt;p&gt;The Upgrading Process is stupidly easy. The process is &lt;a href="https://www.openbsd.org/faq/upgrade62.html"&gt;well documented&lt;/a&gt; for each release
+and is available after the release of binary packages and when install images are out but
+before going any further, please read the OpenBSD 6.2 &lt;a href="4"&gt;new features&lt;/a&gt; for the list of
+changes and improvements. &lt;/p&gt;
+&lt;p&gt;The process is split into two separate processes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;First, You should upgrade the base system using one of two possibles. Using a bootable disk
+image or using the manual process which is not recommended.&lt;/li&gt;
+&lt;li&gt;Second, Upgrading the binary packages.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I choose Upgrading via a bootable media since it is the highly recommended way:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;$curl&lt;/span&gt; -o install62.fs https://openbsd.mirror.netelligent.ca/pub/OpenBSD/6.2/amd64/install62.fs
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Writing the image to the USB stick was a matter of executing &lt;code&gt;dd&lt;/code&gt; command (as always):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sysctl hw.disknames
+hw.disknames&lt;span class="o"&gt;=&lt;/span&gt;sd0:da0bedc25009303c,cd0:,sd1:9e5b01f8dc3ea3f3
+$ doas dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;install62.fs &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/rsd1c &lt;span class="nv"&gt;bs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1m
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Again, if you're unfamiliar with anything like OpenBSD way of &lt;a href="https://www.openbsd.org/faq/faq14.html"&gt;dealing with storage devices&lt;/a&gt; and
+other things, please consider reading the entire &lt;a href="https://www.openbsd.org/faq/"&gt;FAQ&lt;/a&gt;. It really pays off, I promise ;-)&lt;/p&gt;
+&lt;p&gt;Now the next move is follow the pre-upgrade which I actually forgot. For my currect
+setup, it was only to manually remove the man pages to avoid having old manpages in
+the new system after successfull upgrade:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ doas rm -rf /usr/share/man/
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, Just rebooted the machine and booted from the USB stick and Press (U)pgrade and that was it.
+After confirming the keyboard layout and my laptop's primary disk where my OpenBSD installation
+resides, the process of Upgrading &lt;strong&gt;The Base System&lt;/strong&gt; was done. After completion and rebooting
+the machine, the first thing the new OS did was retrieving the newer firmwares which I skipped
+since at the time, I had no (reliable) Internet connection, but don't worry, you can do it later:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ uname -a
+OpenBSD localhost.lenovo 6.2 GENERIC.MP#134 amd64
+$ doas fw_update
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, it's time to &lt;strong&gt;update the binary packages&lt;/strong&gt; since their dependencies on the base system has
+just been upgraded. But that was just one command away:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ doas pkg_add -u
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That was it. Hope to write more about OpenBSD in the near future.&lt;/p&gt;</content><category term="openbsd"></category><category term="upgrade"></category></entry><entry><title>Freebsd's .mount.conf</title><link href="http://bijanebrahimi.github.io/blog/freebsds-mountconf.html" rel="alternate"></link><published>2017-02-24T22:05:00+03:30</published><updated>2017-02-24T22:05:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-24:/blog/freebsds-mountconf.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;As I'm getting more and more familiar with the FreeBSD Operating System and
+it's wonderfull architeture and design, I found the need to work with different
+versions of FreeBSD live (specially at work) and since it's not a good idea to install
+every single version I needed into a …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;As I'm getting more and more familiar with the FreeBSD Operating System and
+it's wonderfull architeture and design, I found the need to work with different
+versions of FreeBSD live (specially at work) and since it's not a good idea to install
+every single version I needed into a USB flash drive, I tried Grub to boot a given
+Freebsd ISO image (admittedly I'm still unfamiliar with the powers of FreeBSD's
+own boot loader program).&lt;/p&gt;
+&lt;h1&gt;How Grub is booting an ISO image&lt;/h1&gt;
+&lt;p&gt;Essentially what the grub does, is loading the given ISO image using &lt;code&gt;loopback&lt;/code&gt;
+command as a loop device and mount it in a special &lt;code&gt;(loop)&lt;/code&gt; directory. That's
+pretty much all that grub does before loading the kernel into memory thus
+executing it. After passing the execution process to the kernel, the special loop device
+is lost and kernel at some point needs to remount it again in order to
+complete it's booting process. This process of mounting the root filesystem 
+may differ between operating systems. For example, Ubuntu uses a parameter passed
+to kernel named &lt;code&gt;iso-scan/filename&lt;/code&gt; which essentially tells the kernel to look for
+which file to mount as root filesystem. Kernel does this by mounting every existing
+partitions looking for this speific path and when it finds it, it mounts it as
+root filesystem and the process of booting the kernel continues.&lt;/p&gt;
+&lt;h1&gt;How to boot FreeBSD from an ISO image&lt;/h1&gt;
+&lt;p&gt;As I searched the web, I found a few other people having the same problem booting
+FreeBSD from ISO images and found a few interesting solutions like
+&lt;a href="http://mfsbsd.vx.sk/"&gt;mfsBSD&lt;/a&gt; which is a set of scripts building a special
+FreeBSD kernel loaded entirely into RAM thus no need to mounting the root
+filesystem at the first place. But that wasn't my solution till I find FreeBSD's
+mount configuration file manual.&lt;/p&gt;
+&lt;h1&gt;FreeBSD's &lt;code&gt;.mount.conf&lt;/code&gt; To Rescue&lt;/h1&gt;
+&lt;p&gt;FreeBSD provides a kind of scriptable process of finding and mounting
+the root filesystem via a file named &lt;code&gt;.mount.conf&lt;/code&gt;. The process of mounting the
+root filesystem is fully described in the &lt;a href="https://www.freebsd.org/cgi/man.cgi?query=mount.conf"&gt;man page&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;What is interesting is that the kernel can follow the intructions in the &lt;code&gt;.mount.conf&lt;/code&gt;
+file in the root filesystem it mounts (if exists) and change it's current root
+filesystem accordingly:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;{FS}:{MOUNTPOINT} {OPTIONS}&lt;/code&gt;
+The kernel will try to mount this in an operation equivalent to:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;mount -t {FS} -o {OPTIONS} {MOUNTPOINT} /&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;If this is successfully mounted, further lines in .mount.conf
+are ignored.  If all lines in .mount.conf have been processed
+and no root file system has been successfully mounted, then
+the action specified by &lt;code&gt;.onfail&lt;/code&gt; is performed.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;.ask&lt;/code&gt; When the kernel processes this line, a &lt;code&gt;mountroot&amp;gt;&lt;/code&gt; command-
+line prompt is displayed. At this prompt, the operator can
+enter the the root mount.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;.md file&lt;/code&gt; Create a memory backed &lt;a href="https://www.freebsd.org/cgi/man.cgi?query=md"&gt;md(4)&lt;/a&gt; virtual disk, using file as the
+backing store.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;So what the really need to do is to put a mount config file in our USB flash drive's
+root directory which should contain a &lt;code&gt;md&lt;/code&gt; command creating a memory backed
+virtual disk from our FreeBSD's iso image and then mount it as our new root
+filesystem:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="na"&gt;.timeout&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;
+&lt;span class="na"&gt;.md&lt;/span&gt; &lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="no"&gt;iso&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="no"&gt;FreeBSD-11.0-RELEASE-amd64-dvd1.iso&lt;/span&gt;
+&lt;span class="na"&gt;.timeout&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;
+&lt;span class="nl"&gt;cd9660:&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="nf"&gt;dev&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="no"&gt;md&lt;/span&gt;&lt;span class="c"&gt;# ro&lt;/span&gt;
+&lt;span class="na"&gt;.ask&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;Important&lt;/strong&gt;: please note that when the kernel mounts the new rootfilesystem, 
+there should be a directory named &lt;code&gt;dev&lt;/code&gt; inside the new root filesystem for kernerl
+to remount the &lt;code&gt;devfs&lt;/code&gt; on it. The whole process fails (sadly with no proper 
+message) if the &lt;code&gt;dev&lt;/code&gt; doesn't exist.&lt;/p&gt;
+&lt;h1&gt;The Solution&lt;/h1&gt;
+&lt;p&gt;The following is the whole process plus formatting and installing grub from a
+debian-based linux distro:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Installing GRUB, Assuming /dev/sdb is the USB flash drive device&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mount /dev/sdb1 /mnt&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mkdir /mnt/boot&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; grub-install --boot-directory=/mnt/boot /dev/sdb&lt;/span&gt;
+
+&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Copy FreeBSD iso image and creating proper grub configuration file&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mkdir /mnt/iso&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cp ~/Downloads/FreeBSD-11.0-RELEASE-amd64-dvd1.iso /mnt/iso&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cat &amp;gt; /mnt/boot/grub/grub.cfg &amp;lt;&amp;lt; EOF&lt;/span&gt;
+&lt;span class="x"&gt;insmod loopback&lt;/span&gt;
+&lt;span class="x"&gt;insmod iso9660&lt;/span&gt;
+&lt;span class="x"&gt;insmod ufs2&lt;/span&gt;
+&lt;span class="x"&gt;insmod ntfs&lt;/span&gt;
+&lt;span class="x"&gt;menuentry &amp;quot;FreeBSD 11.0 amd64&amp;quot; &lt;/span&gt;&lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+&lt;span class="x"&gt;  set isofile=&amp;quot;/iso/FreeBSD-11.0-RELEASE-amd64-dvd1.iso&amp;quot;&lt;/span&gt;
+&lt;span class="x"&gt;  loopback loop (hd0,1)&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;isofile&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+&lt;span class="x"&gt;  kfreebsd  (loop)/boot/kernel/kernel&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+&lt;span class="x"&gt;EOF&lt;/span&gt;
+
+&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Create FreeBSD mount configuration file&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mkdir /mnt/dev&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cat &amp;gt; /mnt/.mount.conf &amp;lt;&amp;lt; EOF&lt;/span&gt;
+&lt;span class="x"&gt;.timeout 3&lt;/span&gt;
+&lt;span class="x"&gt;.md /iso/FreeBSD-11.0-RELEASE-amd64-dvd1.iso&lt;/span&gt;
+&lt;span class="x"&gt;.timeout 4&lt;/span&gt;
+&lt;span class="x"&gt;cd9660:/dev/md&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; ro&lt;/span&gt;
+&lt;span class="x"&gt;.ask&lt;/span&gt;
+&lt;span class="x"&gt;EOF&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That's It. Now after reboot and booting the USB flash drive, GRUB loads the
+freebsd kernel from it's &lt;code&gt;loopback&lt;/code&gt; device, and when FreeBSD kernel loads, it
+fails mounting the root filesystem and drops into a prompt command line asking
+for the root filesystem. We can Enter &lt;code&gt;?&lt;/code&gt; to first get a list of known devies
+and Then mount our USB flash drive partition as a temporary root filesystem
+allowing kernel to find our &lt;code&gt;.mount.conf&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mountroot&amp;gt; msdosfs:/dev/da0s1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This last step can be avoided by setting the &lt;code&gt;FreeBSD.vfs.root.mountfrom&lt;/code&gt; option
+from grub which I have not tested yet:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;set FreeBSD.vfs.root.mountfrom=msdosfs:/dev/da0s1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If nothing goes wrong (specially if you didn't forget to create a &lt;code&gt;dev&lt;/code&gt;
+directory in USB flash drive's root directory) you should login into your FreeBSD
+iso image:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ df
+Filesystem 1K-blocks    Used  Avail Capcity  Mounted on
+/dev/md0      &lt;span class="m"&gt;286146&lt;/span&gt; &lt;span class="m"&gt;2861416&lt;/span&gt;      &lt;span class="m"&gt;8&lt;/span&gt;    100%  /
+/dev/da0s1   &lt;span class="m"&gt;7561408&lt;/span&gt; &lt;span class="m"&gt;6621600&lt;/span&gt;  &lt;span class="m"&gt;99808&lt;/span&gt;     88%  /mnt
+devfs              &lt;span class="m"&gt;1&lt;/span&gt;       &lt;span class="m"&gt;1&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;    100%  /dev
+/dev/md1       &lt;span class="m"&gt;31260&lt;/span&gt;     &lt;span class="m"&gt;308&lt;/span&gt;  &lt;span class="m"&gt;28452&lt;/span&gt;      1%  /var
+/dev/md2       &lt;span class="m"&gt;19356&lt;/span&gt;      &lt;span class="m"&gt;28&lt;/span&gt;  &lt;span class="m"&gt;17780&lt;/span&gt;      0%  /tmp
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Look that the old root filesystem (&lt;code&gt;/dev/da0s1&lt;/code&gt;) is re-mounted on &lt;code&gt;/mnt&lt;/code&gt; as
+described in manual. Hope it helps other :-)&lt;/p&gt;</content><category term="freebsd"></category><category term="grub"></category><category term="iso"></category><category term="mount.conf"></category></entry><entry><title>Graphviz in markdown</title><link href="http://bijanebrahimi.github.io/blog/graphviz-in-markdown.html" rel="alternate"></link><published>2017-02-20T20:12:00+03:30</published><updated>2017-02-20T20:12:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-20:/blog/graphviz-in-markdown.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;There is a good tutorial on &lt;a href="https://github.com/TLmaK0/gravizo"&gt;How to include graphviz graphs in github&lt;/a&gt;. Basically it introduced me to an online web service which takes graphviz scripts as part of a url query string and renders it into an image type. It is a very good idea for many reasons …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;There is a good tutorial on &lt;a href="https://github.com/TLmaK0/gravizo"&gt;How to include graphviz graphs in github&lt;/a&gt;. Basically it introduced me to an online web service which takes graphviz scripts as part of a url query string and renders it into an image type. It is a very good idea for many reasons. One, the graph is still plain text and searchable inside source files, Second, editing an already drawn graph inside a wiki page is now very easy and the dot files are pretty easy to write.&lt;/p&gt;
+&lt;h1&gt;Problem?&lt;/h1&gt;
+&lt;p&gt;So, what's the problem? As I said, It was a good idea (even our Project Manager liked it since we're about to move our project's knowledge base into a local Gitlab's server, way better than using &lt;a href="http://asciiflow.com"&gt;asciiflow.com&lt;/a&gt;). The Only problem was that It was an unnecessary dependency to use an remote web-service and I thought why not I build our own local version of it? So, I did.&lt;/p&gt;
+&lt;h1&gt;Requirments&lt;/h1&gt;
+&lt;p&gt;Since we already had an omnibus version of gitlab running on a debian server, I tried to write a simple php-script serving on the already running bundle version of nginx in gitlab omnibus package. The following is the work around. If you have a similiar but not quiet the same situation, you may consider changing the following steps as fits your needs so I try to explain as much as needed.&lt;/p&gt;
+&lt;h1&gt;Gitlab's Nginx, a proxy to local Apache&lt;/h1&gt;
+&lt;p&gt;Since I knew php way better than ruby (still I'm not a php developer anymore), I deided to write my graphviz web-service in php language, so I installed apache (running on port 8090) and php and no to forget, the graphviz command tools:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ apt-get install apache2 libapache2-mod-php5 graphviz
+$ editor /etc/apache2/ports.conf
+Listen 8090
+$ editor /etc/apache2/sites-enabled/000-default.conf
+&lt;span class="nt"&gt;&amp;lt;VirtualHost&lt;/span&gt; &lt;span class="err"&gt;*:8090&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/webtools.company_domain.net
+  ErrorLog &lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;APACHE_LOG_DIR&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;/error.log
+  CustomLog &lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;APACHE_LOG_DIR&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;/access.log combined
+&lt;span class="nt"&gt;&amp;lt;/VirtualHost&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and set the gitlab's nginx to work as a proxy to my apache web-server:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ editor /var/opt/gitlab/nginx/conf/webtools.company_domain.net
+server &lt;span class="o"&gt;{&lt;/span&gt;
+  listen *:80&lt;span class="p"&gt;;&lt;/span&gt;
+  server_name webtools.company_domain.net&lt;span class="p"&gt;;&lt;/span&gt;
+  access_log /var/log/webtools.company_domain.net.access.log&lt;span class="p"&gt;;&lt;/span&gt;
+  error_log /var/log/webtools.company_domain.net.error.log&lt;span class="p"&gt;;&lt;/span&gt;
+  location / &lt;span class="o"&gt;{&lt;/span&gt;
+    proxy_pass http://127.0.0.1:8090&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+$ nano /etc/gitlab/gitlab.rb
+nginx&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;custom_nginx_config&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;include /var/opt/gitlab/nginx/conf/webtools.company_domain.net;&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now we shoould reconfigure gitlab to create the new nginx configuration file from our changes in &lt;code&gt;/etc/gitlab/gitlab.rb&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gitlab-ctl reconfigure
+$ gitlab-ctl restart nginx
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now the only missing pieces is the actual php script. Since it's a prototype version of our graphviz web service, we only render svg formats:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nx"&gt;$&lt;/span&gt; &lt;span class="nx"&gt;nano&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="kd"&gt;var&lt;/span&gt;&lt;span class="err"&gt;/www/webtools.company_domain.net/graphviz/index.php&lt;/span&gt;
+&lt;span class="cp"&gt;&amp;lt;?php&lt;/span&gt;
+  &lt;span class="nv"&gt;$dot_content&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;rawurldecode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$_SERVER&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;QUERY_STRING&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+  &lt;span class="nv"&gt;$dot_file&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;tempnam&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/tmp&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;dot_&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="nb"&gt;file_put_contents&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$dot_file&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$dot_content&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="nb"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Content-type: image/svg+xml&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="nb"&gt;system&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;dot -Tsvg &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$dot_file&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="nb"&gt;unlink&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$dot_file&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="cp"&gt;?&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, the following markdown script should nicely render as a svg image in our rendered markdown wiki pages:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Alt&lt;/span&gt; &lt;span class="n"&gt;Text&lt;/span&gt;&lt;span class="p"&gt;](&lt;/span&gt;&lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//webtools.company_domain.net/graphviz/?&lt;/span&gt;
+&lt;span class="n"&gt;digraph&lt;/span&gt; &lt;span class="n"&gt;G&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;aize&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;4,4&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;main&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;shape&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;box&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="n"&gt;main&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;parse&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;weight&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="n"&gt;parse&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;main&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;init&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;style&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;dotted&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="n"&gt;main&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;cleanup&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;execute&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="n"&gt;make_string&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+    &lt;span class="n"&gt;init&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;make_string&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;edge&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;red&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="n"&gt;main&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;printf&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;style&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;bold&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;label&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;100 times&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="n"&gt;make_string&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;label&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;make a string&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="n"&gt;node&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;shape&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;box&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;style&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;filled&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;.7 .3 1.0&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="n"&gt;execute&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;compare&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Hope it helps other people as well :-)&lt;/p&gt;</content><category term="gitlab"></category><category term="wiki"></category><category term="graphviz"></category><category term="debian"></category><category term="omnibus"></category><category term="apache"></category><category term="nginx"></category><category term="php"></category><category term="dot"></category><category term="svg"></category></entry><entry><title>Books I Read in 2016</title><link href="http://bijanebrahimi.github.io/blog/books-i-read-in-2016.html" rel="alternate"></link><published>2017-02-17T14:40:00+03:30</published><updated>2017-02-17T14:40:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-17:/blog/books-i-read-in-2016.html</id><summary type="html">&lt;p&gt;The List isn't long. same as the last year, I was spending my last months in the military service. I think there are a couple of books missing from the list which I might forgot them for the moment of creating this post. Also I hope I to find the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;The List isn't long. same as the last year, I was spending my last months in the military service. I think there are a couple of books missing from the list which I might forgot them for the moment of creating this post. Also I hope I to find the time in the next year to also keep track of the useful articles since I'm mainly reading them instead of hard cover books.&lt;/p&gt;
+&lt;h2&gt;Computer &amp;amp; Programming&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Head First C&lt;/li&gt;
+&lt;li&gt;Scalable C by Pieter Hintjens&lt;/li&gt;
+&lt;li&gt;The Design and Implementation of the FreeBSD by Marshall Kirk McKusick (only a few chapters)&lt;/li&gt;
+&lt;/ul&gt;</content></entry><entry><title>GCC Cross-Compiler</title><link href="http://bijanebrahimi.github.io/blog/gcc-cross-compiler.html" rel="alternate"></link><published>2017-02-17T12:04:00+03:30</published><updated>2017-02-17T12:04:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-17:/blog/gcc-cross-compiler.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A cross compiler is a compiler capable of creating executable code for a platform other than the one on which the compiler is running. For example, a compiler that runs on a Windows 7 PC but generates code that runs on Android smartphone is a cross compiler.&lt;/p&gt;
+&lt;p&gt;--&lt;a href="https://en.wikipedia.org/wiki/Crosscompiler"&gt;Wikipedia&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Before …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A cross compiler is a compiler capable of creating executable code for a platform other than the one on which the compiler is running. For example, a compiler that runs on a Windows 7 PC but generates code that runs on Android smartphone is a cross compiler.&lt;/p&gt;
+&lt;p&gt;--&lt;a href="https://en.wikipedia.org/wiki/Crosscompiler"&gt;Wikipedia&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Before we continue, there issome definitions we need to decide.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Build&lt;/strong&gt;: The machine you are building on which in our case, we're building our cross-compiler on a linux machine (&lt;code&gt;--host&lt;/code&gt; option).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Host&lt;/strong&gt;: The machine that you are building for and again, it's a linux machine we're trying to build our binaries (&lt;code&gt;--host&lt;/code&gt; option).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Target&lt;/strong&gt;: The machine that GCC will produce code for which is a freebsd machine (&lt;code&gt;--target&lt;/code&gt; option).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: To decide the values of the above configuration, simply run &lt;code&gt;gdb --version&lt;/code&gt; on the native machine. for a linux machine it's &lt;code&gt;x86_64-pc-linux-gnu&lt;/code&gt; and for my target machine it's &lt;code&gt;amd64-marcel-freebsd9.2&lt;/code&gt;. Since we're building and running our cross-compile on the same machine (&lt;code&gt;x86_64-pc-linux-gnu&lt;/code&gt;), we don't need to specify the build and the host configuration which gcc will pick automatically.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;TARGET&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;amd64-marcel-freebsd9.2
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And since, we don't wan to mix our cross-compile toolchains with our native binaries, we install our cross-compiler toolchains in the &lt;code&gt;/usr/cross-build&lt;/code&gt; directory:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PREFIX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/usr/cross-build
+$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;TARGET_PREFIX&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
+$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PATH&lt;/span&gt;:&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/bin
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;One more important note before start compiling is that we need the head-files and libraries of the target machine. So we should copy &lt;code&gt;/lib&lt;/code&gt; and &lt;code&gt;/include&lt;/code&gt; directories from our freebsd machine to our cross-build directory:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="n"&gt;mkdir&lt;/span&gt; -&lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="nv"&gt;$TARGET_PREFIX&lt;/span&gt;{,&lt;span class="sr"&gt;/lib,/&lt;/span&gt;&lt;span class="n"&gt;include&lt;/span&gt;}
+&lt;span class="c c-Singleline"&gt;# copy /lib and /include directories from our freebsd machine in our target $TARGET_PREFIX directory.&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;GCC requires that a compiled copy of binutils be available for each targeted platform. So we need to download the source code of binutils and compile it for the freebsd machine.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ mkdir -p build-binutils
+$ wget https://ftp.gnu.org/gnu/binutils/binutils-2.27.tar.gz
+$ tar zxvf binutils-2.27.tar.gz
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; build-binutils
+$ ../binutils-2.27/configure --target&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt; --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; -v
+$ make -j 4
+$ sudo make install
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;GCC also depends on the following components:
+&lt;em&gt; GMP: GNU Multiple Precision Arithmetic Library
+&lt;/em&gt; MPFR: GNU Multiple-precision floating-point rounding library
+* MPC: GNU Multiple-precision C library&lt;/p&gt;
+&lt;p&gt;To build our cross-compiler, we need to compile these dependencies but since these dependencies should produce code for our target machine, we need to build them for the host option set to our tagret (&lt;code&gt;--host=amd64-marcel-freebsd9.2&lt;/code&gt;):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ mkdir build-gmp
+$ wget https://ftp.gnu.org/gnu/gmp/gmp-6.1.1.tar.xz
+$ tar xvf gmp-6.1.1.tar.xz
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; build-gmp
+$ ../gmp-6.1.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --enable-shared --enable-static --enable-mpbsd --enable-fft --enable-cxx --host&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
+$ make -j 4
+$ sudo make install
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
+
+$ mkdir build-mpfr
+$ wget https://ftp.gnu.org/gnu/mpfr/mpfr-3.1.5.tar.xz
+$ tar xvf mpfr-3.1.5.tar.xz
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; build-mpfr
+$ ../mpfr-3.1.5/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;  --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
+$ make -j 4
+$ sudo make install
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
+
+$ mkdir build-mpci
+$ wget https://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz
+$ tar zxvf mpc-1.0.3.tar.gz
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; build-mpc
+$ ../mpc-1.0.3/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
+$ make -j 4
+$ sudo make install
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Finally, to compile gcc we need to specify where to look for it's dependencies above:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ mkdir build-gcc
+$ wget https://ftp.gnu.org/gnu/gcc/gcc-6.2.0/gcc-6.2.0.tar.gz
+$ tar zxvf gcc-6.2.0.tar.gz
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; build-gcc
+$ ../gcc-6.2.0/configure --without-headers --with-gnu-as --with-gnu-ld --enable-languages&lt;span class="o"&gt;=&lt;/span&gt;c,c++ --disable-nls --enable-libssp --enable-gold --enable-ld --target&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt; --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-mpc&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --disable-libgomp
+$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/lib make -j 4
+$ sudo make install
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, we should have our own cross-compiler's toolchain in &lt;code&gt;/usr/cross-build/bin&lt;/code&gt; directory. To use it we should include it in our &lt;code&gt;$PATH&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="x"&gt;export PATH=&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="x"&gt;:&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;PREFIX&lt;/span&gt;&lt;span class="x"&gt;/bin&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To test our own cross-compiler, we simply run:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcc main.c -o helloworld-linux
+$ file helloword-linux
+main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;SYSV&lt;span class="o"&gt;)&lt;/span&gt;, dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, &lt;span class="k"&gt;for&lt;/span&gt; GNU/Linux 2.6.32, BuildID&lt;span class="o"&gt;[&lt;/span&gt;sha1&lt;span class="o"&gt;]=&lt;/span&gt;ca5ba57ac722ef8521d50ee8ecbbdca4b44a76e1, not stripped
+$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/lib amd64-marcel-freebsd9.2-gcc helloworld.c -o helloworld-freebsd
+$ file helloworld-freebsd
+main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;FreeBSD&lt;span class="o"&gt;)&lt;/span&gt;, dynamically linked, interpreter /libexec/ld-elf.so.1, &lt;span class="k"&gt;for&lt;/span&gt; FreeBSD 9.2, not stripped
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you need a cross-compile version of gdb, simply compile the gdb for the target machine like above:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ wget https://ftp.gnu.org/gnu/gdb/gdb-7.11.tar.xz
+$ tar xvf gdb-7.11.tar.xz
+$ ../gdb-7.11.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --target&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
+$ make -j 4
+$ sudo make install
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can see the whole compile process in my &lt;a href="https://gist.github.com/bijanebrahimi/62596745808f8667c40ff91b07d9e7b8"&gt;github gist&lt;/a&gt;.&lt;/p&gt;</content><category term="gist"></category><category term="gcc"></category><category term="cross-compiler"></category><category term="freebsd"></category><category term="linux"></category><category term="compiler"></category></entry><entry><title>Git Submodules</title><link href="http://bijanebrahimi.github.io/blog/git-submodules.html" rel="alternate"></link><published>2017-02-06T12:22:00+03:30</published><updated>2017-02-06T12:22:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-06:/blog/git-submodules.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;There are many good articles and blog posts on the Interenet describing how to migrate from svn to git repository. There are a lot of advantages to migrate to git, (&lt;a href="nvie.com/posts/a-successful-git-branching-model"&gt;git-flow&lt;/a&gt; to metion one) but there are also a few draw-backs. For example svn supports &lt;a href="http://svnbook.red-bean.com/en/1.7/svn.serverconfig.pathbasedauthz.html"&gt;Path-Based Authorization&lt;/a&gt; meaning great …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;There are many good articles and blog posts on the Interenet describing how to migrate from svn to git repository. There are a lot of advantages to migrate to git, (&lt;a href="nvie.com/posts/a-successful-git-branching-model"&gt;git-flow&lt;/a&gt; to metion one) but there are also a few draw-backs. For example svn supports &lt;a href="http://svnbook.red-bean.com/en/1.7/svn.serverconfig.pathbasedauthz.html"&gt;Path-Based Authorization&lt;/a&gt; meaning great control over who sees what parts of the project. Unfortunately git does not provide such mechanism meaning to overcome this task, we should split such files or directories into separate git repositories to restrict access per project and yet keep the project as a whole. In this post I explain how to use git submdules to do that.&lt;/p&gt;
+&lt;h1&gt;Git-Flow using submodules&lt;/h1&gt;
+&lt;p&gt;Imagine the following scenario in which we have a shared library named &lt;strong&gt;lib-shared&lt;/strong&gt; and two projects named &lt;strong&gt;protocol-x&lt;/strong&gt; and &lt;strong&gt;shell-y&lt;/strong&gt; which different developers have access to one of them.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ find . -type d
+./libs/lib-shared
+./routing/protocol-x
+./cli/shell-y
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;What we're going to do is to create a separate git repository for each project (as sub-projects):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ mkdir lib-shared
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; lib-shared
+$ git init
+$ touch .gitignore
+$ git add .
+$ git commit -m &lt;span class="s2"&gt;&amp;quot;added .gitignore&amp;quot;&lt;/span&gt;
+$ git remote add origin git@debian:root/lib-shared.git
+$ git tag -a v0.1 -m v0.1
+$ git push origin --all
+$ git push --tags
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
+$ mkdir protocol-x
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; protocol-x
+$ git init
+$ touch .gitignore
+$ git add .
+$ git commit -m &lt;span class="s2"&gt;&amp;quot;added .gitignore&amp;quot;&lt;/span&gt;
+$ git remote add origin git@debian:root/protocol-x.git
+$ git tag -a v0.1 -m v0.1
+$ git push origin --all
+$ git push --tags
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
+$ mkdir shell-y
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; shell-y
+$ git init
+$ touch .gitignore
+$ git add .
+$ git commit -m &lt;span class="s2"&gt;&amp;quot;added .gitignore&amp;quot;&lt;/span&gt;
+$ git remote add origin git@debian:root/shell-y.git
+$ git tag -a v0.1 -m v0.1
+$ git push origin --all
+$ git push --tags
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And we create another project (super-project) containing these projects. To do that, we should add above sub-projects as submodules. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /home/manager/
+$ mkdir super-project
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; super-project
+$ git init
+$ git remote add origin git@debian:root/super-project.git
+$ git submodule add -b master --name lib-shared git@debian:root/lib-shared libs/lib-shared
+$ git submodule add -b master --name protocol-x git@debian:root/protocol-x protocols/protocol-x
+$ git submodule add -b master --name shell-y git@debian:root/shell-y cli/shell-y
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Running &lt;code&gt;git status&lt;/code&gt; we can see that git created a file named &lt;code&gt;.gitmodules&lt;/code&gt; which keeps a list of our current submodules. This file should be a part of source code and it'll help other people cloning this super-project to know which submodules they should also get using &lt;code&gt;git submodule init&lt;/code&gt; (if they have permission ofc). Also Git sees these sub-projects as files instead of directories. This is how git sees submodules. Each submodule points to a git commit SHA-1 which in our case is the latest commit in master branch of each-subproject. You can confirm this by running &lt;code&gt;git diff --staged&lt;/code&gt; command. More interestingly, we can see which version of submodules out super-project is following (before committing):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ git submodule status
+ fa75a2c38ed4b80f1c42e4434fd3d43e230605ba cli/shell-y &lt;span class="o"&gt;(&lt;/span&gt;v0.1&lt;span class="o"&gt;)&lt;/span&gt;
+ 9f0dd01bea1ec7f719bf17e2ff2018dc64fbe335 libs/lib-shared &lt;span class="o"&gt;(&lt;/span&gt;v0.1&lt;span class="o"&gt;)&lt;/span&gt;
+ a2b7c92292a6b47a5ece5feea9e3390879d49d89 protocols/protocol-x &lt;span class="o"&gt;(&lt;/span&gt;v0.1&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now we can commit the changes in our super-project:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ git commit -m &lt;span class="s2"&gt;&amp;quot;added libshared, protocol-x and shell-y sub-projects&amp;quot;&lt;/span&gt;
+$ git tag -a v0.1 -m &lt;span class="s2"&gt;&amp;quot;v0.1&amp;quot;&lt;/span&gt;
+$ git push origin --all
+$ git push --tags
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_01.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Now to follow our git-flow, we need to fork a new branch named &lt;strong&gt;dev&lt;/strong&gt; from master branch. What we should do  first is to create a dev branch in all of our sub-projects using &lt;code&gt;git submodule foreach&lt;/code&gt; which executes given commands in each of our (initialized) submodules:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /home/manager/projects/super-project
+$ git checkout -b dev master
+$ git submodule foreach &lt;span class="s1"&gt;&amp;#39;git pull origin master; git checkout -b dev master; $ $ git push origin dev&amp;#39;&lt;/span&gt;
+$ sed -i&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;s/branch = master/branch = dev/g&amp;#39;&lt;/span&gt; .gitmodules
+$ git add .gitmodules
+$ git commit -m &lt;span class="s2"&gt;&amp;quot;forked dev branch&amp;quot;&lt;/span&gt;
+$ git push origin dev
+$ git tag -a v0.1-dev -m v0.1-dev
+$ git push origin --tags
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_02.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Now it's time for our developers to clone the super project and changes some code. our developer &lt;strong&gt;kevin&lt;/strong&gt; is the maintainer of the shell-y and only have access to our shared library beside his project so he should avoid trying to get protocol-x project:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ make /home/kevin/projects/kevin-project
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; ~/kevin/projects/kevin-project
+$ git init
+$ git remote add origin git@debian:root/super-project.git
+$ git fetch origin
+$ git checkout -b dev remotes/origin/dev
+$ git submodule init cli/shell-y
+$ git submodule init libs/lib-shared
+$ git submodule update --remote
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_03.svg"&gt;&lt;/p&gt;
+&lt;p&gt;To make a change in lib-shared, he needs to fork a new feature-branch from lib-shared's dev branch and simply pushes his branch to remote and notify the manager:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cd libs/lib-shared
+git checkout -b feature-authors remotes/origin/dev
+touch AUTHORS
+git add AUTHORS
+git commit -m &amp;quot;added AUTHORS file&amp;quot;
+echo &amp;quot;bijan-e&amp;quot; &amp;gt; AUTHORS
+git commit -a -m &amp;quot;added bijan-e to AUTHORS&amp;quot;
+git push origin feature-authors
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: If kevin now goes to the root of his super-project, he sees that his super-project has changes:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ git submodule status
+ fa75a2c38ed4b80f1c42e4434fd3d43e230605ba ../cli/shell-y &lt;span class="o"&gt;(&lt;/span&gt;v0.1&lt;span class="o"&gt;)&lt;/span&gt;
++51b9fbe3b08bc793193a70a48e762b4a5629514f lib-shared &lt;span class="o"&gt;(&lt;/span&gt;v0.1-2-g51b9fbe&lt;span class="o"&gt;)&lt;/span&gt;
+-a2b7c92292a6b47a5ece5feea9e3390879d49d89 ../protocols/protocol-x
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_04.svg"&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;+&lt;/code&gt; sign beside lib-shared submodule shows that this subodule has changes which super-project does not added yet. the &lt;code&gt;-&lt;/code&gt; sign beside protocol-x submodule indictes that this module has not been initialized. Since his changes to lib-shared has not been accepted yet, he should revert update this submodule to point at the right hash commit which dev knows:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ git submodule update
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_05.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Now The manager is notified and should review kevin's changes and decide if it's good enough to be merged into lib-shared's dev branch:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /home/manager/projects/super-project/libs/lib-shared
+$ git pull origin
+$ git tag -a v0.1-dev -m v0.1-dev
+$ git checkout -b feature-authors remotes/origin/feature-authors
+$ // Code Review
+$ git checkout dev
+$ git merge --no-ff feature-authors -m &lt;span class="s2"&gt;&amp;quot;merged feature authors&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_06.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Now lib-shared has reached v0.1-dev-3 should be included in super-project's dev branch:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /home/manager/projects/super-project
+$ git submodule status
+ fa75a2c38ed4b80f1c42e4434fd3d43e230605ba cli/shell-y &lt;span class="o"&gt;(&lt;/span&gt;v0.1&lt;span class="o"&gt;)&lt;/span&gt;
++04edc4cd6f3916f5d51a7f5cc7a6df92b11014a9 libs/lib-shared &lt;span class="o"&gt;(&lt;/span&gt;v0.1-dev-3-g04edc4c&lt;span class="o"&gt;)&lt;/span&gt;
+ a2b7c92292a6b47a5ece5feea9e3390879d49d89 protocols/protocol-x &lt;span class="o"&gt;(&lt;/span&gt;v0.1&lt;span class="o"&gt;)&lt;/span&gt;
+$ git diff --submodule
+Submodule libs/lib-shared 9f0dd01..04edc4c:
+  &amp;gt; merged feature authors
+$ git add libs/lib-shared
+$ git commit -m &lt;span class="s2"&gt;&amp;quot;merged lib-shared v0.1-dev-3&amp;quot;&lt;/span&gt;
+$ git push origin dev --recurse-submodules&lt;span class="o"&gt;=&lt;/span&gt;on-demand
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The changes of lib-shared and super-project should can be send to their remotes manually for each project or only once from super-project using &lt;code&gt;--recurse-submodules&lt;/code&gt; argument. Note that push doesn't push submodule's tags so we need to push submodules's tags separately:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ git submodule foreach &lt;span class="s1"&gt;&amp;#39;git push --tags&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_07.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Now kevin can fetch new changes in dev:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /home/kevin/projects/kevin-project
+$ git pull origin dev
+$ git submodule update --remote
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_08.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Merging branches in super-project is a little tricky. When merging dev branch into master, we should always check not to change &lt;code&gt;.gitmodules&lt;/code&gt; between merges. To do that we use &lt;code&gt;--no-commit&lt;/code&gt; argument just to do merge the, and before &lt;code&gt;git commit&lt;/code&gt; we should revert any changing comming from dev to master into &lt;code&gt;.gitmodules&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /home/manager/projects/super-project
+$ git checkout master
+$ git submodule update
+$ git submodule foreach &lt;span class="s1"&gt;&amp;#39;git checkout master&amp;#39;&lt;/span&gt;
+$ git merge --no-commit --no-ff dev
+$ git reset HEAD .gitmodules
+$ git checkout -- .gitmodules
+$ git diff --submodule --staged
+Submodule libs 9f0dd01..04edc4c:
+  &amp;gt; merged feature authors
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;git diff --submodule --staged&lt;/code&gt; shows which changes is going from submodules. We can use this commit messages to create a &lt;code&gt;CHANGELOG&lt;/code&gt; file. FInally before committing we should also merge submodules changes using &lt;code&gt;--merge&lt;/code&gt; argument:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ git submodule update --merge
+Updating 9f0dd01..04edc4c
+Fast-forward
+ AUTHORS &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt; +
+ &lt;span class="m"&gt;1&lt;/span&gt; file changed, &lt;span class="m"&gt;1&lt;/span&gt; insertion&lt;span class="o"&gt;(&lt;/span&gt;+&lt;span class="o"&gt;)&lt;/span&gt;
+ create mode &lt;span class="m"&gt;100644&lt;/span&gt; AUTHORS
+Submodule path &lt;span class="s1"&gt;&amp;#39;libs/lib-shared&amp;#39;&lt;/span&gt;: merged in &lt;span class="s1"&gt;&amp;#39;04edc4cd6f3916f5d51a7f5cc7a6df92b11014a9&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This confirms what the changes from dev's submodules are also merged into master's submodules. We should finalize this merge by committing changes and pushing both super-project and sub-project merge commits to remote:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ git commit -m &lt;span class="s2"&gt;&amp;quot;merged v0.1-dev-1 into master&amp;quot;&lt;/span&gt;
+$ git submodule foreach &lt;span class="s1"&gt;&amp;#39;git push origin master&amp;#39;&lt;/span&gt;
+$ git push origin master
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_09.svg"&gt;&lt;/p&gt;</content><category term="git"></category><category term="svn"></category><category term="git submodules"></category></entry><entry><title>py3status Configuration</title><link href="http://bijanebrahimi.github.io/blog/py3status-configuration.html" rel="alternate"></link><published>2016-03-14T22:35:00+03:30</published><updated>2016-03-14T22:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-03-14:/blog/py3status-configuration.html</id><summary type="html">&lt;p&gt;Edited: Follow changes via my &lt;a href="https://github.com/bijanebrahimi/py3status-config"&gt;Github&lt;/a&gt; repository.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Screenshot&lt;/strong&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="py3status Configuration" src="https://bijanebrahimi.github.io/py3status-config/images/py3status.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Dependencies&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/ultrabug/py3status"&gt;py3status&lt;/a&gt; is an extensible i3status wrapper written in python.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-flag"&gt;&lt;/i&gt; &lt;a href="https://fortawesome.github.io/Font-Awesome/"&gt;Font Awesome&lt;/a&gt;: Font Icons for i3-bar&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-camera"&gt;&lt;/i&gt; &lt;a href="https://github.com/naelstrof/maim"&gt;maim&lt;/a&gt;: a utility that takes screenshots of your desktop&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-lock"&gt;&lt;/i&gt; &lt;a href="http://i3wm.org/i3lock/"&gt;i3lock&lt;/a&gt;: is a simple screen locker like slock.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-picture-o"&gt;&lt;/i&gt; &lt;a href="https://github.com/bijanebrahimi/waffle"&gt;waffle&lt;/a&gt;: to randomly download/change wallpaper.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-calendar"&gt;&lt;/i&gt; &lt;a href="https://gahshomar.github.io/gahshomar/"&gt;gahshomar&lt;/a&gt; is a …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;Edited: Follow changes via my &lt;a href="https://github.com/bijanebrahimi/py3status-config"&gt;Github&lt;/a&gt; repository.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Screenshot&lt;/strong&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="py3status Configuration" src="https://bijanebrahimi.github.io/py3status-config/images/py3status.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Dependencies&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/ultrabug/py3status"&gt;py3status&lt;/a&gt; is an extensible i3status wrapper written in python.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-flag"&gt;&lt;/i&gt; &lt;a href="https://fortawesome.github.io/Font-Awesome/"&gt;Font Awesome&lt;/a&gt;: Font Icons for i3-bar&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-camera"&gt;&lt;/i&gt; &lt;a href="https://github.com/naelstrof/maim"&gt;maim&lt;/a&gt;: a utility that takes screenshots of your desktop&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-lock"&gt;&lt;/i&gt; &lt;a href="http://i3wm.org/i3lock/"&gt;i3lock&lt;/a&gt;: is a simple screen locker like slock.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-picture-o"&gt;&lt;/i&gt; &lt;a href="https://github.com/bijanebrahimi/waffle"&gt;waffle&lt;/a&gt;: to randomly download/change wallpaper.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-calendar"&gt;&lt;/i&gt; &lt;a href="https://gahshomar.github.io/gahshomar/"&gt;gahshomar&lt;/a&gt; is a calendar with simplicity in design and elegance in execution.&lt;/li&gt;
+&lt;li&gt;&lt;i class="fa fa-music"&gt;&lt;/i&gt; &lt;a href="http://audacious-media-player.org/"&gt;audacious&lt;/a&gt; Music Player (needs qdbus and audacious mpris plugins installed).&lt;/li&gt;
+&lt;/ul&gt;</content><category term="linux"></category><category term="i3"></category><category term="py3status"></category><category term="i3status"></category><category term="font-awesome"></category></entry><entry><title>Books I Read in 2015</title><link href="http://bijanebrahimi.github.io/blog/books-i-read-in-2015.html" rel="alternate"></link><published>2016-03-13T12:09:00+03:30</published><updated>2016-03-13T12:09:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-03-13:/blog/books-i-read-in-2015.html</id><summary type="html">&lt;p&gt;The List isn't long. in fact I spend the entire year in a military camp doing my
+final year of military service. my resolution for the year to read Books
+I wished to read but didn't have the time and I enjoyed reading every one of them.&lt;/p&gt;
+&lt;h2&gt;Novels&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Divergent Series …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;The List isn't long. in fact I spend the entire year in a military camp doing my
+final year of military service. my resolution for the year to read Books
+I wished to read but didn't have the time and I enjoyed reading every one of them.&lt;/p&gt;
+&lt;h2&gt;Novels&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Divergent Series by Veronica Roth&lt;/li&gt;
+&lt;li&gt;Lord of the Rings by J.R.R Tolkien&lt;/li&gt;
+&lt;li&gt;Inferno by Dan Brown&lt;/li&gt;
+&lt;li&gt;The Lost Symbol by Dan Brown&lt;/li&gt;
+&lt;li&gt;Beloved by Toni Morrison&lt;/li&gt;
+&lt;li&gt;The Fault in our starts by John Green&lt;/li&gt;
+&lt;li&gt;The Abundance of Katherines by John Green&lt;/li&gt;
+&lt;li&gt;The First Man by Albert Camus&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Computer &amp;amp; Programming&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Clean Code by Robert C. Martin&lt;/li&gt;
+&lt;li&gt;Effective Python by Brett Slatkin&lt;/li&gt;
+&lt;li&gt;Pro Git by Scott Chacon&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Book"></category><category term="Divergent"></category><category term="Insurgent"></category><category term="Allegiant"></category><category term="Veronica Roth"></category><category term="Lord of the Rings"></category><category term="J.R.R Tolkien"></category><category term="Dan Brown"></category><category term="Lost Symbol"></category><category term="Inferno"></category><category term="Beloved"></category><category term="Toni Morrison"></category><category term="The fault in our stars"></category><category term="The Abundance of Katherines"></category><category term="John Green"></category><category term="The first man"></category><category term="Albert Camus"></category><category term="Clean Code"></category><category term="Robert C. Martin"></category><category term="Effective Python"></category><category term="Brett Slatkin"></category><category term="Pro Git"></category><category term="Scott Chacon"></category></entry><entry><title>A dropdown Tiling Terminal for i3-wm</title><link href="http://bijanebrahimi.github.io/blog/a-dropdown-tiling-terminal-for-i3-wm.html" rel="alternate"></link><published>2016-02-27T14:27:00+03:30</published><updated>2016-02-27T14:27:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-27:/blog/a-dropdown-tiling-terminal-for-i3-wm.html</id><summary type="html">&lt;p&gt;&lt;a href="http://i3wm.org/docs/userguide.html#_scratchpad"&gt;Scratchpad&lt;/a&gt; is one of the
+coolest, and unique features in &lt;a href="http://i3wm.org"&gt;i3&lt;/a&gt;. Scratchpad is basically a
+hidden workspace that you can send your programs into it.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;There is no way to open that workspace. Instead, when using &lt;code&gt;scratchpad show&lt;/code&gt;,
+the window will be shown again, as a floating window, centered on …&lt;/p&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://i3wm.org/docs/userguide.html#_scratchpad"&gt;Scratchpad&lt;/a&gt; is one of the
+coolest, and unique features in &lt;a href="http://i3wm.org"&gt;i3&lt;/a&gt;. Scratchpad is basically a
+hidden workspace that you can send your programs into it.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;There is no way to open that workspace. Instead, when using &lt;code&gt;scratchpad show&lt;/code&gt;,
+the window will be shown again, as a floating window, centered on your current
+workspace&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Using scratchpad, we can turn any terminal into a drop-down terminal. I'm using &lt;a href="http://www.tenshu.net/p/terminator.html"&gt;terminator&lt;/a&gt; which supports tiling (and more)
+and &lt;code&gt;F1&lt;/code&gt; key as hot key to toggle terminator since I have no other use for formally
+known help button key on linux.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Add this to your i3 config (~/.config/i3/config) and restart i3 (Super+Shift+R)
+exec --no-startup-id &amp;quot;terminator -m&amp;quot;
+for_window [class=&amp;quot;Terminator&amp;quot; title=&amp;quot;^((?!Terminator Preferences).)*$&amp;quot;] move scratchpad, move position 0 0, resize set 1366 768;
+bindsym F1 [class=&amp;quot;Terminator&amp;quot;] scratchpad show;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can also view the changes via &lt;a href="https://gist.github.com/bijanebrahimi/6641e8022dffb2e6a5dd"&gt;Github Gist&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: It's possible to send other programs into scratchpad workspace, and
+toggle them using different key bindings. The trick is to exclude &lt;strong&gt;Terminator&lt;/strong&gt;
+which is also in Scratchpad from showing. for example, Using the code below we
+can simply send any active programs into Scratchpad using &lt;code&gt;Super+Shift+F1&lt;/code&gt; key
+and retrieve them one by one by hitting &lt;code&gt;Super+F1&lt;/code&gt; and only by pressing &lt;code&gt;F1&lt;/code&gt; we
+can toggle &lt;strong&gt;Terminator&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="x"&gt;bindsym &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;mod&lt;/span&gt;&lt;span class="x"&gt;+Shift+F1 move container to scratchpad&lt;/span&gt;
+&lt;span class="x"&gt;bindsym &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;mod&lt;/span&gt;&lt;span class="x"&gt;+F1 [class=&amp;quot;^((?!Terminator).)*&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt;&amp;quot;] scratchpad show&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="linux"></category><category term="terminal"></category><category term="terminator"></category><category term="i3"></category><category term="scratchpad"></category></entry><entry><title>rofi-todo</title><link href="http://bijanebrahimi.github.io/blog/rofi-todo.html" rel="alternate"></link><published>2016-02-26T18:15:00+03:30</published><updated>2016-02-26T18:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-26:/blog/rofi-todo.html</id><summary type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;It's a popup window switcher roughly based on &lt;a href="http://code.google.com/p/superswitcher/"&gt;superswitcher&lt;/a&gt;,
+requiring only xlib and pango&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Rofi has multiple modes.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;RUN&lt;/strong&gt;: Shows a list of executables in $PATH and can launch them (optional in a terminal).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DRUN&lt;/strong&gt;: Same as the run launches, but the list is created …&lt;/li&gt;&lt;/ol&gt;</summary><content type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;It's a popup window switcher roughly based on &lt;a href="http://code.google.com/p/superswitcher/"&gt;superswitcher&lt;/a&gt;,
+requiring only xlib and pango&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Rofi has multiple modes.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;RUN&lt;/strong&gt;: Shows a list of executables in $PATH and can launch them (optional in a terminal).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DRUN&lt;/strong&gt;: Same as the run launches, but the list is created from the installed desktop files.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Window&lt;/strong&gt;: Show a list of all the windows and allow switching between them.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WindowCD&lt;/strong&gt;: Shows a list of the windows on the current desktop and allows switching between them.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SSH&lt;/strong&gt;: Shows a list of SSH targets based on your ssh config file, and allows to quickly ssh into them.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Script&lt;/strong&gt;: Allows custom scripted Modi to be added.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Using &lt;code&gt;script&lt;/code&gt; mode, one can extend the rofi. There are plenty scripts
+other there. you should definitely check &lt;a href="https://davedavenport.github.io/rofi/p07-Scripts.html"&gt;them&lt;/a&gt; out.&lt;/p&gt;
+&lt;h2&gt;TODO List Script&lt;/h2&gt;
+&lt;p&gt;Script modi can be enabled using &lt;code&gt;name:script&lt;/code&gt; syntax. Just save the following
+script somewhere in your &lt;code&gt;PATH&lt;/code&gt; directory like &lt;code&gt;/usr/local/bin&lt;/code&gt;, make sure it's
+executable and run the following:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;rofi -modi TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img alt="rofi-todo" src="http://bijanebrahimi.github.io/blog/assets/images/rofi_todolist-rofi_todo.png"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;~/.rofi_todos
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; ! -a &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+    touch &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="k"&gt;function&lt;/span&gt; list_todos&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="nv"&gt;TODO&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;cat &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+        &lt;span class="nv"&gt;TODDO&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;fi&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$@&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+    list_todos
+&lt;span class="k"&gt;else&lt;/span&gt;
+    &lt;span class="nv"&gt;TODO&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; sed &lt;span class="s2"&gt;&amp;quot;s/\([^a-zA-Z0-9]\)/\\\\\\1/g&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;TODO_UNSCAPED&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;
+
+    &lt;span class="nv"&gt;MATCHING&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;grep &lt;span class="s2"&gt;&amp;quot;^&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;$&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;MATCHING&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+        sed -i &lt;span class="s2"&gt;&amp;quot;/^&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;$&lt;span class="s2"&gt;/d&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;`date +&amp;quot;&lt;/span&gt;%B %d %H:%M&lt;span class="s2"&gt;&amp;quot;` &lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_UNSCAPED&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;TODO_FILE&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;fi&lt;/span&gt;
+    list_todos
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;Instructions&lt;/strong&gt;:
+- To &lt;strong&gt;Add new TODO&lt;/strong&gt;, just type it (It should be Unique, BTW) at TODO prompt
+- To &lt;strong&gt;Delete one&lt;/strong&gt;, Just Select the one and hit Enter&lt;/p&gt;
+&lt;p&gt;If you're already using rofi, just add &lt;code&gt;TODO&lt;/code&gt; modi to your existing command-line:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;rofi -modi DRun,Run,Window,TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t -show TODO
+&lt;/pre&gt;&lt;/div&gt;</content><category term="linux"></category><category term="rofi"></category><category term="rofi-todo"></category><category term="rofi-script"></category><category term="bash"></category><category term="project"></category></entry><entry><title>Extending The Battery Life in Linux</title><link href="http://bijanebrahimi.github.io/blog/extending-the-battery-life-in-linux.html" rel="alternate"></link><published>2016-02-25T14:20:00+03:30</published><updated>2016-02-25T14:20:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-25:/blog/extending-the-battery-life-in-linux.html</id><summary type="html">&lt;p&gt;Before Running any tunning, the average estimated lifetime of my battery was
+about 3 hours (below image). Through this post we learn how to extend it to
+almost 4 and a half hours. It's more than 50 percent increase!&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: I'm currently using a lenovo G50 laptop with Quad-Core AMD …&lt;/p&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;p&gt;Before Running any tunning, the average estimated lifetime of my battery was
+about 3 hours (below image). Through this post we learn how to extend it to
+almost 4 and a half hours. It's more than 50 percent increase!&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: I'm currently using a lenovo G50 laptop with Quad-Core AMD CPU equiped
+with a 4-cell battery and running &lt;code&gt;i3-wm&lt;/code&gt;, a lightweight tilling window manager
+(no Gnome/KDE craps for me) on ArchLinux.
+So depending on your hardware and programs you have running and your daily usage
+pattern, the results may vary for you.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img alt="Gnome Battery Bench" src="http://bijanebrahimi.github.io/blog/assets/images/extend_linux_battery_life-battery_bench_before_tunning.png" title="Gnome Battery Bench - Before Tunning"&gt;&lt;/p&gt;
+&lt;p&gt;First, run &lt;code&gt;powertop&lt;/code&gt; to find out which devices/processes are draining power the most.
+In The &lt;code&gt;Overview Tab&lt;/code&gt; you can actually see what processes/devices are draining
+how much power and By applying the Good option in &lt;code&gt;Tunables Tab&lt;/code&gt;, powertop
+automatically tunes them. you can do this manually for every item in Tunable tab
+or just use the &lt;code&gt;--auto-tune&lt;/code&gt; option.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo powertop --auto-tune
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That single command will probably add a noticeable extra minutes to your battery
+life. But there are still other ways to improve it more. Let's Go to powertop's
+&lt;code&gt;Overview Tab&lt;/code&gt; again:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Power est.  Usage        Events/s    Category    Description
+  5.18 W    0.4 pkts/s               Device      Network interface: wlp2s0 (wl)
+  3.80 W    100.0%                   Device      Display backlight
+  1.26 W    165.5 ms/s   123.3       Process     /usr/share/atom/atom --type=zygote --no-sandbox
+  675 mW    95.9 ms/s    5.3         Process     atom
+  660 mW    94.0%                    Device      USB device: USB2.0-CRW (Generic)
+  262 mW    27.0 ms/s    90.1        Process     /usr/share/atom/atom --executed-from=/home/bijan --pid=1109
+  247 mW    27.2 ms/s    70.4        Process     /usr/lib/xorg-server/Xorg :0 -seat seat0 -auth /run/lightdm/root/:0 -nolisten tc
+  103 mW    2.0 ms/s     109.7        kWork      od_dbs_timer
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;According to above, after my wireless interface (which i use), the display backlight,
+USB CD-RW and my Ethernet interface are the most draining power sources.
+The last two I never/rarely use.&lt;/p&gt;
+&lt;h3&gt;Turning Off unnecessary devices&lt;/h3&gt;
+&lt;p&gt;Since I never/rarely use my CD-RW and I never connect to Internet through wired
+connection, so it seems logical to me to disable them. to find my CD-RW device
+power location, I used powertop &lt;code&gt;Tunable Tab&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Disable CR-RW
+$ echo 0 | s tee /sys/bus/usb/devices/1-1.3/power/autosuspend_delay_ms
+$ echo auto | s tee /sys/bus/usb/devices/1-1.3/power/control
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To disable my Ethernet device, first I have to find it's device number:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Find Ethernet domain:bus:slot number
+$ lspci | grep -i ethernet
+03:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller (rev 10)
+
+# Find relative device on /sys/devices
+$ find /sys/devices -name &amp;quot;*03:00.0&amp;quot;
+/sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0
+
+# Turn off device
+echo 1 | s tee /sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0/remove
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Backlight&lt;/h3&gt;
+&lt;p&gt;To reduce the brightness LED backlight, I set a brightness value (between 0 and 255):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Brightness&lt;/span&gt;
+&lt;span class="x"&gt;basedir=&amp;quot;/sys/class/backlight/&amp;quot;&lt;/span&gt;
+&lt;span class="x"&gt;handler=&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;basedir&lt;/span&gt;&lt;span class="p"&gt;$(&lt;/span&gt;&lt;span class="err"&gt;ls&lt;/span&gt; &lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;basedir&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="x"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;
+
+&lt;span class="x"&gt;chmod 666 &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;handler&lt;/span&gt;&lt;span class="x"&gt;/brightness&lt;/span&gt;
+&lt;span class="x"&gt;echo 100 &amp;gt; handler/brightness&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;Running as a Service&lt;/h1&gt;
+&lt;p&gt;To execute the above commands at boot up, I created a shell script and run that
+as a service.&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt; 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c1"&gt;# /usr/local/bin/powertop_tuning.sh&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Auto-tune powertop&lt;/span&gt;
+powertop --auto-tune
+
+&lt;span class="c1"&gt;# Disable CR-RW&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; s tee /sys/bus/usb/devices/1-1.3/power/autosuspend_delay_ms
+&lt;span class="nb"&gt;echo&lt;/span&gt; auto &lt;span class="p"&gt;|&lt;/span&gt; s tee /sys/bus/usb/devices/1-1.3/power/control
+
+&lt;span class="c1"&gt;# Disable Ethernet&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; s tee /sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0/remove
+
+&lt;span class="c1"&gt;# Brightness&lt;/span&gt;
+chmod &lt;span class="m"&gt;666&lt;/span&gt; /sys/class/backlight/radeon_bl0/brightness
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="m"&gt;80&lt;/span&gt; &amp;gt; /sys/class/backlight/radeon_bl0/brightness
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;p&gt;And to create proper systemd service:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# /etc/systemd/system/powertop_tuning.service
+[Unit]
+Description=&amp;quot;PowerTop Tuning config&amp;quot;
+ConditionPathExists=/usr/local/bin/powertop_tuning.sh
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+KillMode=none
+ExecStart=/usr/local/bin/powertop_tuning.sh
+ExecStop=exit
+
+[Install]
+WantedBy=multi-user.target
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So, to make &lt;code&gt;powertop_tuning&lt;/code&gt; service run automatically, just enable the service:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo systemctl &lt;span class="nb"&gt;enable&lt;/span&gt; powertop_tuning.service
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;The result is very satisfactory. In daily usage, my battery life went up
+from about 3 hours to almost 4 and a half hours.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Gnome Battery Bench" src="http://bijanebrahimi.github.io/blog/assets/images/extend_linux_battery_life-battery_bench_after_tunning.png" title="Gnome Battery Bench - After Tunning"&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: The tests and battery benchmark did not placed in a controlled
+environment but it seems logical to expect similar effects.&lt;/p&gt;
+&lt;/blockquote&gt;</content><category term="linux"></category><category term="powertop"></category><category term="power"></category></entry><entry><title>Multiseat Linux Desktop, Multiple X servers</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html" rel="alternate"></link><published>2014-10-22T10:35:00+03:30</published><updated>2014-10-22T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-22:/blog/multiseat-linux-desktop-multiple-x-servers.html</id><summary type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="{filename}/multiseat-linux-desktop.md"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
+&lt;h3&gt;Hardware Requirements&lt;/h3&gt;
+&lt;p&gt;for each user, we need seperate:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;mouse&lt;/li&gt;
+&lt;li&gt;keyboard&lt;/li&gt;
+&lt;li&gt;monitor&lt;/li&gt;
+&lt;li&gt;Video Card&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;each Monitor will be attached to a seperate Video Card.&lt;/p&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="{filename}/multiseat-linux-desktop.md"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
+&lt;h3&gt;Hardware Requirements&lt;/h3&gt;
+&lt;p&gt;for each user, we need seperate:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;mouse&lt;/li&gt;
+&lt;li&gt;keyboard&lt;/li&gt;
+&lt;li&gt;monitor&lt;/li&gt;
+&lt;li&gt;Video Card&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;each Monitor will be attached to a seperate Video Card.&lt;/p&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;the &lt;a href="https://en.wikipedia.org/wiki/X_Window_System"&gt;X Window System&lt;/a&gt; is a system program which implements the hardware layer and the basis for graphical user interfaces (GUIs). to run seperate Desktop Environment in linux, we need to run seperate X servers as well. each X server will use separate Video card, Mouse and Keyboard (input devices). for that we have to configure the X server to do that. but first we have to identify the devices we have plugged to the computer to address them later in the X configuration file.
+&lt;!-- BREAK --&gt;&lt;/p&gt;
+&lt;h3&gt;Hardware Detection&lt;/h3&gt;
+&lt;p&gt;we can find our input devices (Mouse &amp;amp; Keyboards) in &lt;code&gt;/dev/input&lt;/code&gt; directory. lets look to see what have we here:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ls -la /dev/input
+drwxr-xr-x  &lt;span class="m"&gt;4&lt;/span&gt; root root    &lt;span class="m"&gt;320&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 .
+drwxr-xr-x &lt;span class="m"&gt;15&lt;/span&gt; root root   &lt;span class="m"&gt;3060&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:59 ..
+drwxr-xr-x  &lt;span class="m"&gt;2&lt;/span&gt; root root    &lt;span class="m"&gt;160&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 by-id
+drwxr-xr-x  &lt;span class="m"&gt;2&lt;/span&gt; root root    &lt;span class="m"&gt;220&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 by-path
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;64&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event0
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;65&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event1
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;66&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event2
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;67&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event3
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;68&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event4
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;69&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event5
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;70&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event6
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;71&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event7
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;72&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event8
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;63&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 mice
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;32&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 mouse0
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;33&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 mouse1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;before explaining what is each of these files and directories, first we have to look at their permissions. they belogs to root user and group. so for reading them, we have to have read permission. run the below commands as super user or just run them using the &lt;code&gt;sudo&lt;/code&gt; command which i did.&lt;/p&gt;
+&lt;p&gt;each &lt;code&gt;/dev/input/event*&lt;/code&gt; file is an input device file. to find out which one is related to which input device we can print the files and see if it contains output when we move our mouse or press a key. so i did run the command and played with my input devices to see which one is which.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo cat /dev/input/event0
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;do this till you find all of your input devices.&lt;/p&gt;
+&lt;p&gt;an alternative way (which i preffer) is to look into &lt;code&gt;/dev/input/by-id/&lt;/code&gt; directory. your Input devices should be listed there with their human readable names.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ls -la /dev/input/by-id/
+drwxr-xr-x &lt;span class="m"&gt;2&lt;/span&gt; root root &lt;span class="m"&gt;160&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 .
+drwxr-xr-x &lt;span class="m"&gt;2&lt;/span&gt; root root &lt;span class="m"&gt;160&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 .
+drwxr-xr-x &lt;span class="m"&gt;4&lt;/span&gt; root root &lt;span class="m"&gt;320&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 ..
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-15ca_USB_Optical_Mouse-event-mouse -&amp;gt; ../event2
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-15ca_USB_Optical_Mouse-mouse -&amp;gt; ../mouse0
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-CHICONY_USB_Keyboard-event-if01 -&amp;gt; ../event4
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-CHICONY_USB_Keyboard-event-kbd -&amp;gt; ../event3
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-Logitech_Logitech_USB_Keyboard-event-if01 -&amp;gt; ../event1
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-Logitech_Logitech_USB_Keyboard-event-kbd -&amp;gt; ../event0
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;since you may notice, there may be a lot more input devices there. that's because linux will create several input device files for devices like Keyboards which have fancy buttons. try the old &lt;code&gt;cat&lt;/code&gt; command to find out which one is your proper device driver file. i did it this way:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo cat /dev/input/by-id/usb-15ca_USB_Optical_Mouse-event-mouse
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;write your input device names with their related device file name somewhere cause we're going to need those later.&lt;/p&gt;
+&lt;p&gt;at last for Video Cards. Video cards are identified by their address on the PCI bus. so to find them we can use &lt;code&gt;lspci&lt;/code&gt; command.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ lspci &lt;span class="p"&gt;|&lt;/span&gt;  grep VGA
+00:09.0 VGA compatible controller: nVidia Corporation NV18 &lt;span class="o"&gt;[&lt;/span&gt;GeForce4 MX &lt;span class="m"&gt;4000&lt;/span&gt; AGP 8x&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;rev c1&lt;span class="o"&gt;)&lt;/span&gt;
+00:0a.0 VGA compatible controller: nVidia Corporation NV18 &lt;span class="o"&gt;[&lt;/span&gt;GeForce4 MX &lt;span class="m"&gt;4000&lt;/span&gt; AGP 8x&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;rev c1&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;this command lists the pci devices connected to the computer and filters the lines containing VGA. the number on the left is the device PCI address. now we have the table below for our multiseat configuration:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Seat number one&lt;/li&gt;
+&lt;li&gt;mouse: /dev/input/event2&lt;/li&gt;
+&lt;li&gt;keyboard: /dev/input/event0&lt;/li&gt;
+&lt;li&gt;Video Card: 00:09.0&lt;/li&gt;
+&lt;li&gt;Seat number two&lt;/li&gt;
+&lt;li&gt;mouse: /dev/input/event8&lt;/li&gt;
+&lt;li&gt;keyboard: /dev/input/event3&lt;/li&gt;
+&lt;li&gt;Video Card: /dev/input/event8&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;X Configuration&lt;/h3&gt;
+&lt;p&gt;the X keeps it's configuration file in &lt;code&gt;/etc/X11&lt;/code&gt; directory. we can directly modify it's current configuration file &lt;code&gt;xorg.conf&lt;/code&gt; or we can simply create an alternative configuration file and tell X to read from it manually. that will help us to run X with default configurations if our configuration somehow didn't work.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo touch /etc/X11/xorg.conf.multiseat
+$ sudo nano xorg.conf.multiseat
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;First of all, we need to set &lt;a href="https://wiki.archlinux.org/index.php/Xorg_multiseat#The_basics"&gt;basic Xorg configuration&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Section &amp;quot;ServerFlags&amp;quot;
+    Option &amp;quot;AutoAddDevices&amp;quot;     &amp;quot;false&amp;quot;
+    Option &amp;quot;AutoEnableDevices&amp;quot;  &amp;quot;false&amp;quot;
+    Option &amp;quot;AllowMouseOpenFail&amp;quot; &amp;quot;on&amp;quot;
+    Option &amp;quot;AllowEmptyInput&amp;quot; &amp;quot;on&amp;quot;
+    Option &amp;quot;ZapWarning&amp;quot;         &amp;quot;on&amp;quot;
+    Option &amp;quot;HandleSpecialKeys&amp;quot;  &amp;quot;off&amp;quot; # Zapping on
+    Option &amp;quot;DRI2&amp;quot; &amp;quot;on&amp;quot;
+    Option &amp;quot;Xinerama&amp;quot; &amp;quot;off&amp;quot;
+EndSection
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;after that we need to define input devices, screens, monitors and layouts. do the following configuration for each seat you want to have. so first we need to define out input devices. look at the "Option Device". it is the device file name we detect earlier:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Section &amp;quot;InputDevice&amp;quot;
+    Identifier      &amp;quot;Keyboard0&amp;quot;
+    Driver          &amp;quot;evdev&amp;quot;
+    Option          &amp;quot;Device&amp;quot;                &amp;quot;/dev/input/event0&amp;quot;
+    Option &amp;quot;xkb_rules&amp;quot; &amp;quot;evdev&amp;quot;
+    Option &amp;quot;xkb_model&amp;quot; &amp;quot;evdev&amp;quot;
+    Option &amp;quot;xkb_layout&amp;quot; &amp;quot;us&amp;quot;
+    Option &amp;quot;GrabDevice&amp;quot; &amp;quot;on&amp;quot; # prevent send event to other X-servers
+EndSection
+Section &amp;quot;InputDevice&amp;quot;
+    Identifier &amp;quot;Mouse0&amp;quot;
+    Driver &amp;quot;evdev&amp;quot;
+    Option &amp;quot;Device&amp;quot; &amp;quot;/dev/input/event2&amp;quot;
+    Option &amp;quot;GrabDevice&amp;quot; &amp;quot;on&amp;quot;
+EndSection
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;now we need to define Screen with uses Monitor and Device which is our Video Card (you can tweak the Modes and ... if you like). the BusId Option is the PCI address we also found earlier.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Section &amp;quot;Device&amp;quot;
+    Identifier      &amp;quot;Nvidia0&amp;quot;
+    Driver          &amp;quot;nouveau&amp;quot;
+    BusId           &amp;quot;PCI:00:09.0&amp;quot;
+EndSection
+    Section &amp;quot;Monitor&amp;quot;
+    Identifier      &amp;quot;Lg0&amp;quot;
+    HorizSync       30-93
+    VertRefresh     60
+    Option          &amp;quot;dpms&amp;quot;
+EndSection
+Section &amp;quot;Screen&amp;quot;
+    Identifier              &amp;quot;Screen0&amp;quot;
+    Device                  &amp;quot;Nvidia0&amp;quot;
+    Monitor                 &amp;quot;Lg0&amp;quot;
+    DefaultDepth    24
+    Option                  &amp;quot;DPI&amp;quot;   &amp;quot;100x100&amp;quot;
+    Subsection &amp;quot;Display&amp;quot;
+        Depth   24
+        Modes   &amp;quot;1280x1024&amp;quot;     &amp;quot;1024x768&amp;quot;
+    EndSubsection
+EndSection
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and finally, we need to define a Layout which we will later tell X to load it. it simply gathers the defined input devices and Screens.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Section &amp;quot;ServerLayout&amp;quot;
+    Identifier      &amp;quot;Seat0&amp;quot;
+    Screen          1               &amp;quot;Screen0&amp;quot;       1                   1
+    InputDevice     &amp;quot;Mouse0&amp;quot;        &amp;quot;CorePointer&amp;quot;
+    InputDevice     &amp;quot;keyboard0&amp;quot;      &amp;quot;CoreKeyboard&amp;quot;
+    Option &amp;quot;Clone&amp;quot; &amp;quot;off&amp;quot;
+    Option &amp;quot;AutoAddDevices&amp;quot; &amp;quot;off&amp;quot;
+    Option &amp;quot;DisableModInDev&amp;quot; &amp;quot;true&amp;quot;
+    Option &amp;quot;SingleCard&amp;quot; &amp;quot;on&amp;quot;   # use this to simplfied isolatedevice option
+EndSection
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;that's it. do this process again for the next seats and then you're done.&lt;/p&gt;
+&lt;h3&gt;Test The Configuration&lt;/h3&gt;
+&lt;p&gt;to test if everything is OK, we can run X using our multiseat configuration file and defined Layout. so we need to tell X where to look for COnfiguration file and load Which layout.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ startx -- :1 -layout Seat0 -config xorg.conf.multiseat
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;in the above code, i used &lt;code&gt;startx&lt;/code&gt;. it is a front-end script to xinit. you can also simply run the X directly:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ X -novtswitch -sharevts -nolisten tcp -config xorg.conf.multiseat -layout Seat0 :1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;you may need to go to the 7th console to use it (CTRL+F7) as the second seat will be available on the 8th console and so on.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ startx -- :2 -layout Seat0 -config xorg.conf.multiseat
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;if anything happend,read the log files and search the web.&lt;/p&gt;
+&lt;h3&gt;Configure Display Managers&lt;/h3&gt;
+&lt;p&gt;it is possible to configure your Display Manager (like KDM or GDM) to behave properly with Multiseat configuration at boot-up, but since i dont use any Display Manager, i can not tell you exactly how to do it. search the web for that matter. you can do it the easy way by configuring your Display Manager rc file or the hard way by editing the &lt;code&gt;/etc/inittab&lt;/code&gt; file if you have systemV.&lt;/p&gt;</content><category term="X11"></category><category term="config"></category><category term="xephyr"></category></entry><entry><title>Multiseat Linux Desktop</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html" rel="alternate"></link><published>2014-10-21T10:35:00+03:30</published><updated>2014-10-21T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-21:/blog/multiseat-linux-desktop.html</id><summary type="html">&lt;p&gt;here is the story. my 3 years old nephew (which i love him so much) is so curious about computers. every time he comes to visit (which is not rarely), he insist on helping me with my computer works. of course he thinks he is helping but i can't have …&lt;/p&gt;</summary><content type="html">&lt;p&gt;here is the story. my 3 years old nephew (which i love him so much) is so curious about computers. every time he comes to visit (which is not rarely), he insist on helping me with my computer works. of course he thinks he is helping but i can't have him messing my projects. so i wondered if i can (peacefully) share the computer with him. i searched and i found out about &lt;a href="en.wikipedia.org/wiki/Multiseat_configuration"&gt;Multiseat&lt;/a&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A multiseat, multi-station or multiterminal configuration is a single computer which supports
+multiple independent local users at the same time. In modern usage the terms refer to multiple
+users using one personal computer, each with their own console, consisting of a keyboard a mouse,
+a monitor, and possibly headphones --Wikipedia&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;so obviously that was the solution. time to get my hands dirty on the code :)&lt;/p&gt;
+&lt;h3&gt;GNU/Linux Solutions&lt;/h3&gt;
+&lt;p&gt;as it may be obvious, there are numbers of solution to do configure the GNU/Linux system to fit my need. so, in the following next articles (below links), i will explain these solution as i experienced them. i try to do them separately and independently, so you can skip ones you are not interested about. here are what i found:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="{filename}/multiseat-linux-desktop-multiple-x-servers.md"&gt;Multiple X servers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Nested X servers (i will write about it very soon)&lt;/li&gt;
+&lt;li&gt;The Multi-seat display manager&lt;/li&gt;
+&lt;/ol&gt;</content><category term="X11"></category><category term="config"></category></entry></feed>
