@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Books I Read in 2015</title>
+        <title>Makefiles, part one</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
@@ -17,9 +17,9 @@
             <li class="pure-menu-item"></li>
 
             <li class="pure-menu-item"><a href="/pages/bookmarks.html" class="pure-menu-link">Bookmarks</a></li>
-            <li class="pure-menu-item pure-menu-selected"><a href="/category/books.html" class="pure-menu-link">Books</a></li>
+            <li class="pure-menu-item"><a href="/category/books.html" class="pure-menu-link">Books</a></li>
             <li class="pure-menu-item"><a href="/category/freebsd.html" class="pure-menu-link">FreeBSD</a></li>
-            <li class="pure-menu-item"><a href="/category/gist.html" class="pure-menu-link">Gist</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="/category/gist.html" class="pure-menu-link">Gist</a></li>
             <li class="pure-menu-item"><a href="/category/git.html" class="pure-menu-link">Git</a></li>
             <li class="pure-menu-item"><a href="/category/linux.html" class="pure-menu-link">Linux</a></li>
             <li class="pure-menu-item"><a href="/category/openbsd.html" class="pure-menu-link">OpenBSD</a></li>
@@ -32,10 +32,10 @@
     <div class="entry-content">
         <div class="post-meta pure-g">
 <div class="pure-u-3-4 meta-data">
-    <a href="/category/books.html" class="category">Books</a><br />
+    <a href="/category/gist.html" class="category">Gist</a><br />
 
     <a class="author" href="/author/bijan.html">Bijan</a>
-    &mdash; <abbr title="2016-03-13T12:09:00+03:30">Sun 13 March 2016</abbr>
+    &mdash; <abbr title="2017-10-21T21:47:00+03:30">Sat 21 October 2017</abbr>
 </div>        </div>
     </div>
 
@@ -44,61 +44,46 @@
 
             <div class="background-image-small">
                 <div class="title-container">
-                    <h1>Books I Read in 2015</h1>
-                    <h4>List of books I like to share</h4>
+                    <h1>Makefiles, part one</h1>
+                    <h4>Simple Automation Scripts</h4>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="entry-content">
-        <p>The List isn't long. in fact I spend the entire year in a military camp doing my
-final year of military service. my resolution for the year to read Books
-I wished to read but didn't have the time and I enjoyed reading every one of them.</p>
-<h2>Novels</h2>
-<ul>
-<li>Divergent Series by Veronica Roth</li>
-<li>Lord of the Rings by J.R.R Tolkien</li>
-<li>Inferno by Dan Brown</li>
-<li>The Lost Symbol by Dan Brown</li>
-<li>Beloved by Toni Morrison</li>
-<li>The Fault in our starts by John Green</li>
-<li>The Abundance of Katherines by John Green</li>
-<li>The First Man by Albert Camus</li>
-</ul>
-<h2>Computer &amp; Programming</h2>
-<ul>
-<li>Clean Code by Robert C. Martin</li>
-<li>Effective Python by Brett Slatkin</li>
-<li>Pro Git by Scott Chacon</li>
-</ul>
+        <p>Today, I'm decided to post a series of NOT THAT technical posts about
+Makefiles and automation process. My goal is to learn more in the
+process of writing such series though there are many great an compete
+tutorials on the web. </p>
+<p>Consider the following <strong>hello world</strong> example since we're focusing
+mainly on writing Makefile scripts to compile and generate output
+binaries:</p>
+<div class="highlight"><pre><span></span><span class="cm">/* main.c */</span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;main.h&quot;</span><span class="cp"></span>
+
+<span class="kt">int</span>
+<span class="nf">main</span> <span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+        <span class="n">printf</span> <span class="p">(</span><span class="n">MESSAGE</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="cm">/* main.h */</span>
+<span class="cp">#define MESSAGE &quot;HELLO WORLD&quot;</span>
+</pre></div>
     </div>
 
     <footer>
         <div class="tags">
-            <a href="/tag/book.html">Book</a>
-            <a href="/tag/divergent.html">Divergent</a>
-            <a href="/tag/insurgent.html">Insurgent</a>
-            <a href="/tag/allegiant.html">Allegiant</a>
-            <a href="/tag/veronica-roth.html">Veronica Roth</a>
-            <a href="/tag/lord-of-the-rings.html">Lord of the Rings</a>
-            <a href="/tag/jrr-tolkien.html">J.R.R Tolkien</a>
-            <a href="/tag/dan-brown.html">Dan Brown</a>
-            <a href="/tag/lost-symbol.html">Lost Symbol</a>
-            <a href="/tag/inferno.html">Inferno</a>
-            <a href="/tag/beloved.html">Beloved</a>
-            <a href="/tag/toni-morrison.html">Toni Morrison</a>
-            <a href="/tag/the-fault-in-our-stars.html">The fault in our stars</a>
-            <a href="/tag/the-abundance-of-katherines.html">The Abundance of Katherines</a>
-            <a href="/tag/john-green.html">John Green</a>
-            <a href="/tag/the-first-man.html">The first man</a>
-            <a href="/tag/albert-camus.html">Albert Camus</a>
-            <a href="/tag/clean-code.html">Clean Code</a>
-            <a href="/tag/robert-c-martin.html">Robert C. Martin</a>
-            <a href="/tag/effective-python.html">Effective Python</a>
-            <a href="/tag/brett-slatkin.html">Brett Slatkin</a>
-            <a href="/tag/pro-git.html">Pro Git</a>
-            <a href="/tag/scott-chacon.html">Scott Chacon</a>
+            <a href="/tag/gist.html">gist</a>
+            <a href="/tag/makefile.html">Makefile</a>
+            <a href="/tag/gcc.html">gcc</a>
+            <a href="/tag/openbsd.html">openbsd</a>
+            <a href="/tag/unix.html">unix</a>
         </div>
         <div class="pure-g post-footer">
             <div class="pure-u-1 pure-u-md-1-2">
