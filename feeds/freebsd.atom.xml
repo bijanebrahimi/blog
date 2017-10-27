@@ -1,5 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - FreeBSD</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/freebsd.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-02-24T22:05:00+03:30</updated><entry><title>Freebsd's .mount.conf</title><link href="http://bijanebrahimi.github.io/blog/freebsds-mountconf.html" rel="alternate"></link><published>2017-02-24T22:05:00+03:30</published><updated>2017-02-24T22:05:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-24:/blog/freebsds-mountconf.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - FreeBSD</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/freebsd.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-10-27T11:21:00+03:30</updated><entry><title>Building FreeBSD Custom Kernel</title><link href="http://bijanebrahimi.github.io/blog/building-freebsd-custom-kernel.html" rel="alternate"></link><published>2017-10-27T11:21:00+03:30</published><updated>2017-10-27T11:21:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-27:/blog/building-freebsd-custom-kernel.html</id><summary type="html">&lt;p&gt;According to &lt;a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook"&gt;FreeBSD Handbook&lt;/a&gt;, there are two ways of building a custom
+kernel: &lt;a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/developers-handbook/kernelbuild.html"&gt;The Traditional Way&lt;/a&gt; and &lt;a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig-building.html"&gt;The New Way&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Either way, we should create a custom kernel configuration file, Then we use
+this custom kernel configuration for building the new kernel:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /usr/src
+$ cp sys/amd64/config/GENERIC …&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;According to &lt;a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook"&gt;FreeBSD Handbook&lt;/a&gt;, there are two ways of building a custom
+kernel: &lt;a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/developers-handbook/kernelbuild.html"&gt;The Traditional Way&lt;/a&gt; and &lt;a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig-building.html"&gt;The New Way&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Either way, we should create a custom kernel configuration file, Then we use
+this custom kernel configuration for building the new kernel:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /usr/src
+$ cp sys/amd64/config/GENERIC sys/amd64/config/CUSTOM
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For example, we can enable kernel debuggings enabled in our custom
+configuration:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat &amp;gt;&amp;gt; sys/amd64/config/CUSTOM &amp;lt;EOF
+makeoptions -g
+options KDB
+options DDB
+EOF
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, to compile the new kernel with our custom configuration:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;make -j &lt;span class="m"&gt;16&lt;/span&gt; buildkernel &lt;span class="nv"&gt;KERNCONF&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;CUSTOM
+make -j &lt;span class="m"&gt;16&lt;/span&gt; installkernel &lt;span class="nv"&gt;KERNCONF&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;CUSTOM
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you're experiencing modifying kernel and trying to avoid re-
+compiling the kernel every time you have a small change in the
+source code, use the following command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;make -j &lt;span class="m"&gt;16&lt;/span&gt; buildkernel &lt;span class="nv"&gt;KERNCONF&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;CUSTOM -DKERNFAST
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;Tips&lt;/strong&gt;: Remember to remove the multiple make jobs &lt;code&gt;-j&lt;/code&gt; flags
+if you have errors in compiling the source to easily spot the
+error message:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;make buildkernel &lt;span class="nv"&gt;KERNCONF&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;CUSTOM -DKERNFAST
+&lt;/pre&gt;&lt;/div&gt;</content><category term="freebsd"></category><category term="kernel"></category><category term="compile"></category></entry><entry><title>Freebsd's .mount.conf</title><link href="http://bijanebrahimi.github.io/blog/freebsds-mountconf.html" rel="alternate"></link><published>2017-02-24T22:05:00+03:30</published><updated>2017-02-24T22:05:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-24:/blog/freebsds-mountconf.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;As I'm getting more and more familiar with the FreeBSD Operating System and
 it's wonderfull architeture and design, I found the need to work with different
 versions of FreeBSD live (specially at work) and since it's not a good idea to install

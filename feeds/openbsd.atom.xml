@@ -91,9 +91,9 @@ which uses which.&lt;/p&gt;
     &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;nbytes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;read&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;MAX_BUF_SIZE&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
         &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Failed to read&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nbytes&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-                &lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;nbytes&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sc"&gt;&amp;#39;\0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;nbytes&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sc"&gt;&amp;#39;\0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
         &lt;span class="n"&gt;printf&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Received &lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt;%s&lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt; from the Child&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;buf&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
 
     &lt;span class="n"&gt;waitpid&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;WAIT_ANY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;WEXITSTATUS&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
@@ -103,7 +103,7 @@ which uses which.&lt;/p&gt;
 
 &lt;p&gt;And the output is:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcc -o privsep main.c
-$ ./main
+$ ./privsep
 Received &lt;span class="s2"&gt;&amp;quot;Hello World&amp;quot;&lt;/span&gt; from the Child
 &lt;/pre&gt;&lt;/div&gt;
 
