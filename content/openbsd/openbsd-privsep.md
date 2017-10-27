@@ -111,9 +111,9 @@ parent_process (int fd, pid_t pid)
 	if ((nbytes = read (fd, buf, MAX_BUF_SIZE- 1)) == -1)
 		warn ("Failed to read");
 	else if (nbytes > 0) {
-                buf[nbytes] = '\0';
+		buf[nbytes] = '\0';
 		printf ("Received \"%s\" from the Child\n", buf);
-        }
+	}
 
 	waitpid (pid, &status, WAIT_ANY);
 	return WEXITSTATUS(status);
@@ -124,7 +124,7 @@ And the output is:
 
 ```sh
 $ gcc -o privsep main.c
-$ ./main
+$ ./privsep
 Received "Hello World" from the Child
 ```
 
