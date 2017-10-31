@@ -69,6 +69,16 @@ presented to the receiving program whole.  They are commonly used in
 privilege separated processes, where processes with different rights are
 required to cooperate.</p>
 </blockquote>
+<div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">imsgbuf</span> <span class="p">{</span>
+        <span class="n">TAILQ_HEAD</span><span class="p">(,</span> <span class="n">imsg_fd</span><span class="p">)</span> <span class="n">fds</span><span class="p">;</span>
+        <span class="k">struct</span> <span class="n">ibuf_read</span>      <span class="n">r</span><span class="p">;</span>
+        <span class="k">struct</span> <span class="n">msgbuf</span>         <span class="n">w</span><span class="p">;</span>
+        <span class="kt">int</span>                   <span class="n">fd</span><span class="p">;</span>
+        <span class="kt">pid_t</span>                 <span class="n">pid</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
 <div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">imsg</span> <span class="p">{</span>
         <span class="k">struct</span> <span class="n">imsg_hdr</span> <span class="p">{</span>
                 <span class="kt">uint32_t</span> <span class="n">type</span><span class="p">;</span>
