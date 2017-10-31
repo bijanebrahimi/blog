@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-10-31T21:15:00+03:30</updated><entry><title>My OpenBSD Setup</title><link href="http://bijanebrahimi.github.io/blog/my-openbsd-setup.html" rel="alternate"></link><published>2017-10-31T21:15:00+03:30</published><updated>2017-10-31T21:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-31:/blog/my-openbsd-setup.html</id><summary type="html">&lt;p&gt;Today, I'm going to write about my personal experience with OpenBSD on my Laptop
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-10-31T21:53:00+03:30</updated><entry><title>Smallest and Longest Manpage you ever read</title><link href="http://bijanebrahimi.github.io/blog/smallest-and-longest-manpage-you-ever-read.html" rel="alternate"></link><published>2017-10-31T21:53:00+03:30</published><updated>2017-10-31T21:53:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-31:/blog/smallest-and-longest-manpage-you-ever-read.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Recently I asked a question on OpenSD IRC channel which led to a question
+entirely different. What's the smallest/longest manpage you ever read?&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ find /usr/local/share/man -type f -exec wc -l &lt;span class="o"&gt;{}&lt;/span&gt; &lt;span class="se"&gt;\;&lt;/span&gt;  &lt;span class="p"&gt;|&lt;/span&gt; sort
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;On OpenBSD 6.2, the smallest is &lt;a href="https://man.openbsd.org/dcphy.4"&gt;dcphy(4)&lt;/a&gt; with 23 lines and the …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Recently I asked a question on OpenSD IRC channel which led to a question
+entirely different. What's the smallest/longest manpage you ever read?&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ find /usr/local/share/man -type f -exec wc -l &lt;span class="o"&gt;{}&lt;/span&gt; &lt;span class="se"&gt;\;&lt;/span&gt;  &lt;span class="p"&gt;|&lt;/span&gt; sort
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;On OpenBSD 6.2, the smallest is &lt;a href="https://man.openbsd.org/dcphy.4"&gt;dcphy(4)&lt;/a&gt; with 23 lines and the longest
+(by far distance) is &lt;a href="https://man.openbsd.org/perltoc.1"&gt;perltoc(1)&lt;/a&gt; with 33106 lines. But what's the longest
+manpage you actually read?&lt;/p&gt;</content><category term="OpenBSD"></category><category term="Manpages"></category></entry><entry><title>My OpenBSD Setup</title><link href="http://bijanebrahimi.github.io/blog/my-openbsd-setup.html" rel="alternate"></link><published>2017-10-31T21:15:00+03:30</published><updated>2017-10-31T21:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-31:/blog/my-openbsd-setup.html</id><summary type="html">&lt;p&gt;Today, I'm going to write about my personal experience with OpenBSD on my Laptop
 as an OpenBSD user. I think I will come back day to day and update this blog
 post, but currently the following topics are coeverd:&lt;/p&gt;
 &lt;ul&gt;
