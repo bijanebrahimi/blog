@@ -16,6 +16,7 @@ TODO:
 
 - Android Integration
 - Development Environment
+- Themes
 
 ## Network Managers
 I found [netctl(8)][1] an interesting utility.It supports
