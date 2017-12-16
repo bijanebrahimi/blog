@@ -1,6 +1,7 @@
 Title: My OpenBSD Setup
 SubTitle: how I use i3wm on OpenBSD 6.2
 Date: 2017-10-31 21:15
+Modified: 2017-12-15 10:50
 Category: OpenBSD
 Tags: bsd, openbsd, netctl, wifi, nmctl, network-manager, hotplugd, automount, dunst
 
@@ -11,6 +12,7 @@ post, but currently the following topics are coeverd:
 - [Network Managers](#network-managers)
 - [Filesystem Auto-Mount](#filesystem-auto-mount)
 - [Desktop Notification Daemon](#desktop-notification-daemon)
+- [Integrated Development Window Manager](#integrated-development-window-manager)
 
 TODO:
 
@@ -366,6 +368,9 @@ timeout = 8
 #
 # vim: ft=cfg
 ```
+
+# Integrated Development Window Manager
+
 
 [1]: https://github.com/akpoff/netctl/
 [2]: http://man.openbsd.org/hostname.if.5
