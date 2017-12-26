@@ -1,5 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - OpenBSD</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/openbsd.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-12-15T13:15:00+03:30</updated><entry><title>OpenBSD's Network stack (PART 1)</title><link href="http://bijanebrahimi.github.io/blog/openbsds-network-stack-part-1.html" rel="alternate"></link><published>2017-12-15T13:15:00+03:30</published><updated>2017-12-15T13:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-12-15:/blog/openbsds-network-stack-part-1.html</id><summary type="html">&lt;h2&gt;The OpenBSD Network Stack Graph&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - OpenBSD</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/openbsd.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-12-26T22:31:00+03:30</updated><entry><title>OpenBSD hotplugd scripting</title><link href="http://bijanebrahimi.github.io/blog/openbsd-hotplugd-scripting.html" rel="alternate"></link><published>2017-12-26T22:31:00+03:30</published><updated>2017-12-26T22:31:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-12-26:/blog/openbsd-hotplugd-scripting.html</id><summary type="html">&lt;h2&gt;The OpenBSD hotplugd script&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The hotplugd daemon monitors the &lt;a href="http://man.openbsd.org/hotplugd.8"&gt;hotplug(4)&lt;/a&gt; pseudo-device, acting on
+signaled events by executing the scripts in the &lt;code&gt;/etc/hotplug&lt;/code&gt; directory.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The following is a modified version of &lt;a href="https://www.tumfatig.net/20110903/automount-usb-stick-on-openbsd/"&gt;TuM'Fatig's Automount USB stick on OpenBSD&lt;/a&gt;.
+You can also find &lt;a href="http://bijanebrahimi.github.io/blog/my-openbsd-setup.html"&gt;My OpenBSD Setup&lt;/a&gt; post describing my personal experience …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;The OpenBSD hotplugd script&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The hotplugd daemon monitors the &lt;a href="http://man.openbsd.org/hotplugd.8"&gt;hotplug(4)&lt;/a&gt; pseudo-device, acting on
+signaled events by executing the scripts in the &lt;code&gt;/etc/hotplug&lt;/code&gt; directory.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The following is a modified version of &lt;a href="https://www.tumfatig.net/20110903/automount-usb-stick-on-openbsd/"&gt;TuM'Fatig's Automount USB stick on OpenBSD&lt;/a&gt;.
+You can also find &lt;a href="http://bijanebrahimi.github.io/blog/my-openbsd-setup.html"&gt;My OpenBSD Setup&lt;/a&gt; post describing my personal experience
+with OpenBSD as a desktop.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ doas rcctl &lt;span class="nb"&gt;enable&lt;/span&gt; hotplugd
+$ cat /etc/hotplug/attach
+&lt;span class="c1"&gt;#!/bin/sh&lt;/span&gt;
+
+&lt;span class="nv"&gt;DEVCLASS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;
+&lt;span class="nv"&gt;DEVNAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$2&lt;/span&gt;
+&lt;span class="nv"&gt;MOUNTROOT&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/mnt&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;DEBUG&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;DISPLAY&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;:0.0
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;HOME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/home/bijan
+
+&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$DEVCLASS&lt;/span&gt; in
+2&lt;span class="o"&gt;)&lt;/span&gt;
+        &lt;span class="c1"&gt;# disk devices&lt;/span&gt;
+        /sbin/disklabel &lt;span class="nv"&gt;$DEVNAME&lt;/span&gt; 2&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk -F &lt;span class="s1"&gt;&amp;#39;[ ]*&amp;#39;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/^  [abd-z]:/&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="nb"&gt;read&lt;/span&gt; line&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;do&lt;/span&gt;
+                &lt;span class="nv"&gt;slice&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk -F &lt;span class="s1"&gt;&amp;#39;:&amp;#39;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{print $1}&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+                &lt;span class="nv"&gt;fs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk -F &lt;span class="s1"&gt;&amp;#39;[ ]*&amp;#39;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{print $4}&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+                &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$fs&lt;/span&gt; in
+                MSDOS &lt;span class="p"&gt;|&lt;/span&gt; ISO9660 &lt;span class="p"&gt;|&lt;/span&gt; ext2fs &lt;span class="p"&gt;|&lt;/span&gt; 4.2BSD&lt;span class="o"&gt;)&lt;/span&gt;
+                        &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$DEBUG&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; logger -i &lt;span class="s2"&gt;&amp;quot;hotplugd attaching SLICE &lt;/span&gt;&lt;span class="nv"&gt;$slice&lt;/span&gt;&lt;span class="s2"&gt; of DEVICE &lt;/span&gt;&lt;span class="nv"&gt;$DEVNAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+                        &lt;span class="o"&gt;[&lt;/span&gt; ! -d &lt;span class="nv"&gt;$MOUNTROOT&lt;/span&gt;/&lt;span class="nv"&gt;$DEVNAME$slice&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; mkdir -p -m &lt;span class="m"&gt;1777&lt;/span&gt; &lt;span class="nv"&gt;$MOUNTROOT&lt;/span&gt;/&lt;span class="nv"&gt;$DEVNAME$slice&lt;/span&gt;
+                        mount -o ro /dev/&lt;span class="nv"&gt;$DEVNAME$slice&lt;/span&gt; &lt;span class="nv"&gt;$MOUNTROOT&lt;/span&gt;/&lt;span class="nv"&gt;$DEVNAME$slice&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+                        /usr/local/bin/notify-send &lt;span class="s2"&gt;&amp;quot;Mounted &lt;/span&gt;&lt;span class="nv"&gt;$DEVNAME$slice&lt;/span&gt;&lt;span class="s2"&gt; (&lt;/span&gt;&lt;span class="nv"&gt;$fs&lt;/span&gt;&lt;span class="s2"&gt;)&amp;quot;&lt;/span&gt;
+                        &lt;span class="p"&gt;;;&lt;/span&gt;
+                &lt;span class="k"&gt;esac&lt;/span&gt;
+        &lt;span class="k"&gt;done&lt;/span&gt;
+        &lt;span class="p"&gt;;;&lt;/span&gt;
+3&lt;span class="o"&gt;)&lt;/span&gt;
+    &lt;span class="c1"&gt;# network devices; requires hostname.$DEVNAME&lt;/span&gt;
+    sh /etc/netstart &lt;span class="nv"&gt;$DEVNAME&lt;/span&gt;
+    &lt;span class="p"&gt;;;&lt;/span&gt;
+&lt;span class="k"&gt;esac&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="openbsd"></category><category term="hotplugd"></category><category term="mount"></category></entry><entry><title>OpenBSD's Network stack (PART 1)</title><link href="http://bijanebrahimi.github.io/blog/openbsds-network-stack-part-1.html" rel="alternate"></link><published>2017-12-15T13:15:00+03:30</published><updated>2017-12-15T13:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-12-15:/blog/openbsds-network-stack-part-1.html</id><summary type="html">&lt;h2&gt;The OpenBSD Network Stack Graph&lt;/h2&gt;
 &lt;p&gt;Since &lt;a href="https://www.openbsd.org/papers/asiabsdcon08-network.pdf"&gt;OpenBSD Network Stack Internals&lt;/a&gt; by Claudio Jeker at AsiaBSDCon 2008,
 there's a noticeable changes in OpenBSD network stack. obviously the removal
 of using softnet task queue for forwarding IP packets which is now done by almost
@@ -94,6 +141,8 @@ version of rewritten in python. He also has an intergration section with openbox
 &lt;p&gt;To automatically mount USB storage sticks, &lt;a href="http://man.openbsd.org/hotplugd.8"&gt;hotplugd(8)&lt;/a&gt; is the tool. You can
 find a nice example script in the manual or here at &lt;a href="https://www.tumfatig.net/20110903/automount-usb-stick-on-openbsd/"&gt;TuM'Fatig Automount USB
 stick on OpenBSD&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: an improved version of the script can be found in
+&lt;a href="http://bijanebrahimi.github.io/blog/openbsd-hotplugd-scripting.html"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ doas rcctl &lt;span class="nb"&gt;enable&lt;/span&gt; hotplugd
 $ cat /etc/hotplug/attach
 &lt;span class="c1"&gt;#!/bin/sh&lt;/span&gt;

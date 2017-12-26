@@ -96,6 +96,8 @@ version of rewritten in python. He also has an intergration section with openbox
 <p>To automatically mount USB storage sticks, <a href="http://man.openbsd.org/hotplugd.8">hotplugd(8)</a> is the tool. You can
 find a nice example script in the manual or here at <a href="https://www.tumfatig.net/20110903/automount-usb-stick-on-openbsd/">TuM'Fatig Automount USB
 stick on OpenBSD</a>:</p>
+<p><strong>Update</strong>: an improved version of the script can be found in
+<a href="http://bijanebrahimi.github.io/blog/openbsd-hotplugd-scripting.html">here</a>.</p>
 <div class="highlight"><pre><span></span>$ doas rcctl <span class="nb">enable</span> hotplugd
 $ cat /etc/hotplug/attach
 <span class="c1">#!/bin/sh</span>
