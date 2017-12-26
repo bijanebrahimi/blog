@@ -50,6 +50,9 @@ To automatically mount USB storage sticks, [hotplugd(8)][5] is the tool. You can
 find a nice example script in the manual or here at [TuM'Fatig Automount USB
 stick on OpenBSD][6]:
 
+**Update**: an improved version of the script can be found in
+[here][9].
+
 ```sh
 $ doas rcctl enable hotplugd
 $ cat /etc/hotplug/attach
@@ -380,4 +383,4 @@ timeout = 8
 [6]: https://www.tumfatig.net/20110903/automount-usb-stick-on-openbsd/
 [7]: https://i3wm.org
 [8]: https://dunst-project.org/
-
+[9]: {filename}/openbsd/openbsd-hotplugd-attach.md
