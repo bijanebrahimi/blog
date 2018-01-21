@@ -62,6 +62,64 @@ signaled events by executing the scripts in the <code>/etc/hotplug</code> direct
 <p>The following is a modified version of <a href="https://www.tumfatig.net/20110903/automount-usb-stick-on-openbsd/">TuM'Fatig's Automount USB stick on OpenBSD</a>.
 You can also find <a href="http://bijanebrahimi.github.io/blog/my-openbsd-setup.html">My OpenBSD Setup</a> post describing my personal experience
 with OpenBSD as a desktop.</p>
+<p><strong>UPDATE 2018-01-21</strong>: Since <a href="http://bsdnow.tv/">BSDNow</a> guys kindly mentioned this script at one of their
+<a href="http://www.jupiterbroadcasting.com/121362/the-spectre-of-meltdown-bsd-now-228/">latest episode</a>, I managed to look at it again and enhance the script,
+specifically permission-wise. So mounting MSDOS and NTFS partitions are now done
+with proper user and grup permissions:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+
+<span class="nv">DEVCLASS</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">DEVNAME</span><span class="o">=</span><span class="nv">$2</span>
+<span class="nv">MOUNTROOT</span><span class="o">=</span><span class="s2">&quot;/mnt&quot;</span>
+<span class="nv">DEBUG</span><span class="o">=</span>1
+<span class="nv">mount_helper</span><span class="o">=</span>/sbin/mount
+<span class="nv">group_prem</span><span class="o">=</span>1000
+<span class="nv">user_perm</span><span class="o">=</span>1000
+<span class="nb">export</span> <span class="nv">DISPLAY</span><span class="o">=</span>:0.0
+<span class="nb">export</span> <span class="nv">HOME</span><span class="o">=</span>/home/bijan
+
+<span class="k">case</span> <span class="nv">$DEVCLASS</span> in
+2<span class="o">)</span>
+    <span class="c1"># disk devices</span>
+        /sbin/disklabel <span class="nv">$DEVNAME</span> 2&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">|</span> awk -F <span class="s1">&#39;[ ]*&#39;</span> <span class="s1">&#39;/^  [abd-z]:/&#39;</span> <span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> line<span class="p">;</span>
+        <span class="k">do</span>
+        <span class="nv">mount_flags</span><span class="o">=</span><span class="s2">&quot;-o noexec,noatime,nodev&quot;</span>
+                <span class="nv">slice</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> <span class="nv">$line</span> <span class="p">|</span> awk -F <span class="s1">&#39;:&#39;</span> <span class="s1">&#39;{print $1}&#39;</span><span class="sb">`</span>
+                <span class="nv">type</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> <span class="nv">$line</span> <span class="p">|</span> awk -F <span class="s1">&#39;[ ]*&#39;</span> <span class="s1">&#39;{print $4}&#39;</span><span class="sb">`</span>
+                <span class="k">case</span> <span class="nv">$type</span> in
+        ISO9660 <span class="p">|</span> 4.2BSD<span class="o">)</span>
+                        <span class="p">;;</span>
+        ext2fs<span class="o">)</span>
+            <span class="nv">mount_flags</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$mount_flags</span><span class="s2"> -r&quot;</span>
+            <span class="p">;;</span>
+        NTFS<span class="o">)</span>
+            <span class="nv">mount_helper</span><span class="o">=</span>/sbin/mount_ntfs
+            <span class="nv">mount_flags</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$mount_flags</span><span class="s2"> -g </span><span class="nv">$group_prem</span><span class="s2"> -u </span><span class="nv">$user_perm</span><span class="s2">&quot;</span>
+            <span class="p">;;</span>
+        MSDOS<span class="o">)</span>
+            <span class="nv">mount_helper</span><span class="o">=</span>/sbin/mount_msdos
+            <span class="nv">mount_flags</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$mount_flags</span><span class="s2"> -g </span><span class="nv">$group_prem</span><span class="s2"> -u </span><span class="nv">$user_perm</span><span class="s2">&quot;</span>
+            <span class="p">;;</span>
+        *<span class="o">)</span>
+            <span class="k">continue</span>
+            <span class="p">;;</span>
+                <span class="k">esac</span>
+
+                <span class="o">[</span> <span class="nv">$DEBUG</span> <span class="o">==</span> <span class="m">1</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> logger -i <span class="s2">&quot;hotplugd attaching SLICE </span><span class="nv">$slice</span><span class="s2"> of DEVICE </span><span class="nv">$DEVNAME</span><span class="s2">&quot;</span>
+        <span class="o">[</span> ! -d <span class="nv">$MOUNTROOT</span>/<span class="nv">$DEVNAME$slice</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> mkdir -p -m <span class="m">1777</span> <span class="nv">$MOUNTROOT</span>/<span class="nv">$DEVNAME$slice</span>
+        <span class="nv">$mount_helper</span> <span class="nv">$mount_flags</span> /dev/<span class="nv">$DEVNAME$slice</span> <span class="nv">$MOUNTROOT</span>/<span class="nv">$DEVNAME$slice</span>
+        /usr/local/bin/notify-send <span class="s2">&quot;Mounted </span><span class="nv">$DEVNAME$slice</span><span class="s2"> (</span><span class="nv">$type</span><span class="s2">)&quot;</span>
+        <span class="k">done</span>
+        <span class="p">;;</span>
+3<span class="o">)</span>
+    <span class="c1"># network devices; requires hostname.$DEVNAME</span>
+    sh /etc/netstart <span class="nv">$DEVNAME</span>
+    <span class="p">;;</span>
+<span class="k">esac</span>
+</pre></div>
+
+
+<p><strong>Original</strong>:</p>
 <div class="highlight"><pre><span></span>$ doas rcctl <span class="nb">enable</span> hotplugd
 $ cat /etc/hotplug/attach
 <span class="c1">#!/bin/sh</span>
