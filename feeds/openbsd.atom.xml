@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - OpenBSD</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/openbsd.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2018-04-14T15:30:00+04:30</updated><entry><title>Debugging the running OpenBSD kernel</title><link href="http://bijanebrahimi.github.io/blog/debugging-the-running-openbsd-kernel.html" rel="alternate"></link><published>2018-04-14T15:30:00+04:30</published><updated>2018-04-14T15:30:00+04:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2018-04-14:/blog/debugging-the-running-openbsd-kernel.html</id><summary type="html">&lt;h2&gt;The Problem&lt;/h2&gt;
-&lt;p&gt;A few month ago, I tried porting the FreeBSD kdb along with it's gdb stub
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - OpenBSD</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/openbsd.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2018-04-14T15:30:00+04:30</updated><entry><title>Remote Debugging the running OpenBSD kernel</title><link href="http://bijanebrahimi.github.io/blog/remote-debugging-the-running-openbsd-kernel.html" rel="alternate"></link><published>2018-04-14T15:30:00+04:30</published><updated>2018-04-14T15:30:00+04:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2018-04-14:/blog/remote-debugging-the-running-openbsd-kernel.html</id><summary type="html">&lt;h2&gt;The Problem&lt;/h2&gt;
+&lt;p&gt;A few month ago, I tried porting the FreeBSD kdb along with it's &lt;a href="https://github.com/freebsd/freebsd/blob/master/sys/gdb/gdb_main.c#L127"&gt;gdb stub&lt;/a&gt;
 implementations to OpenBSD as a practice of learning the internals of an
 BSD operating system. The ddb code in both FreeBSD and OpenBSD looks
 pretty much the same and the &lt;a href="https://sourceware.org/gdb/onlinedocs/gdb/Remote-Protocol.html"&gt;GDB Remote Serial …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;h2&gt;The Problem&lt;/h2&gt;
-&lt;p&gt;A few month ago, I tried porting the FreeBSD kdb along with it's gdb stub
+&lt;p&gt;A few month ago, I tried porting the FreeBSD kdb along with it's &lt;a href="https://github.com/freebsd/freebsd/blob/master/sys/gdb/gdb_main.c#L127"&gt;gdb stub&lt;/a&gt;
 implementations to OpenBSD as a practice of learning the internals of an
 BSD operating system. The ddb code in both FreeBSD and OpenBSD looks
-pretty much the same and the &lt;a href="https://sourceware.org/gdb/onlinedocs/gdb/Remote-Protocol.html"&gt;GDB Remote Serial Protocol&lt;/a&gt; is very minimal.&lt;/p&gt;
-&lt;p&gt;So soon I got a working kdb implemenation and a gdb stub which didn't work as
-expected and very hard to debug that remineded me I need way to debug it's
-problems. So I found an alternative way to &lt;a href="https://markshroyer.com/2013/01/debugging-openbsd-via-qemu/"&gt;Debugging the OpenBSD kernel via QEMU&lt;/a&gt;
-which I recommend reading it to anybody interested. What I did is basically
-the same with a few changes which I hope to describe as best.&lt;/p&gt;
+pretty much the same and the &lt;a href="https://sourceware.org/gdb/onlinedocs/gdb/Remote-Protocol.html"&gt;GDB Remote Serial Protocol&lt;/a&gt; looks very minimal.&lt;/p&gt;
+&lt;p&gt;But sadly I got very busy and the work is stalled but I'm planning on resuming
+the attempt as soon as I get the chance, But there is an alternative way to
+&lt;a href="https://markshroyer.com/2013/01/debugging-openbsd-via-qemu/"&gt;Debugging the OpenBSD kernel via QEMU&lt;/a&gt;. What I did below is
+basically the same with a few minor changes which I hope to describe it as best.&lt;/p&gt;
 &lt;h2&gt;Installing OpenBSD on Qemu&lt;/h2&gt;
 &lt;p&gt;For debugging the kernel, we need a working OpenBSD system running on Qemu. I choosed to
 create a &lt;code&gt;raw&lt;/code&gt; disk file to be able to easily mount it later via the host and
@@ -33,6 +32,9 @@ $ &lt;span class="nb"&gt;cd&lt;/span&gt; sys/arch/amd64/conf
 $ config GENERIC
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; ../compile/GENERIC/
 $ make -j 8
+$ ls -la obj/bsd&lt;span class="o"&gt;{&lt;/span&gt;,.gdb&lt;span class="o"&gt;}&lt;/span&gt;
+-rwxrwx---  &lt;span class="m"&gt;1&lt;/span&gt; root  bijan  &lt;span class="m"&gt;13110110&lt;/span&gt; Apr &lt;span class="m"&gt;14&lt;/span&gt; 10:34 obj/bsd
+-rwxrwx---  &lt;span class="m"&gt;1&lt;/span&gt; root  bijan  &lt;span class="m"&gt;55392459&lt;/span&gt; Apr &lt;span class="m"&gt;14&lt;/span&gt; 10:34 obj/bsd.gdb
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -70,7 +72,7 @@ $ vnconfig -u vnd0
 
 &lt;h2&gt;Remote debugging kernel&lt;/h2&gt;
 &lt;p&gt;Now it's to time to boot the guest with the new custom kernel. Remember that the
-&lt;code&gt;-s&lt;/code&gt; argument enables the gdb server on qemu on &lt;code&gt;localhost&lt;/code&gt; port &lt;code&gt;1234&lt;/code&gt;:&lt;/p&gt;
+&lt;code&gt;-s&lt;/code&gt; argument enables the gdb server on qemu on &lt;code&gt;localhost&lt;/code&gt; port &lt;code&gt;1234&lt;/code&gt; by default:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ qemu-system-x86_64 -m 256M -s &lt;span class="se"&gt;\&lt;/span&gt;
     -net nic -net user &lt;span class="se"&gt;\&lt;/span&gt;
     -drive &lt;span class="nv"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;raw,file&lt;span class="o"&gt;=&lt;/span&gt;install63.fs &lt;span class="se"&gt;\&lt;/span&gt;

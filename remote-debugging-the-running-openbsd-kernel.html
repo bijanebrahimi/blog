@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Debugging the running OpenBSD kernel</title>
+        <title>Remote Debugging the running OpenBSD kernel</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
@@ -46,7 +46,7 @@
 
             <div class="background-image-small">
                 <div class="title-container">
-                    <h1>Debugging the running OpenBSD kernel</h1>
+                    <h1>Remote Debugging the running OpenBSD kernel</h1>
                     <h4>A way to understand the OpenBSD internals</h4>
                 </div>
             </div>
@@ -55,15 +55,14 @@
 
     <div class="entry-content">
         <h2>The Problem</h2>
-<p>A few month ago, I tried porting the FreeBSD kdb along with it's gdb stub
+<p>A few month ago, I tried porting the FreeBSD kdb along with it's <a href="https://github.com/freebsd/freebsd/blob/master/sys/gdb/gdb_main.c#L127">gdb stub</a>
 implementations to OpenBSD as a practice of learning the internals of an
 BSD operating system. The ddb code in both FreeBSD and OpenBSD looks
-pretty much the same and the <a href="https://sourceware.org/gdb/onlinedocs/gdb/Remote-Protocol.html">GDB Remote Serial Protocol</a> is very minimal.</p>
-<p>So soon I got a working kdb implemenation and a gdb stub which didn't work as
-expected and very hard to debug that remineded me I need way to debug it's
-problems. So I found an alternative way to <a href="https://markshroyer.com/2013/01/debugging-openbsd-via-qemu/">Debugging the OpenBSD kernel via QEMU</a>
-which I recommend reading it to anybody interested. What I did is basically
-the same with a few changes which I hope to describe as best.</p>
+pretty much the same and the <a href="https://sourceware.org/gdb/onlinedocs/gdb/Remote-Protocol.html">GDB Remote Serial Protocol</a> looks very minimal.</p>
+<p>But sadly I got very busy and the work is stalled but I'm planning on resuming
+the attempt as soon as I get the chance, But there is an alternative way to
+<a href="https://markshroyer.com/2013/01/debugging-openbsd-via-qemu/">Debugging the OpenBSD kernel via QEMU</a>. What I did below is
+basically the same with a few minor changes which I hope to describe it as best.</p>
 <h2>Installing OpenBSD on Qemu</h2>
 <p>For debugging the kernel, we need a working OpenBSD system running on Qemu. I choosed to
 create a <code>raw</code> disk file to be able to easily mount it later via the host and
@@ -84,6 +83,9 @@ $ <span class="nb">cd</span> sys/arch/amd64/conf
 $ config GENERIC
 $ <span class="nb">cd</span> ../compile/GENERIC/
 $ make -j 8
+$ ls -la obj/bsd<span class="o">{</span>,.gdb<span class="o">}</span>
+-rwxrwx---  <span class="m">1</span> root  bijan  <span class="m">13110110</span> Apr <span class="m">14</span> 10:34 obj/bsd
+-rwxrwx---  <span class="m">1</span> root  bijan  <span class="m">55392459</span> Apr <span class="m">14</span> 10:34 obj/bsd.gdb
 </pre></div>
 
 
@@ -121,7 +123,7 @@ $ vnconfig -u vnd0
 
 <h2>Remote debugging kernel</h2>
 <p>Now it's to time to boot the guest with the new custom kernel. Remember that the
-<code>-s</code> argument enables the gdb server on qemu on <code>localhost</code> port <code>1234</code>:</p>
+<code>-s</code> argument enables the gdb server on qemu on <code>localhost</code> port <code>1234</code> by default:</p>
 <div class="highlight"><pre><span></span>$ qemu-system-x86_64 -m 256M -s <span class="se">\</span>
     -net nic -net user <span class="se">\</span>
     -drive <span class="nv">format</span><span class="o">=</span>raw,file<span class="o">=</span>install63.fs <span class="se">\</span>
