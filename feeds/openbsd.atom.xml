@@ -167,7 +167,9 @@ by pressing any key and running the &lt;code&gt;setenv boot_targets usb0 mmc0 dh
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Hope it helps! Cheers.&lt;/p&gt;</content><category term="openbsd"></category><category term="raspberrypi"></category></entry><entry><title>OpenBSD 6.2 Upgrade</title><link href="http://bijanebrahimi.github.io/blog/openbsd-62-upgrade.html" rel="alternate"></link><published>2017-10-10T22:49:00+03:30</published><updated>2017-10-10T22:49:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-10:/blog/openbsd-62-upgrade.html</id><summary type="html">&lt;p&gt;The Upgrading Process is stupidly easy. The process is &lt;a href="https://www.openbsd.org/faq/upgrade62.html"&gt;well documented&lt;/a&gt; for each release
+&lt;p&gt;Hope it helps! Cheers.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update 2018-04-14&lt;/strong&gt;: And here's the &lt;a href="http://dmesgd.nycbug.org/index.cgi?do=view&amp;amp;id=3566"&gt;dmesg&lt;/a&gt; output which was requested on
+&lt;a href="https://www.reddit.com/r/openbsd/comments/8asxq5/installing_openbsd_63_snapshots_on_raspberry_pi_3/dxbw64f/"&gt;reddit&lt;/a&gt;.&lt;/p&gt;</content><category term="openbsd"></category><category term="raspberrypi"></category></entry><entry><title>OpenBSD 6.2 Upgrade</title><link href="http://bijanebrahimi.github.io/blog/openbsd-62-upgrade.html" rel="alternate"></link><published>2017-10-10T22:49:00+03:30</published><updated>2017-10-10T22:49:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-10:/blog/openbsd-62-upgrade.html</id><summary type="html">&lt;p&gt;The Upgrading Process is stupidly easy. The process is &lt;a href="https://www.openbsd.org/faq/upgrade62.html"&gt;well documented&lt;/a&gt; for each release
 and is available after the release of binary packages and when install images are out but
 before going any further, please read the OpenBSD 6.2 &lt;a href="4"&gt;new features&lt;/a&gt; for the list of
 changes and improvements. &lt;/p&gt;
