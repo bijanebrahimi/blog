@@ -1,5 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2018-04-08T21:35:00+04:30</updated><entry><title>Installing OpenBSD 6.3 on Raspberry pi 3</title><link href="http://bijanebrahimi.github.io/blog/installing-openbsd-63-on-raspberry-pi-3.html" rel="alternate"></link><published>2018-04-08T21:35:00+04:30</published><updated>2018-04-08T21:35:00+04:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2018-04-08:/blog/installing-openbsd-63-on-raspberry-pi-3.html</id><summary type="html">&lt;p&gt;Installing the OpenBSD on raspberry pi 3 is very easy and &lt;a href="https://ftp.openbsd.org/pub/OpenBSD/6.3/arm64/INSTALL.arm64"&gt;well documented&lt;/a&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2018-04-14T15:30:00+04:30</updated><entry><title>Debugging the running OpenBSD kernel</title><link href="http://bijanebrahimi.github.io/blog/debugging-the-running-openbsd-kernel.html" rel="alternate"></link><published>2018-04-14T15:30:00+04:30</published><updated>2018-04-14T15:30:00+04:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2018-04-14:/blog/debugging-the-running-openbsd-kernel.html</id><summary type="html">&lt;h2&gt;The Problem&lt;/h2&gt;
+&lt;p&gt;A few month ago, I tried porting the FreeBSD kdb along with it's gdb stub
+implementations to OpenBSD as a practice of learning the internals of an
+BSD operating system. The ddb code in both FreeBSD and OpenBSD looks
+pretty much the same and the &lt;a href="https://sourceware.org/gdb/onlinedocs/gdb/Remote-Protocol.html"&gt;GDB Remote Serial …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;h2&gt;The Problem&lt;/h2&gt;
+&lt;p&gt;A few month ago, I tried porting the FreeBSD kdb along with it's gdb stub
+implementations to OpenBSD as a practice of learning the internals of an
+BSD operating system. The ddb code in both FreeBSD and OpenBSD looks
+pretty much the same and the &lt;a href="https://sourceware.org/gdb/onlinedocs/gdb/Remote-Protocol.html"&gt;GDB Remote Serial Protocol&lt;/a&gt; is very minimal.&lt;/p&gt;
+&lt;p&gt;So soon I got a working kdb implemenation and a gdb stub which didn't work as
+expected and very hard to debug that remineded me I need way to debug it's
+problems. So I found an alternative way to &lt;a href="https://markshroyer.com/2013/01/debugging-openbsd-via-qemu/"&gt;Debugging the OpenBSD kernel via QEMU&lt;/a&gt;
+which I recommend reading it to anybody interested. What I did is basically
+the same with a few changes which I hope to describe as best.&lt;/p&gt;
+&lt;h2&gt;Installing OpenBSD on Qemu&lt;/h2&gt;
+&lt;p&gt;For debugging the kernel, we need a working OpenBSD system running on Qemu. I choosed to
+create a &lt;code&gt;raw&lt;/code&gt; disk file to be able to easily mount it later via the host and
+copy the custom kernel onto it.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ qemu-img create -f raw disk.raw 5G
+$ qemu-system-x86_64 -m 256M &lt;span class="se"&gt;\&lt;/span&gt;
+    -drive &lt;span class="nv"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;raw,file&lt;span class="o"&gt;=&lt;/span&gt;install63.fs &lt;span class="se"&gt;\&lt;/span&gt;
+    -drive &lt;span class="nv"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;raw,file&lt;span class="o"&gt;=&lt;/span&gt;disk.raw
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Custom Kernel&lt;/h2&gt;
+&lt;p&gt;To debug the kernel, we need a version of the kernel with
+debugging symbols and for that we have to recompile it first. The process is
+documented at &lt;a href="https://www.openbsd.org/faq/faq5.html"&gt;Building the System from Sourc&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /usr/src
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; sys/arch/amd64/conf
+$ config GENERIC
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; ../compile/GENERIC/
+$ make -j 8
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then we can copy the &lt;code&gt;bsd&lt;/code&gt; kernel to the guest machine and keep the &lt;code&gt;bsd.gdb&lt;/code&gt; on
+the host to start the remote debugging via gdb.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ vnconfig vnd0 disk.raw
+$ disklabel vnd0
+&lt;span class="c1"&gt;# /dev/rvnd0c:&lt;/span&gt;
+type: ESDI
+disk: ESDI/IDE disk
+label: QEMU HARDDISK   
+duid: 3e97835c8cfa04a4
+flags:
+bytes/sector: 512
+sectors/track: 63
+tracks/cylinder: 255
+sectors/cylinder: 16065
+cylinders: 652
+total sectors: 10485760
+boundstart: 64
+boundend: 10474380
+drivedata: &lt;span class="m"&gt;0&lt;/span&gt; 
+
+&lt;span class="m"&gt;16&lt;/span&gt; partitions:
+&lt;span class="c1"&gt;#                size           offset  fstype [fsize bsize   cpg]&lt;/span&gt;
+  a:         &lt;span class="m"&gt;10474304&lt;/span&gt;               &lt;span class="m"&gt;64&lt;/span&gt;  4.2BSD   &lt;span class="m"&gt;2048&lt;/span&gt; &lt;span class="m"&gt;16384&lt;/span&gt; &lt;span class="m"&gt;12958&lt;/span&gt; 
+  c:         &lt;span class="m"&gt;10485760&lt;/span&gt;                &lt;span class="m"&gt;0&lt;/span&gt;  unused                    
+
+$ mount /dev/vnd0a /mnt
+$ cp obj/bsd /mnt/bsd
+$ umount /mnt
+$ vnconfig -u vnd0
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Remote debugging kernel&lt;/h2&gt;
+&lt;p&gt;Now it's to time to boot the guest with the new custom kernel. Remember that the
+&lt;code&gt;-s&lt;/code&gt; argument enables the gdb server on qemu on &lt;code&gt;localhost&lt;/code&gt; port &lt;code&gt;1234&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ qemu-system-x86_64 -m 256M -s &lt;span class="se"&gt;\&lt;/span&gt;
+    -net nic -net user &lt;span class="se"&gt;\&lt;/span&gt;
+    -drive &lt;span class="nv"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;raw,file&lt;span class="o"&gt;=&lt;/span&gt;install63.fs &lt;span class="se"&gt;\&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now to finally attach to the running kernel:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gdb obj/bsd.gdb
+GNU gdb 6.3
+Copyright &lt;span class="m"&gt;2004&lt;/span&gt; Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type &lt;span class="s2"&gt;&amp;quot;show copying&amp;quot;&lt;/span&gt; to see the conditions.
+There is absolutely no warranty &lt;span class="k"&gt;for&lt;/span&gt; GDB.  Type &lt;span class="s2"&gt;&amp;quot;show warranty&amp;quot;&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; details.
+This GDB was configured as &lt;span class="s2"&gt;&amp;quot;amd64-unknown-openbsd6.3&amp;quot;&lt;/span&gt;...
+&lt;span class="o"&gt;(&lt;/span&gt;gdb&lt;span class="o"&gt;)&lt;/span&gt; target remote :1234
+Remote debugging using :1234
+&lt;span class="o"&gt;[&lt;/span&gt;New Thread 1&lt;span class="o"&gt;]&lt;/span&gt;
+0xffffffff8123bcf5 in broxton_set_cdclk &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;dev&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;0x100, &lt;span class="nv"&gt;frequency&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;-2119613816&lt;span class="o"&gt;)&lt;/span&gt;
+    at /home/bijan/projects/github.com/openbsd/src/sys/dev/pci/drm/i915/intel_display.c:5569
+&lt;span class="m"&gt;5569&lt;/span&gt;                    val &lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; divider&lt;span class="p"&gt;;&lt;/span&gt;
+Current language:  auto&lt;span class="p"&gt;;&lt;/span&gt; currently minimal
+&lt;span class="o"&gt;(&lt;/span&gt;gdb&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="openbsd"></category><category term="kernel"></category><category term="debugging"></category><category term="gdb"></category><category term="qemu"></category></entry><entry><title>Installing OpenBSD 6.3 on Raspberry pi 3</title><link href="http://bijanebrahimi.github.io/blog/installing-openbsd-63-on-raspberry-pi-3.html" rel="alternate"></link><published>2018-04-08T21:35:00+04:30</published><updated>2018-04-08T21:35:00+04:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2018-04-08:/blog/installing-openbsd-63-on-raspberry-pi-3.html</id><summary type="html">&lt;p&gt;Installing the OpenBSD on raspberry pi 3 is very easy and &lt;a href="https://ftp.openbsd.org/pub/OpenBSD/6.3/arm64/INSTALL.arm64"&gt;well documented&lt;/a&gt;
 which almost convinced me of not writing about it, but still I felt like it may
 help somebody new to the project (But again I really recommend reading the
 document if you are interested and have the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Installing the OpenBSD on raspberry pi 3 is very easy and &lt;a href="https://ftp.openbsd.org/pub/OpenBSD/6.3/arm64/INSTALL.arm64"&gt;well documented&lt;/a&gt;

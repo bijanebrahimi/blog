@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Debugging the running OpenBSD kernel</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/openbsd.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="http://bijanebrahimi.github.io/blog/" class="pure-menu-heading  pure-menu-link">Routines Excluded</a>
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"></li>
+
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/pages/bookmarks.html" class="pure-menu-link">Bookmarks</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/books.html" class="pure-menu-link">Books</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="pure-menu-link">FreeBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="pure-menu-link">Gist</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/git.html" class="pure-menu-link">Git</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="pure-menu-link">OpenBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
+        </ul>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="category">OpenBSD</a><br />
+
+    <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+    &mdash; <abbr title="2018-04-14T15:30:00+04:30">Sat 14 April 2018</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image-small">
+                <div class="title-container">
+                    <h1>Debugging the running OpenBSD kernel</h1>
+                    <h4>A way to understand the OpenBSD internals</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <h2>The Problem</h2>
+<p>A few month ago, I tried porting the FreeBSD kdb along with it's gdb stub
+implementations to OpenBSD as a practice of learning the internals of an
+BSD operating system. The ddb code in both FreeBSD and OpenBSD looks
+pretty much the same and the <a href="https://sourceware.org/gdb/onlinedocs/gdb/Remote-Protocol.html">GDB Remote Serial Protocol</a> is very minimal.</p>
+<p>So soon I got a working kdb implemenation and a gdb stub which didn't work as
+expected and very hard to debug that remineded me I need way to debug it's
+problems. So I found an alternative way to <a href="https://markshroyer.com/2013/01/debugging-openbsd-via-qemu/">Debugging the OpenBSD kernel via QEMU</a>
+which I recommend reading it to anybody interested. What I did is basically
+the same with a few changes which I hope to describe as best.</p>
+<h2>Installing OpenBSD on Qemu</h2>
+<p>For debugging the kernel, we need a working OpenBSD system running on Qemu. I choosed to
+create a <code>raw</code> disk file to be able to easily mount it later via the host and
+copy the custom kernel onto it.</p>
+<div class="highlight"><pre><span></span>$ qemu-img create -f raw disk.raw 5G
+$ qemu-system-x86_64 -m 256M <span class="se">\</span>
+    -drive <span class="nv">format</span><span class="o">=</span>raw,file<span class="o">=</span>install63.fs <span class="se">\</span>
+    -drive <span class="nv">format</span><span class="o">=</span>raw,file<span class="o">=</span>disk.raw
+</pre></div>
+
+
+<h2>Custom Kernel</h2>
+<p>To debug the kernel, we need a version of the kernel with
+debugging symbols and for that we have to recompile it first. The process is
+documented at <a href="https://www.openbsd.org/faq/faq5.html">Building the System from Sourc</a>:</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /usr/src
+$ <span class="nb">cd</span> sys/arch/amd64/conf
+$ config GENERIC
+$ <span class="nb">cd</span> ../compile/GENERIC/
+$ make -j 8
+</pre></div>
+
+
+<p>Then we can copy the <code>bsd</code> kernel to the guest machine and keep the <code>bsd.gdb</code> on
+the host to start the remote debugging via gdb.</p>
+<div class="highlight"><pre><span></span>$ vnconfig vnd0 disk.raw
+$ disklabel vnd0
+<span class="c1"># /dev/rvnd0c:</span>
+type: ESDI
+disk: ESDI/IDE disk
+label: QEMU HARDDISK   
+duid: 3e97835c8cfa04a4
+flags:
+bytes/sector: 512
+sectors/track: 63
+tracks/cylinder: 255
+sectors/cylinder: 16065
+cylinders: 652
+total sectors: 10485760
+boundstart: 64
+boundend: 10474380
+drivedata: <span class="m">0</span> 
+
+<span class="m">16</span> partitions:
+<span class="c1">#                size           offset  fstype [fsize bsize   cpg]</span>
+  a:         <span class="m">10474304</span>               <span class="m">64</span>  4.2BSD   <span class="m">2048</span> <span class="m">16384</span> <span class="m">12958</span> 
+  c:         <span class="m">10485760</span>                <span class="m">0</span>  unused                    
+
+$ mount /dev/vnd0a /mnt
+$ cp obj/bsd /mnt/bsd
+$ umount /mnt
+$ vnconfig -u vnd0
+</pre></div>
+
+
+<h2>Remote debugging kernel</h2>
+<p>Now it's to time to boot the guest with the new custom kernel. Remember that the
+<code>-s</code> argument enables the gdb server on qemu on <code>localhost</code> port <code>1234</code>:</p>
+<div class="highlight"><pre><span></span>$ qemu-system-x86_64 -m 256M -s <span class="se">\</span>
+    -net nic -net user <span class="se">\</span>
+    -drive <span class="nv">format</span><span class="o">=</span>raw,file<span class="o">=</span>install63.fs <span class="se">\</span>
+</pre></div>
+
+
+<p>Now to finally attach to the running kernel:</p>
+<div class="highlight"><pre><span></span>$ gdb obj/bsd.gdb
+GNU gdb 6.3
+Copyright <span class="m">2004</span> Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type <span class="s2">&quot;show copying&quot;</span> to see the conditions.
+There is absolutely no warranty <span class="k">for</span> GDB.  Type <span class="s2">&quot;show warranty&quot;</span> <span class="k">for</span> details.
+This GDB was configured as <span class="s2">&quot;amd64-unknown-openbsd6.3&quot;</span>...
+<span class="o">(</span>gdb<span class="o">)</span> target remote :1234
+Remote debugging using :1234
+<span class="o">[</span>New Thread 1<span class="o">]</span>
+0xffffffff8123bcf5 in broxton_set_cdclk <span class="o">(</span><span class="nv">dev</span><span class="o">=</span>0x100, <span class="nv">frequency</span><span class="o">=</span>-2119613816<span class="o">)</span>
+    at /home/bijan/projects/github.com/openbsd/src/sys/dev/pci/drm/i915/intel_display.c:5569
+<span class="m">5569</span>                    val <span class="p">|</span><span class="o">=</span> divider<span class="p">;</span>
+Current language:  auto<span class="p">;</span> currently minimal
+<span class="o">(</span>gdb<span class="o">)</span>
+</pre></div>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/openbsd.html">openbsd</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/kernel.html">kernel</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/debugging.html">debugging</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/gdb.html">gdb</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/qemu.html">qemu</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
+                        <p class="author-description">
+                          
+            I Love to Read, Code and Explore the Possibilities.
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'bijanebrahimi';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="http://bijanebrahimi.github.io/blog/" title="Routines Excluded">Routines Excluded</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/books.html">Books</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/freebsd.html">FreeBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/gist.html">Gist</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/git.html">Git</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/linux.html">Linux</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html">OpenBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/projects.html">Projects</a>
+        <a href="https://github.com/bijanebrahimi/blog">Fork Me on Github</a>
+
+    </footer>
+
+</body>
+</html>
