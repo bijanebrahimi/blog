@@ -1,39 +1,45 @@
 Title: Raspbian on 1G SD-Card
 SubTitle: How to Create a alter the Rasbian image to fit into 1G SD-Card
-Date: 2021-01-22 13:20
+Date: 2021-01-22 19:20
 Category: Linux
 Tags: linux, rasbperry pi, debian, buster, raspbian
 
 Recently I setup a raspberry pi as my home wireless router. It worked great,
 until I accidently broke the sd-card. I had a spare SD-Card but it was only
-1GB. Considering the 1.8GB raspbian image, something had to be done to shrink
+a 1GB memory. Considering the 1.8GB raspbian image (after decompressing),
+something had to be done to shrink
 the image size to fit into a 1GB SD-Card. Here's the **How To** but I should
-warn, the following instructions to beexecuted very carefully or you might wipe
-the wrong storage and lose data.
+warn, the following instructions to be executed very carefully or you might wipe
+the wrong storage and lose the precious data.
 
 **Note:** Most of the following commands are to be executed with root privileges.
 Please ensure you understand them before trying to execute them.
 
 First I needed to create an image, with the right size to fit exactly into my
 1GB SC-Card. To check the size of the media, simply execute `fdisk -l`. My SD-Card
-has around **940MB** capacity, So the following command creates a image file
-with that exact size:
+has around **940MB** capacity, So the following command creates an image file
+with the exact size:
 
 ```sh
 truncate -s 940M sd-card.img
 ```
 
-the next step is to create block devices from the raspberry image and my own image.
+The instructions to create partition table on the image, should be done
+on a block device.
+The next step is to create block devices from the raspberry image and my
+own image. Here I choose `/dev/loop1` for the rasbian image file and `/dev/loop2`
+for the custom image file.
 
 ```sh
 losetup /dev/loop1 2020-05-27-raspios-buster-lite-armhf.img
 losetup /dev/loop2 sd-card.img
 ```
+
 So, from now on, the `/dev/loop1` device, represents the raspbian image and the
 `/dev/loop2` device should represents my custom image device.
 
-Then, we need to properly copy the boot instructions from the Raspbian image. The
-boot instructions are located after the partition table at sector zero and before
+Then, I needed to properly copy the boot instructions from the Raspbian into the image.
+The boot instructions are located after the partition table at sector zero and ends before
 the start position of the first partition. 
 
 ```sh
@@ -47,7 +53,7 @@ Device       Boot  Start     End Sectors  Size Id Type
 ```
 
 From the `fdisk` output, it's clear that I need to copy the sectors from `0` to
-`8191`, just efore the start of the first partition.
+`8191`, just before the start of the first partition.
 
 ```sh
 sudo dd if=/dev/loop1 of=/dev/loop2 bs=512 count=8192
@@ -58,7 +64,7 @@ size of the media. So, I reserved `55MB` for the boot partition and the reset fo
 the root partition. The following script, did just that:
 
 ```sh
-sudo fdisk/dev/loop2 <<EOF
+sudo fdisk /dev/loop2 <<EOF
 d
 1
 d
@@ -126,8 +132,7 @@ mount /dev/loop2p2 /tmp/sdcard-root
 mkdir -p /tmp/sdcard-root/lib/modules
 mkdir -p /tmp/sdcard-root/usr/{games,src,local,include,share}
 
-
-# Copy LFSH
+# Copying necessary files
 cp -a /tmp/raspbian-root/{boot,media,mnt,proc,srv,sys,tmp,dev,root,run,home,etc,sbin,bin,var} /tmp/sdcard-root
 cp -a /tmp/raspbian-root/lib/{arm-linux-gnueabihf,cpp,dhcpcd,ifupdown,klibc-fAGGTaZfOmYXUytsXgfSuL5MT48.so,ld-linux.so.3,modprobe.d,resolvconf,terminfo,console-setup,crda,firmware,init,ld-linux-armhf.so.3,lsb,systemd,udev} /tmp/sdcard-root/lib/
 cp -a /tmp/raspbian-root/lib/modules/4.19.118-v7+ /tmp/sdcard-root/lib/modules/
@@ -135,7 +140,7 @@ cp -a /tmp/raspbian-root/usr/{sbin,bin,lib} /tmp/sdcard-root/usr/
 cp -a /tmp/raspbian-root/usr/lib /tmp/sdcard-root/usr/
 sudo cp -a /tmp/raspbian-root/usr/share/{GeoIP,X11,aclocal,adduser,alsa,applications,apport,apps,apt-listchanges,avahi,base-files,base-passwd,bash-completion,binfmts,bug,build-essential,ca-certificates,calendar,cmake,common-licenses,console-setup,consolefonts,consoletrans,dbus-1,debconf,debhelper,debianutils,dhcpcd,dict,distro-info,doc-base,dpkg,file,gcc-8,gdb,gettext,glib-2.0,gnupg,groff,hal,i18n,icons,info,initramfs-tools,iptables,iso-codes,java,keyrings,keyutils,libc-bin,lintian,luajit-2.1.0-beta3,man,man-db,menu,metainfo,mime,misc,nano,nfs-common,openssh,pam,pam-configs,perl,perl5,pixmaps,pkg-config-crosswrapper,pkg-config-dpkghook,pkgconfig,polkit-1,publicsuffix,pyshared,python,python-apt,python3,raspi-config,readline,sensible-utils,sounds,systemd,tabset,tasksel,terminfo,usb_modeswitch,vim,vl805fw,xml,zoneinfo,zsh} /tmp/sdcard-root/usr/share/
 
-# Remove unnecessary files
+# Removing unnecessary files to make enough free space available
 rm /tmp/sdcard-root/var/cache/apt/srcpkgcache.bin
 rm -rf /tmp/sdcard-root/usr/share/{GeoIP,i18n,man,bash-completion,sounds,misc}
 

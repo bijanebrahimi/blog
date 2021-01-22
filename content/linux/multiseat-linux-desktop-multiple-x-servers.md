@@ -4,7 +4,7 @@ Date: 2014-10-22 10:35
 Category: Linux
 tags: X11, config, xephyr
 
-This is the first solution in the main Article [Multiseat Linux Desktop]({filename}/multiseat-linux-desktop.md). you may also find other solutions for multiseat configuration in there as well.
+This is the first solution in the main Article [Multiseat Linux Desktop]({filename}/linux/multiseat-linux-desktop.md). you may also find other solutions for multiseat configuration in there as well.
 
 ### Hardware Requirements
 

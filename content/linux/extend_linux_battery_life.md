@@ -15,7 +15,7 @@ with a 4-cell battery and running `i3-wm`, a lightweight tilling window manager
 So depending on your hardware and programs you have running and your daily usage
 pattern, the results may vary for you.
 
-![Gnome Battery Bench]({filename}/assets/images/extend_linux_battery_life-battery_bench_before_tunning.png "Gnome Battery Bench - Before Tunning")
+![Gnome Battery Bench]({static}/assets/images/extend_linux_battery_life-battery_bench_before_tunning.png "Gnome Battery Bench - Before Tunning")
 
 First, run `powertop` to find out which devices/processes are draining power the most.
 In The `Overview Tab` you can actually see what processes/devices are draining
@@ -141,7 +141,7 @@ $ sudo systemctl enable powertop_tuning.service
 The result is very satisfactory. In daily usage, my battery life went up
 from about 3 hours to almost 4 and a half hours.
 
-![Gnome Battery Bench]({filename}/assets/images/extend_linux_battery_life-battery_bench_after_tunning.png "Gnome Battery Bench - After Tunning")
+![Gnome Battery Bench]({static}/assets/images/extend_linux_battery_life-battery_bench_after_tunning.png "Gnome Battery Bench - After Tunning")
 
 > **Disclaimer**: The tests and battery benchmark did not placed in a controlled
 environment but it seems logical to expect similar effects.

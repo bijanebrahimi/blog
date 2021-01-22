@@ -32,7 +32,7 @@ executable and run the following:
 rofi -modi TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t
 ```
 
-![rofi-todo]({filename}/assets/images/rofi_todolist-rofi_todo.png)
+![rofi-todo]({static}/assets/images/rofi_todolist-rofi_todo.png)
 
 ```bash
 #!/bin/bash

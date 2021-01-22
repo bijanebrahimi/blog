@@ -17,6 +17,6 @@ so obviously that was the solution. time to get my hands dirty on the code :)
 
 as it may be obvious, there are numbers of solution to do configure the GNU/Linux system to fit my need. so, in the following next articles (below links), i will explain these solution as i experienced them. i try to do them separately and independently, so you can skip ones you are not interested about. here are what i found:
 
-1. [Multiple X servers]({filename}/multiseat-linux-desktop-multiple-x-servers.md)
+1. [Multiple X servers]({filename}/linux/multiseat-linux-desktop-multiple-x-servers.md)
 2. Nested X servers (i will write about it very soon)
 3. The Multi-seat display manager
