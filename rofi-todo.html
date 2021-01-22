@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
         <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
-        <link href="http://bijanebrahimi.github.io/blog/feeds/projects.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
 </head>
 <body>
 
@@ -77,7 +77,7 @@ other there. you should definitely check <a href="https://davedavenport.github.i
 <p>Script modi can be enabled using <code>name:script</code> syntax. Just save the following
 script somewhere in your <code>PATH</code> directory like <code>/usr/local/bin</code>, make sure it's
 executable and run the following:</p>
-<div class="highlight"><pre><span></span>rofi -modi TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t
+<div class="highlight"><pre><span></span><span class="err">rofi -modi TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t</span>
 </pre></div>
 
 
@@ -121,7 +121,7 @@ executable and run the following:</p>
 - To <strong>Add new TODO</strong>, just type it (It should be Unique, BTW) at TODO prompt
 - To <strong>Delete one</strong>, Just Select the one and hit Enter</p>
 <p>If you're already using rofi, just add <code>TODO</code> modi to your existing command-line:</p>
-<div class="highlight"><pre><span></span>rofi -modi DRun,Run,Window,TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t -show TODO
+<div class="highlight"><pre><span></span><span class="err">rofi -modi DRun,Run,Window,TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t -show TODO</span>
 </pre></div>
     </div>
 

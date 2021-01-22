@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
         <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
-        <link href="http://bijanebrahimi.github.io/blog/feeds/linux.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
 </head>
 <body>
 
@@ -45,6 +45,63 @@
         <div class="pure-u-1 article-info">
            <div class="col">
 
+               <h1><a href="http://bijanebrahimi.github.io/blog/raspbian-on-1g-sd-card.html">Raspbian on 1G SD-Card</a></h1>
+
+               <p>Recently I setup a raspberry pi as my home wireless router. It worked great,
+until I accidently broke the sd-card. I had a spare SD-Card but it was only
+a 1GB memory. Considering the 1.8GB raspbian image (after decompressing),
+something had to be done to shrink
+the image size …</p>
+
+               <div class="post-meta pure-g">
+                   <div class="pure-u">
+                       <img src="http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd" class="post-avatar" alt="Go to the profile of Bijan">
+                   </div>
+                   <div class="pure-u-3-4 meta-data">
+                       <a href="http://bijanebrahimi.github.io/blog/author/bijan.html" class="category">Bijan</a><br />
+                       <abbr title="2021-01-22T19:20:00+03:30">Fri 22 January 2021</abbr>
+                   </div>
+               </div>
+
+           </div>
+
+        </div>
+
+    </div>
+    <div class="pure-g article-row">
+        <div class="pure-u-1 article-info">
+           <div class="col">
+
+               <h1><a href="http://bijanebrahimi.github.io/blog/raspberry-pi-3-as-home-wireless-router.html">Raspberry pi 3 as Home Wireless Router</a></h1>
+
+               <p>I use The following script to configure a Raspbian OS on a Raspberry Pi 3
+as a home wireless router.</p>
+<p><strong>Note:</strong> Please configure the following variable before running the script.</p>
+<div class="highlight"><pre><span></span><span class="nv">DEVICE</span><span class="o">=</span>wlan1
+<span class="nv">PASWORD</span><span class="o">=</span>password
+<span class="nv">HOST</span><span class="o">=</span><span class="m">10</span>.0.0.1
+<span class="nv">DHCP_RANGE</span><span class="o">=</span><span class="m">10</span>.0.0.2,10.0.0.20
+<span class="nv">COUNTRY_CODE</span><span class="o">=</span>uk …</pre></div>
+
+               <div class="post-meta pure-g">
+                   <div class="pure-u">
+                       <img src="http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd" class="post-avatar" alt="Go to the profile of Bijan">
+                   </div>
+                   <div class="pure-u-3-4 meta-data">
+                       <a href="http://bijanebrahimi.github.io/blog/author/bijan.html" class="category">Bijan</a><br />
+                       <abbr title="2021-01-22T14:37:00+03:30">Fri 22 January 2021</abbr>
+                   </div>
+               </div>
+
+           </div>
+
+        </div>
+
+    </div>
+    <div class="pure-g article-row">
+        <div class="pure-u-1 article-info">
+           <div class="col">
+
                <h1><a href="http://bijanebrahimi.github.io/blog/extending-the-battery-life-in-linux.html">Extending The Battery Life in Linux</a></h1>
 
                <p>Before Running any tunning, the average estimated lifetime of my battery was
@@ -74,7 +131,7 @@ almost 4 and a half hours. It's more than 50 percent increase!</p>
 
                <h1><a href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html">Multiseat Linux Desktop, Multiple X servers</a></h1>
 
-               <p>This is the first solution in the main Article <a href="{filename}/multiseat-linux-desktop.md">Multiseat Linux Desktop</a>. you may also find other solutions for multiseat configuration in there as well.</p>
+               <p>This is the first solution in the main Article <a href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html">Multiseat Linux Desktop</a>. you may also find other solutions for multiseat configuration in there as well.</p>
 <h3>Hardware Requirements</h3>
 <p>for each user, we need seperate:</p>
 <ul>
@@ -126,6 +183,7 @@ almost 4 and a half hours. It's more than 50 percent increase!</p>
 
     </div>
 
+    </div>
 
 <div class="pagination">
     <div class="post-meta pure-g">

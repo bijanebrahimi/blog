@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
         <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
-        <link href="http://bijanebrahimi.github.io/blog/feeds/git.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
 </head>
 <body>
 
@@ -160,14 +160,14 @@ $ git submodule update --remote
 
 <p><img alt="image" src="/blog/assets/images/git_submodules_diagram_03.svg"></p>
 <p>To make a change in lib-shared, he needs to fork a new feature-branch from lib-shared's dev branch and simply pushes his branch to remote and notify the manager:</p>
-<div class="highlight"><pre><span></span>cd libs/lib-shared
-git checkout -b feature-authors remotes/origin/dev
-touch AUTHORS
-git add AUTHORS
-git commit -m &quot;added AUTHORS file&quot;
-echo &quot;bijan-e&quot; &gt; AUTHORS
-git commit -a -m &quot;added bijan-e to AUTHORS&quot;
-git push origin feature-authors
+<div class="highlight"><pre><span></span><span class="err">cd libs/lib-shared</span>
+<span class="err">git checkout -b feature-authors remotes/origin/dev</span>
+<span class="err">touch AUTHORS</span>
+<span class="err">git add AUTHORS</span>
+<span class="err">git commit -m &quot;added AUTHORS file&quot;</span>
+<span class="err">echo &quot;bijan-e&quot; &gt; AUTHORS</span>
+<span class="err">git commit -a -m &quot;added bijan-e to AUTHORS&quot;</span>
+<span class="err">git push origin feature-authors</span>
 </pre></div>
 
 

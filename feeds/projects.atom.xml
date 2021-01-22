@@ -21,7 +21,7 @@
 &lt;li&gt;&lt;i class="fa fa-picture-o"&gt;&lt;/i&gt; &lt;a href="https://github.com/bijanebrahimi/waffle"&gt;waffle&lt;/a&gt;: to randomly download/change wallpaper.&lt;/li&gt;
 &lt;li&gt;&lt;i class="fa fa-calendar"&gt;&lt;/i&gt; &lt;a href="https://gahshomar.github.io/gahshomar/"&gt;gahshomar&lt;/a&gt; is a calendar with simplicity in design and elegance in execution.&lt;/li&gt;
 &lt;li&gt;&lt;i class="fa fa-music"&gt;&lt;/i&gt; &lt;a href="http://audacious-media-player.org/"&gt;audacious&lt;/a&gt; Music Player (needs qdbus and audacious mpris plugins installed).&lt;/li&gt;
-&lt;/ul&gt;</content><category term="linux"></category><category term="i3"></category><category term="py3status"></category><category term="i3status"></category><category term="font-awesome"></category></entry><entry><title>rofi-todo</title><link href="http://bijanebrahimi.github.io/blog/rofi-todo.html" rel="alternate"></link><published>2016-02-26T18:15:00+03:30</published><updated>2016-02-26T18:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-26:/blog/rofi-todo.html</id><summary type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
+&lt;/ul&gt;</content><category term="Projects"></category><category term="linux"></category><category term="i3"></category><category term="py3status"></category><category term="i3status"></category><category term="font-awesome"></category></entry><entry><title>rofi-todo</title><link href="http://bijanebrahimi.github.io/blog/rofi-todo.html" rel="alternate"></link><published>2016-02-26T18:15:00+03:30</published><updated>2016-02-26T18:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-26:/blog/rofi-todo.html</id><summary type="html">&lt;p&gt;If you're unfamiliar with &lt;a href="https://davedavenport.github.io/rofi/"&gt;rofi&lt;/a&gt;:&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;It's a popup window switcher roughly based on &lt;a href="http://code.google.com/p/superswitcher/"&gt;superswitcher&lt;/a&gt;,
 requiring only xlib and pango&lt;/p&gt;
@@ -49,7 +49,7 @@ other there. you should definitely check &lt;a href="https://davedavenport.githu
 &lt;p&gt;Script modi can be enabled using &lt;code&gt;name:script&lt;/code&gt; syntax. Just save the following
 script somewhere in your &lt;code&gt;PATH&lt;/code&gt; directory like &lt;code&gt;/usr/local/bin&lt;/code&gt;, make sure it's
 executable and run the following:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;rofi -modi TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;rofi -modi TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -93,5 +93,5 @@ executable and run the following:&lt;/p&gt;
 - To &lt;strong&gt;Add new TODO&lt;/strong&gt;, just type it (It should be Unique, BTW) at TODO prompt
 - To &lt;strong&gt;Delete one&lt;/strong&gt;, Just Select the one and hit Enter&lt;/p&gt;
 &lt;p&gt;If you're already using rofi, just add &lt;code&gt;TODO&lt;/code&gt; modi to your existing command-line:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;rofi -modi DRun,Run,Window,TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t -show TODO
-&lt;/pre&gt;&lt;/div&gt;</content><category term="linux"></category><category term="rofi"></category><category term="rofi-todo"></category><category term="rofi-script"></category><category term="bash"></category><category term="project"></category></entry></feed>
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;rofi -modi DRun,Run,Window,TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t -show TODO&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="Projects"></category><category term="linux"></category><category term="rofi"></category><category term="rofi-todo"></category><category term="rofi-script"></category><category term="bash"></category><category term="project"></category></entry></feed>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Privileged Seperated Processes, Part 2</title>
+        <title>Building FreeBSD Custom Kernel</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
         <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
-        <link href="http://bijanebrahimi.github.io/blog/feeds/openbsd.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
 </head>
 <body>
 
@@ -20,11 +20,11 @@
 
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/pages/bookmarks.html" class="pure-menu-link">Bookmarks</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/books.html" class="pure-menu-link">Books</a></li>
-            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="pure-menu-link">FreeBSD</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="pure-menu-link">FreeBSD</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="pure-menu-link">Gist</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/git.html" class="pure-menu-link">Git</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
-            <li class="pure-menu-item pure-menu-selected"><a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="pure-menu-link">OpenBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="pure-menu-link">OpenBSD</a></li>
             <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
         </ul>
     </div>
@@ -34,10 +34,10 @@
     <div class="entry-content">
         <div class="post-meta pure-g">
 <div class="pure-u-3-4 meta-data">
-    <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="category">OpenBSD</a><br />
+    <a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="category">FreeBSD</a><br />
 
     <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
-    &mdash; <abbr title="2017-10-27T12:22:00+03:30">Fri 27 October 2017</abbr>
+    &mdash; <abbr title="2017-10-27T11:21:00+03:30">Fri 27 October 2017</abbr>
 </div>        </div>
     </div>
 
@@ -46,66 +46,58 @@
 
             <div class="background-image-small">
                 <div class="title-container">
-                    <h1>Privileged Seperated Processes, Part 2</h1>
-                    <h4>Introducing The OpenBSD imsg Functions</h4>
+                    <h1>Building FreeBSD Custom Kernel</h1>
+                    <h4>Small Tips on how to build kernels faster</h4>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="entry-content">
-        <p>In my <a href="{filename}openbsd-privsep.md">previous post</a>, I wrote about <a href="http://man.openbsd.org/socketpair.2">socketpair(2)</a> and how to talk back
-to child processes but before proceding, I should warn that the actual
-separation of priviledges will remain for another post. The main concern in this
-post will be the communication between separate processes.</p>
-<p><strong>Remember</strong> to have separated priviledges, we need separate processes and to
-make these separate processes work together, we need a mechanism to pass data
-back and forth. </p>
-<p>Now I'm just going to write about OpenBSD's <a href="http://man.openbsd.org/imsg_init.3">imsg_init(3)</a> functions:</p>
-<blockquote>
-<p>The imsg functions provide a simple mechanism for communication between
-processes using sockets.  Each transmitted message is guaranteed to be
-presented to the receiving program whole.  They are commonly used in
-privilege separated processes, where processes with different rights are
-required to cooperate.</p>
-</blockquote>
-<div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">imsgbuf</span> <span class="p">{</span>
-        <span class="n">TAILQ_HEAD</span><span class="p">(,</span> <span class="n">imsg_fd</span><span class="p">)</span> <span class="n">fds</span><span class="p">;</span>
-        <span class="k">struct</span> <span class="n">ibuf_read</span>      <span class="n">r</span><span class="p">;</span>
-        <span class="k">struct</span> <span class="n">msgbuf</span>         <span class="n">w</span><span class="p">;</span>
-        <span class="kt">int</span>                   <span class="n">fd</span><span class="p">;</span>
-        <span class="kt">pid_t</span>                 <span class="n">pid</span><span class="p">;</span>
-<span class="p">}</span>
+        <p>According to <a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook">FreeBSD Handbook</a>, there are two ways of building a custom
+kernel: <a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/developers-handbook/kernelbuild.html">The Traditional Way</a> and <a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig-building.html">The New Way</a>.</p>
+<p>Either way, we should create a custom kernel configuration file, Then we use
+this custom kernel configuration for building the new kernel:</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /usr/src
+$ cp sys/amd64/config/GENERIC sys/amd64/config/CUSTOM
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">imsg</span> <span class="p">{</span>
-        <span class="k">struct</span> <span class="n">imsg_hdr</span> <span class="p">{</span>
-                <span class="kt">uint32_t</span> <span class="n">type</span><span class="p">;</span>
-                <span class="kt">uint16_t</span> <span class="n">len</span><span class="p">;</span>
-                <span class="kt">uint16_t</span> <span class="n">flags</span><span class="p">;</span>
-                <span class="kt">uint32_t</span> <span class="n">peer_id</span><span class="p">;</span>
-                <span class="kt">uint32_t</span> <span class="n">pid</span><span class="p">;</span>
-        <span class="p">}</span> <span class="n">hdr</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">fd</span><span class="p">;</span>
-        <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">;</span>
-<span class="p">}</span>
+<p>For example, we can enable kernel debuggings enabled in our custom
+configuration:</p>
+<div class="highlight"><pre><span></span>$ cat &gt;&gt; sys/amd64/config/CUSTOM &lt;EOF
+makeoptions -g
+options KDB
+options DDB
+EOF
 </pre></div>
 
 
-<p>Remember to link the binary using <code>-lutils</code> parameter:</p>
-<div class="highlight"><pre><span></span>$ gcc -lutil -o privsep-2 privsep-2.c
-$ ./privsep-2
+<p>Now, to compile the new kernel with our custom configuration:</p>
+<div class="highlight"><pre><span></span>make -j <span class="m">16</span> buildkernel <span class="nv">KERNCONF</span><span class="o">=</span>CUSTOM
+make -j <span class="m">16</span> installkernel <span class="nv">KERNCONF</span><span class="o">=</span>CUSTOM
+</pre></div>
+
+
+<p>If you're experiencing modifying kernel and trying to avoid re-
+compiling the kernel every time you have a small change in the
+source code, use the following command:</p>
+<div class="highlight"><pre><span></span>make -j <span class="m">16</span> buildkernel <span class="nv">KERNCONF</span><span class="o">=</span>CUSTOM -DKERNFAST
+</pre></div>
+
+
+<p><strong>Tips</strong>: Remember to remove the multiple make jobs <code>-j</code> flags
+if you have errors in compiling the source to easily spot the
+error message:</p>
+<div class="highlight"><pre><span></span>make buildkernel <span class="nv">KERNCONF</span><span class="o">=</span>CUSTOM -DKERNFAST
 </pre></div>
     </div>
 
     <footer>
         <div class="tags">
-            <a href="http://bijanebrahimi.github.io/blog/tag/openbsd.html">openbsd</a>
-            <a href="http://bijanebrahimi.github.io/blog/tag/imsg.html">imsg</a>
-            <a href="http://bijanebrahimi.github.io/blog/tag/imsg_init.html">imsg_init</a>
-            <a href="http://bijanebrahimi.github.io/blog/tag/socket_pair.html">socket_pair</a>
-            <a href="http://bijanebrahimi.github.io/blog/tag/privsep.html">privsep</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/freebsd.html">freebsd</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/kernel.html">kernel</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/compile.html">compile</a>
         </div>
         <div class="pure-g post-footer">
             <div class="pure-u-1 pure-u-md-1-2">

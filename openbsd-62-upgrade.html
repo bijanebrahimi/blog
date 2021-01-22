@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
         <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
-        <link href="http://bijanebrahimi.github.io/blog/feeds/openbsd.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
 </head>
 <body>
 
@@ -91,7 +91,7 @@ resides, the process of Upgrading <strong>The Base System</strong> was done. Aft
 the machine, the first thing the new OS did was retrieving the newer firmwares which I skipped
 since at the time, I had no (reliable) Internet connection, but don't worry, you can do it later:</p>
 <div class="highlight"><pre><span></span>$ uname -a
-OpenBSD localhost.lenovo 6.2 GENERIC.MP#134 amd64
+OpenBSD localhost.lenovo <span class="m">6</span>.2 GENERIC.MP#134 amd64
 $ doas fw_update
 </pre></div>
 

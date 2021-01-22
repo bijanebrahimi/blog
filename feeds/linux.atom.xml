@@ -1,5 +1,233 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - Linux</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/linux.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2016-02-25T14:20:00+03:30</updated><entry><title>Extending The Battery Life in Linux</title><link href="http://bijanebrahimi.github.io/blog/extending-the-battery-life-in-linux.html" rel="alternate"></link><published>2016-02-25T14:20:00+03:30</published><updated>2016-02-25T14:20:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-25:/blog/extending-the-battery-life-in-linux.html</id><summary type="html">&lt;p&gt;Before Running any tunning, the average estimated lifetime of my battery was
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - Linux</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/linux.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2021-01-22T19:20:00+03:30</updated><entry><title>Raspbian on 1G SD-Card</title><link href="http://bijanebrahimi.github.io/blog/raspbian-on-1g-sd-card.html" rel="alternate"></link><published>2021-01-22T19:20:00+03:30</published><updated>2021-01-22T19:20:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2021-01-22:/blog/raspbian-on-1g-sd-card.html</id><summary type="html">&lt;p&gt;Recently I setup a raspberry pi as my home wireless router. It worked great,
+until I accidently broke the sd-card. I had a spare SD-Card but it was only
+a 1GB memory. Considering the 1.8GB raspbian image (after decompressing),
+something had to be done to shrink
+the image size …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Recently I setup a raspberry pi as my home wireless router. It worked great,
+until I accidently broke the sd-card. I had a spare SD-Card but it was only
+a 1GB memory. Considering the 1.8GB raspbian image (after decompressing),
+something had to be done to shrink
+the image size to fit into a 1GB SD-Card. Here's the &lt;strong&gt;How To&lt;/strong&gt; but I should
+warn, the following instructions to be executed very carefully or you might wipe
+the wrong storage and lose the precious data.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Most of the following commands are to be executed with root privileges.
+Please ensure you understand them before trying to execute them.&lt;/p&gt;
+&lt;p&gt;First I needed to create an image, with the right size to fit exactly into my
+1GB SC-Card. To check the size of the media, simply execute &lt;code&gt;fdisk -l&lt;/code&gt;. My SD-Card
+has around &lt;strong&gt;940MB&lt;/strong&gt; capacity, So the following command creates an image file
+with the exact size:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;truncate -s 940M sd-card.img
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The instructions to create partition table on the image, should be done
+on a block device.
+The next step is to create block devices from the raspberry image and my
+own image. Here I choose &lt;code&gt;/dev/loop1&lt;/code&gt; for the rasbian image file and &lt;code&gt;/dev/loop2&lt;/code&gt;
+for the custom image file.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;losetup /dev/loop1 &lt;span class="m"&gt;2020&lt;/span&gt;-05-27-raspios-buster-lite-armhf.img
+losetup /dev/loop2 sd-card.img
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So, from now on, the &lt;code&gt;/dev/loop1&lt;/code&gt; device, represents the raspbian image and the
+&lt;code&gt;/dev/loop2&lt;/code&gt; device should represents my custom image device.&lt;/p&gt;
+&lt;p&gt;Then, I needed to properly copy the boot instructions from the Raspbian into the image.
+The boot instructions are located after the partition table at sector zero and ends before
+the start position of the first partition. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;fdisk -l /dev/loop1
+&amp;lt;sniped&amp;gt;
+Units: sectors of &lt;span class="m"&gt;1&lt;/span&gt; * &lt;span class="nv"&gt;512&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;512&lt;/span&gt; bytes
+&amp;lt;sniped&amp;gt;
+Device       Boot  Start     End Sectors  Size Id Type
+/dev/loop1p1        &lt;span class="m"&gt;8192&lt;/span&gt;  &lt;span class="m"&gt;532479&lt;/span&gt;  &lt;span class="m"&gt;524288&lt;/span&gt;  256M  c W95 FAT32 &lt;span class="o"&gt;(&lt;/span&gt;LBA&lt;span class="o"&gt;)&lt;/span&gt;
+/dev/loop1p2      &lt;span class="m"&gt;532480&lt;/span&gt; &lt;span class="m"&gt;3620863&lt;/span&gt; &lt;span class="m"&gt;3088384&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;.5G &lt;span class="m"&gt;83&lt;/span&gt; Linux
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;From the &lt;code&gt;fdisk&lt;/code&gt; output, it's clear that I need to copy the sectors from &lt;code&gt;0&lt;/code&gt; to
+&lt;code&gt;8191&lt;/code&gt;, just before the start of the first partition.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/loop1 &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/loop2 &lt;span class="nv"&gt;bs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;512&lt;/span&gt; &lt;span class="nv"&gt;count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;8192&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then, I needed to recreate the &lt;strong&gt;boot&lt;/strong&gt; and &lt;strong&gt;root&lt;/strong&gt; partitions according to the
+size of the media. So, I reserved &lt;code&gt;55MB&lt;/code&gt; for the boot partition and the reset for
+the root partition. The following script, did just that:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo fdisk /dev/loop2 &lt;span class="s"&gt;&amp;lt;&amp;lt;EOF&lt;/span&gt;
+&lt;span class="s"&gt;d&lt;/span&gt;
+&lt;span class="s"&gt;1&lt;/span&gt;
+&lt;span class="s"&gt;d&lt;/span&gt;
+&lt;span class="s"&gt;2&lt;/span&gt;
+&lt;span class="s"&gt;n&lt;/span&gt;
+&lt;span class="s"&gt;p&lt;/span&gt;
+&lt;span class="s"&gt;1&lt;/span&gt;
+&lt;span class="s"&gt;8192&lt;/span&gt;
+&lt;span class="s"&gt;+55M&lt;/span&gt;
+&lt;span class="s"&gt;t&lt;/span&gt;
+&lt;span class="s"&gt;c&lt;/span&gt;
+&lt;span class="s"&gt;n&lt;/span&gt;
+&lt;span class="s"&gt;p&lt;/span&gt;
+&lt;span class="s"&gt;2&lt;/span&gt;
+&lt;span class="s"&gt;120832&lt;/span&gt;
+
+&lt;span class="s"&gt;p&lt;/span&gt;
+&lt;span class="s"&gt;w&lt;/span&gt;
+&lt;span class="s"&gt;EOF&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;After creating the new paritions with the right size, I needed to force the kernel
+to re-read the new partition table containing the new partition sizes and then
+reformat.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;partprobe /dev/loop2
+sudo mkfs.fat /dev/loop2p1
+sudo mkfs.ext4 /dev/loop2p2
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, all left to do is to copy all the files to the new image excluding the ones
+that's not actually useful, just to spare some space on SD-Card. First the boot
+partition:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mkdir -p /tmp/raspbian-boot
+mkdir -p /tmp/sdcard-boot
+
+mount /dev/loop1p1 /tmp/raspbian-boot
+mount /dev/loop2p1 /tmp/sdcard-boot
+cp -a /tmp/raspbian-boot/* /tmp/sdcard-boot
+
+&lt;span class="c1"&gt;# Enable ssh automatically on boot&lt;/span&gt;
+touch /tmp/sdcard-boot/ssh
+
+umount /dev/loop1p1
+umount /dev/loop2p1
+rmdir /tmp/raspbian-boot
+rmdir /tmp/sdcard-boot
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then, to Copy the root filesystem contents, I decided copy all the files except
+the files that are not necessary, like man-pages, linux kernel modules for
+different kernel versions and so one. The following commands copies exactly the
+needed files to boot on regular Raspberry pi 3:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mkdir -p /tmp/raspbian-root
+mkdir -p /tmp/sdcard-root
+
+mount /dev/loop1p2 /tmp/raspbian-root
+mount /dev/loop2p2 /tmp/sdcard-root
+
+mkdir -p /tmp/sdcard-root/lib/modules
+mkdir -p /tmp/sdcard-root/usr/&lt;span class="o"&gt;{&lt;/span&gt;games,src,local,include,share&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Copying necessary files&lt;/span&gt;
+cp -a /tmp/raspbian-root/&lt;span class="o"&gt;{&lt;/span&gt;boot,media,mnt,proc,srv,sys,tmp,dev,root,run,home,etc,sbin,bin,var&lt;span class="o"&gt;}&lt;/span&gt; /tmp/sdcard-root
+cp -a /tmp/raspbian-root/lib/&lt;span class="o"&gt;{&lt;/span&gt;arm-linux-gnueabihf,cpp,dhcpcd,ifupdown,klibc-fAGGTaZfOmYXUytsXgfSuL5MT48.so,ld-linux.so.3,modprobe.d,resolvconf,terminfo,console-setup,crda,firmware,init,ld-linux-armhf.so.3,lsb,systemd,udev&lt;span class="o"&gt;}&lt;/span&gt; /tmp/sdcard-root/lib/
+cp -a /tmp/raspbian-root/lib/modules/4.19.118-v7+ /tmp/sdcard-root/lib/modules/
+cp -a /tmp/raspbian-root/usr/&lt;span class="o"&gt;{&lt;/span&gt;sbin,bin,lib&lt;span class="o"&gt;}&lt;/span&gt; /tmp/sdcard-root/usr/
+cp -a /tmp/raspbian-root/usr/lib /tmp/sdcard-root/usr/
+sudo cp -a /tmp/raspbian-root/usr/share/&lt;span class="o"&gt;{&lt;/span&gt;GeoIP,X11,aclocal,adduser,alsa,applications,apport,apps,apt-listchanges,avahi,base-files,base-passwd,bash-completion,binfmts,bug,build-essential,ca-certificates,calendar,cmake,common-licenses,console-setup,consolefonts,consoletrans,dbus-1,debconf,debhelper,debianutils,dhcpcd,dict,distro-info,doc-base,dpkg,file,gcc-8,gdb,gettext,glib-2.0,gnupg,groff,hal,i18n,icons,info,initramfs-tools,iptables,iso-codes,java,keyrings,keyutils,libc-bin,lintian,luajit-2.1.0-beta3,man,man-db,menu,metainfo,mime,misc,nano,nfs-common,openssh,pam,pam-configs,perl,perl5,pixmaps,pkg-config-crosswrapper,pkg-config-dpkghook,pkgconfig,polkit-1,publicsuffix,pyshared,python,python-apt,python3,raspi-config,readline,sensible-utils,sounds,systemd,tabset,tasksel,terminfo,usb_modeswitch,vim,vl805fw,xml,zoneinfo,zsh&lt;span class="o"&gt;}&lt;/span&gt; /tmp/sdcard-root/usr/share/
+
+&lt;span class="c1"&gt;# Removing unnecessary files to make enough free space available&lt;/span&gt;
+rm /tmp/sdcard-root/var/cache/apt/srcpkgcache.bin
+rm -rf /tmp/sdcard-root/usr/share/&lt;span class="o"&gt;{&lt;/span&gt;GeoIP,i18n,man,bash-completion,sounds,misc&lt;span class="o"&gt;}&lt;/span&gt;
+
+umount /dev/loop1p2
+umount /dev/loop2p2
+rmdir /tmp/raspbian-root
+rmdir /tmp/sdcard-root
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That's it. Hopefully after boot, there's enough space for upgrade and installing
+missing softwares. If it's not, try removing other unnecessary files. Lucky for
+me, the home wireless router worked (almost) out of the box and very little installation
+was needed.&lt;/p&gt;</content><category term="Linux"></category><category term="linux"></category><category term="rasbperry pi"></category><category term="debian"></category><category term="buster"></category><category term="raspbian"></category></entry><entry><title>Raspberry pi 3 as Home Wireless Router</title><link href="http://bijanebrahimi.github.io/blog/raspberry-pi-3-as-home-wireless-router.html" rel="alternate"></link><published>2021-01-22T14:37:00+03:30</published><updated>2021-01-22T14:37:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2021-01-22:/blog/raspberry-pi-3-as-home-wireless-router.html</id><summary type="html">&lt;p&gt;I use The following script to configure a Raspbian OS on a Raspberry Pi 3
+as a home wireless router.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Please configure the following variable before running the script.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;DEVICE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;wlan1
+&lt;span class="nv"&gt;PASWORD&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;password
+&lt;span class="nv"&gt;HOST&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;.0.0.1
+&lt;span class="nv"&gt;DHCP_RANGE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;.0.0.2,10.0.0.20
+&lt;span class="nv"&gt;COUNTRY_CODE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;uk …&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;I use The following script to configure a Raspbian OS on a Raspberry Pi 3
+as a home wireless router.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Please configure the following variable before running the script.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;DEVICE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;wlan1
+&lt;span class="nv"&gt;PASWORD&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;password
+&lt;span class="nv"&gt;HOST&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;.0.0.1
+&lt;span class="nv"&gt;DHCP_RANGE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;.0.0.2,10.0.0.20
+&lt;span class="nv"&gt;COUNTRY_CODE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;uk
+&lt;span class="nv"&gt;SSID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;home-router
+&lt;span class="nv"&gt;DNS_1&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;.0.0.1
+&lt;span class="nv"&gt;DNS_2&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;.1.1.1
+
+apt update &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; apt upgrade
+
+&lt;span class="c1"&gt;# Enable the wireless access point service and set it to start when your&lt;/span&gt;
+&lt;span class="c1"&gt;# Raspberry Pi boots:&lt;/span&gt;
+apt install hostapd dnsmasq &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+systemctl unmask hostapd &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+systemctl &lt;span class="nb"&gt;enable&lt;/span&gt; hostapd
+
+&lt;span class="c1"&gt;# Enable the wireless access point service and set it to start when your&lt;/span&gt;
+&lt;span class="c1"&gt;# Raspberry Pi boots:&lt;/span&gt;
+sudo &lt;span class="nv"&gt;DEBIAN_FRONTEND&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;noninteractive apt install -y netfilter-persistent iptables-persistent
+
+&lt;span class="c1"&gt;# Define the wireless interface IP configuration:&lt;/span&gt;
+cat &amp;gt;&amp;gt; /etc/dhcpcd.conf &lt;span class="s"&gt;&amp;lt;&amp;lt;EOF&lt;/span&gt;
+&lt;span class="s"&gt;interface ${DEVICE}&lt;/span&gt;
+&lt;span class="s"&gt;    static ip_address=${HOST}/24&lt;/span&gt;
+&lt;span class="s"&gt;    static domain_name_servers=${DNS_1} ${DNS_2}&lt;/span&gt;
+&lt;span class="s"&gt;    nohook wpa_supplicant&lt;/span&gt;
+&lt;span class="s"&gt;EOF&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Enable routing and IP masquerading&lt;/span&gt;
+cat &amp;gt; /etc/sysctl.d/routed-ap.conf &lt;span class="s"&gt;&amp;lt;&amp;lt;EOF&lt;/span&gt;
+&lt;span class="s"&gt;# https://www.raspberrypi.org/documentation/configuration/wireless/access-point-routed.md&lt;/span&gt;
+&lt;span class="s"&gt;# Enable IPv4 routing&lt;/span&gt;
+&lt;span class="s"&gt;net.ipv4.ip_forward=1&lt;/span&gt;
+&lt;span class="s"&gt;EOF&lt;/span&gt;
+
+&lt;span class="c1"&gt;#systemctl reboot&lt;/span&gt;
+
+&lt;span class="c1"&gt;# update-alternatives --set iptables /usr/sbin/iptables-legacy&lt;/span&gt;
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+netfilter-persistent save
+
+&lt;span class="c1"&gt;# Configure the DHCP and DNS services for the wireless network:&lt;/span&gt;
+mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
+cat &amp;gt; /etc/dnsmasq.conf &lt;span class="s"&gt;&amp;lt;&amp;lt;EOF&lt;/span&gt;
+&lt;span class="s"&gt;interface=${DEVICE} # Listening interface&lt;/span&gt;
+&lt;span class="s"&gt;dhcp-range=${DHCP_RANGE},255.255.255.0,24h&lt;/span&gt;
+&lt;span class="s"&gt;domain=wlan&lt;/span&gt;
+&lt;span class="s"&gt;address=/gw.wlan/${HOST}&lt;/span&gt;
+&lt;span class="s"&gt;EOF&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Ensure wireless operation&lt;/span&gt;
+rfkill unblock wlan
+
+&lt;span class="c1"&gt;# Configure the access point software:&lt;/span&gt;
+cat &amp;gt; /etc/hostapd/hostapd.conf &lt;span class="s"&gt;&amp;lt;&amp;lt;EOF&lt;/span&gt;
+&lt;span class="s"&gt;country_code=${COUNTRY_CODE}&lt;/span&gt;
+&lt;span class="s"&gt;interface=${DEVICE}&lt;/span&gt;
+&lt;span class="s"&gt;ssid=${SSID}&lt;/span&gt;
+&lt;span class="s"&gt;hw_mode=g&lt;/span&gt;
+&lt;span class="s"&gt;#hw_mode=a      # IEEE 802.11a (5 GHz)&lt;/span&gt;
+&lt;span class="s"&gt;#hw_mode=b      # IEEE 802.11b (2.4 GHz)&lt;/span&gt;
+&lt;span class="s"&gt;#hw_mode=g      # IEEE 802.11g (2.4 GHz)&lt;/span&gt;
+&lt;span class="s"&gt;#hw_mode=ad     # IEEE 802.11ad (60 GHz) &lt;/span&gt;
+&lt;span class="s"&gt;channel=7&lt;/span&gt;
+&lt;span class="s"&gt;macaddr_acl=0&lt;/span&gt;
+&lt;span class="s"&gt;auth_algs=3&lt;/span&gt;
+&lt;span class="s"&gt;ignore_broadcast_ssid=0&lt;/span&gt;
+&lt;span class="s"&gt;wpa=2&lt;/span&gt;
+&lt;span class="s"&gt;wpa_passphrase=${PASWORD}&lt;/span&gt;
+&lt;span class="s"&gt;wpa_key_mgmt=WPA-PSK&lt;/span&gt;
+&lt;span class="s"&gt;wpa_pairwise=TKIP&lt;/span&gt;
+&lt;span class="s"&gt;rsn_pairwise=CCMP&lt;/span&gt;
+&lt;span class="s"&gt;EOF&lt;/span&gt;
+
+systemctl reboot
+&lt;/pre&gt;&lt;/div&gt;</content><category term="Linux"></category><category term="linux"></category><category term="rasbperry pi"></category><category term="debian"></category><category term="buster"></category><category term="raspbian"></category><category term="router"></category><category term="wireless"></category></entry><entry><title>Extending The Battery Life in Linux</title><link href="http://bijanebrahimi.github.io/blog/extending-the-battery-life-in-linux.html" rel="alternate"></link><published>2016-02-25T14:20:00+03:30</published><updated>2016-02-25T14:20:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-25:/blog/extending-the-battery-life-in-linux.html</id><summary type="html">&lt;p&gt;Before Running any tunning, the average estimated lifetime of my battery was
 about 3 hours (below image). Through this post we learn how to extend it to
 almost 4 and a half hours. It's more than 50 percent increase!&lt;/p&gt;
 &lt;blockquote&gt;
@@ -26,15 +254,15 @@ or just use the &lt;code&gt;--auto-tune&lt;/code&gt; option.&lt;/p&gt;
 &lt;p&gt;That single command will probably add a noticeable extra minutes to your battery
 life. But there are still other ways to improve it more. Let's Go to powertop's
 &lt;code&gt;Overview Tab&lt;/code&gt; again:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Power est.  Usage        Events/s    Category    Description
-  5.18 W    0.4 pkts/s               Device      Network interface: wlp2s0 (wl)
-  3.80 W    100.0%                   Device      Display backlight
-  1.26 W    165.5 ms/s   123.3       Process     /usr/share/atom/atom --type=zygote --no-sandbox
-  675 mW    95.9 ms/s    5.3         Process     atom
-  660 mW    94.0%                    Device      USB device: USB2.0-CRW (Generic)
-  262 mW    27.0 ms/s    90.1        Process     /usr/share/atom/atom --executed-from=/home/bijan --pid=1109
-  247 mW    27.2 ms/s    70.4        Process     /usr/lib/xorg-server/Xorg :0 -seat seat0 -auth /run/lightdm/root/:0 -nolisten tc
-  103 mW    2.0 ms/s     109.7        kWork      od_dbs_timer
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;Power est.  Usage        Events/s    Category    Description&lt;/span&gt;
+&lt;span class="err"&gt;  5.18 W    0.4 pkts/s               Device      Network interface: wlp2s0 (wl)&lt;/span&gt;
+&lt;span class="err"&gt;  3.80 W    100.0%                   Device      Display backlight&lt;/span&gt;
+&lt;span class="err"&gt;  1.26 W    165.5 ms/s   123.3       Process     /usr/share/atom/atom --type=zygote --no-sandbox&lt;/span&gt;
+&lt;span class="err"&gt;  675 mW    95.9 ms/s    5.3         Process     atom&lt;/span&gt;
+&lt;span class="err"&gt;  660 mW    94.0%                    Device      USB device: USB2.0-CRW (Generic)&lt;/span&gt;
+&lt;span class="err"&gt;  262 mW    27.0 ms/s    90.1        Process     /usr/share/atom/atom --executed-from=/home/bijan --pid=1109&lt;/span&gt;
+&lt;span class="err"&gt;  247 mW    27.2 ms/s    70.4        Process     /usr/lib/xorg-server/Xorg :0 -seat seat0 -auth /run/lightdm/root/:0 -nolisten tc&lt;/span&gt;
+&lt;span class="err"&gt;  103 mW    2.0 ms/s     109.7        kWork      od_dbs_timer&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -45,34 +273,34 @@ The last two I never/rarely use.&lt;/p&gt;
 &lt;p&gt;Since I never/rarely use my CD-RW and I never connect to Internet through wired
 connection, so it seems logical to me to disable them. to find my CD-RW device
 power location, I used powertop &lt;code&gt;Tunable Tab&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Disable CR-RW
-$ echo 0 | s tee /sys/bus/usb/devices/1-1.3/power/autosuspend_delay_ms
-$ echo auto | s tee /sys/bus/usb/devices/1-1.3/power/control
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;# Disable CR-RW&lt;/span&gt;
+&lt;span class="err"&gt;$ echo 0 | s tee /sys/bus/usb/devices/1-1.3/power/autosuspend_delay_ms&lt;/span&gt;
+&lt;span class="err"&gt;$ echo auto | s tee /sys/bus/usb/devices/1-1.3/power/control&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;To disable my Ethernet device, first I have to find it's device number:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Find Ethernet domain:bus:slot number
-$ lspci | grep -i ethernet
-03:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller (rev 10)
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;#&lt;/span&gt; &lt;span class="n"&gt;Find&lt;/span&gt; &lt;span class="n"&gt;Ethernet&lt;/span&gt; &lt;span class="k"&gt;domain&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;bus&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;slot&lt;/span&gt; &lt;span class="nb"&gt;number&lt;/span&gt;
+&lt;span class="err"&gt;$&lt;/span&gt; &lt;span class="n"&gt;lspci&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;grep&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="n"&gt;ethernet&lt;/span&gt;
+&lt;span class="mi"&gt;03&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;00&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="n"&gt;Ethernet&lt;/span&gt; &lt;span class="n"&gt;controller&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Realtek&lt;/span&gt; &lt;span class="n"&gt;Semiconductor&lt;/span&gt; &lt;span class="n"&gt;Co&lt;/span&gt;&lt;span class="p"&gt;.,&lt;/span&gt; &lt;span class="n"&gt;Ltd&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt; &lt;span class="n"&gt;RTL8111&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;8168&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;8411&lt;/span&gt; &lt;span class="n"&gt;PCI&lt;/span&gt; &lt;span class="n"&gt;Express&lt;/span&gt; &lt;span class="n"&gt;Gigabit&lt;/span&gt; &lt;span class="n"&gt;Ethernet&lt;/span&gt; &lt;span class="n"&gt;Controller&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rev&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
-# Find relative device on /sys/devices
-$ find /sys/devices -name &amp;quot;*03:00.0&amp;quot;
-/sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0
+&lt;span class="o"&gt;#&lt;/span&gt; &lt;span class="n"&gt;Find&lt;/span&gt; &lt;span class="k"&gt;relative&lt;/span&gt; &lt;span class="n"&gt;device&lt;/span&gt; &lt;span class="k"&gt;on&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;devices&lt;/span&gt;
+&lt;span class="err"&gt;$&lt;/span&gt; &lt;span class="n"&gt;find&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;devices&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="ss"&gt;&amp;quot;*03:00.0&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;devices&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pci0000&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;00&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;0000&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;00&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;02&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;0000&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;03&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;00&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;
 
-# Turn off device
-echo 1 | s tee /sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0/remove
+&lt;span class="o"&gt;#&lt;/span&gt; &lt;span class="n"&gt;Turn&lt;/span&gt; &lt;span class="k"&gt;off&lt;/span&gt; &lt;span class="n"&gt;device&lt;/span&gt;
+&lt;span class="n"&gt;echo&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="n"&gt;tee&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;devices&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;pci0000&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;00&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;0000&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;00&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;02&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;0000&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;03&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;00&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;remove&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;h3&gt;Backlight&lt;/h3&gt;
 &lt;p&gt;To reduce the brightness LED backlight, I set a brightness value (between 0 and 255):&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Brightness&lt;/span&gt;
-&lt;span class="x"&gt;basedir=&amp;quot;/sys/class/backlight/&amp;quot;&lt;/span&gt;
-&lt;span class="x"&gt;handler=&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;basedir&lt;/span&gt;&lt;span class="p"&gt;$(&lt;/span&gt;&lt;span class="err"&gt;ls&lt;/span&gt; &lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;basedir&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="x"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;#&lt;/span&gt; &lt;span class="n"&gt;Brightness&lt;/span&gt;
+&lt;span class="n"&gt;basedir&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;/sys/class/backlight/&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;handler&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;basedir$&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ls&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;basedir&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;
 
-&lt;span class="x"&gt;chmod 666 &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;handler&lt;/span&gt;&lt;span class="x"&gt;/brightness&lt;/span&gt;
-&lt;span class="x"&gt;echo 100 &amp;gt; handler/brightness&lt;/span&gt;
+&lt;span class="n"&gt;chmod&lt;/span&gt; &lt;span class="mi"&gt;666&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="k"&gt;handler&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;brightness&lt;/span&gt;
+&lt;span class="n"&gt;echo&lt;/span&gt; &lt;span class="mi"&gt;100&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;handler&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;brightness&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -114,20 +342,20 @@ chmod &lt;span class="m"&gt;666&lt;/span&gt; /sys/class/backlight/radeon_bl0/bri
 &lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 
 &lt;p&gt;And to create proper systemd service:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# /etc/systemd/system/powertop_tuning.service
-[Unit]
-Description=&amp;quot;PowerTop Tuning config&amp;quot;
-ConditionPathExists=/usr/local/bin/powertop_tuning.sh
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;etc&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;systemd&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="k"&gt;system&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;powertop_tuning&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;service&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Unit&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="n"&gt;Description&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;PowerTop Tuning config&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="n"&gt;ConditionPathExists&lt;/span&gt;&lt;span class="o"&gt;=/&lt;/span&gt;&lt;span class="n"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="k"&gt;local&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;powertop_tuning&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sh&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
 
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-KillMode=none
-ExecStart=/usr/local/bin/powertop_tuning.sh
-ExecStop=exit
+&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Service&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="n"&gt;Type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;oneshot&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="n"&gt;RemainAfterExit&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;yes&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="n"&gt;KillMode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;none&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="n"&gt;ExecStart&lt;/span&gt;&lt;span class="o"&gt;=/&lt;/span&gt;&lt;span class="n"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="k"&gt;local&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;powertop_tuning&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sh&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="n"&gt;ExecStop&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;exit&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
 
-[Install]
-WantedBy=multi-user.target
+&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Install&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="n"&gt;WantedBy&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;multi&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="k"&gt;user&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;target&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -143,7 +371,7 @@ from about 3 hours to almost 4 and a half hours.&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;&lt;strong&gt;Disclaimer&lt;/strong&gt;: The tests and battery benchmark did not placed in a controlled
 environment but it seems logical to expect similar effects.&lt;/p&gt;
-&lt;/blockquote&gt;</content><category term="linux"></category><category term="powertop"></category><category term="power"></category></entry><entry><title>Multiseat Linux Desktop, Multiple X servers</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html" rel="alternate"></link><published>2014-10-22T10:35:00+03:30</published><updated>2014-10-22T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-22:/blog/multiseat-linux-desktop-multiple-x-servers.html</id><summary type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="{filename}/multiseat-linux-desktop.md"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
+&lt;/blockquote&gt;</content><category term="Linux"></category><category term="linux"></category><category term="powertop"></category><category term="power"></category></entry><entry><title>Multiseat Linux Desktop, Multiple X servers</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html" rel="alternate"></link><published>2014-10-22T10:35:00+03:30</published><updated>2014-10-22T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-22:/blog/multiseat-linux-desktop-multiple-x-servers.html</id><summary type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
 &lt;h3&gt;Hardware Requirements&lt;/h3&gt;
 &lt;p&gt;for each user, we need seperate:&lt;/p&gt;
 &lt;ul&gt;
@@ -154,7 +382,7 @@ environment but it seems logical to expect similar effects.&lt;/p&gt;
 &lt;/ul&gt;
 &lt;p&gt;each Monitor will be attached to a seperate Video Card.&lt;/p&gt;
 &lt;h3&gt;Introduction&lt;/h3&gt;
-&lt;p&gt;the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="{filename}/multiseat-linux-desktop.md"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
+&lt;p&gt;the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This is the first solution in the main Article &lt;a href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html"&gt;Multiseat Linux Desktop&lt;/a&gt;. you may also find other solutions for multiseat configuration in there as well.&lt;/p&gt;
 &lt;h3&gt;Hardware Requirements&lt;/h3&gt;
 &lt;p&gt;for each user, we need seperate:&lt;/p&gt;
 &lt;ul&gt;
@@ -170,22 +398,22 @@ environment but it seems logical to expect similar effects.&lt;/p&gt;
 &lt;h3&gt;Hardware Detection&lt;/h3&gt;
 &lt;p&gt;we can find our input devices (Mouse &amp;amp; Keyboards) in &lt;code&gt;/dev/input&lt;/code&gt; directory. lets look to see what have we here:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ls -la /dev/input
-drwxr-xr-x  &lt;span class="m"&gt;4&lt;/span&gt; root root    &lt;span class="m"&gt;320&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 .
-drwxr-xr-x &lt;span class="m"&gt;15&lt;/span&gt; root root   &lt;span class="m"&gt;3060&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:59 ..
-drwxr-xr-x  &lt;span class="m"&gt;2&lt;/span&gt; root root    &lt;span class="m"&gt;160&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 by-id
-drwxr-xr-x  &lt;span class="m"&gt;2&lt;/span&gt; root root    &lt;span class="m"&gt;220&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 by-path
-crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;64&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event0
-crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;65&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event1
-crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;66&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event2
-crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;67&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event3
-crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;68&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event4
-crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;69&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event5
-crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;70&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event6
-crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;71&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event7
-crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;72&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 event8
-crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;63&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 mice
-crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;32&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 mouse0
-crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m"&gt;33&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 mouse1
+drwxr-xr-x  &lt;span class="m"&gt;4&lt;/span&gt; root root    &lt;span class="m"&gt;320&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 .
+drwxr-xr-x &lt;span class="m"&gt;15&lt;/span&gt; root root   &lt;span class="m"&gt;3060&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:59 ..
+drwxr-xr-x  &lt;span class="m"&gt;2&lt;/span&gt; root root    &lt;span class="m"&gt;160&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 by-id
+drwxr-xr-x  &lt;span class="m"&gt;2&lt;/span&gt; root root    &lt;span class="m"&gt;220&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 by-path
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;13&lt;/span&gt;, &lt;span class="m"&gt;64&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 event0
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;13&lt;/span&gt;, &lt;span class="m"&gt;65&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 event1
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;13&lt;/span&gt;, &lt;span class="m"&gt;66&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 event2
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;13&lt;/span&gt;, &lt;span class="m"&gt;67&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 event3
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;13&lt;/span&gt;, &lt;span class="m"&gt;68&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 event4
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;13&lt;/span&gt;, &lt;span class="m"&gt;69&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 event5
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;13&lt;/span&gt;, &lt;span class="m"&gt;70&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 event6
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;13&lt;/span&gt;, &lt;span class="m"&gt;71&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 event7
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;13&lt;/span&gt;, &lt;span class="m"&gt;72&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 event8
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;13&lt;/span&gt;, &lt;span class="m"&gt;63&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 mice
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;13&lt;/span&gt;, &lt;span class="m"&gt;32&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 mouse0
+crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;13&lt;/span&gt;, &lt;span class="m"&gt;33&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 mouse1
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -198,15 +426,15 @@ crw-------  &lt;span class="m"&gt;1&lt;/span&gt; root root 13, &lt;span class="m
 &lt;p&gt;do this till you find all of your input devices.&lt;/p&gt;
 &lt;p&gt;an alternative way (which i preffer) is to look into &lt;code&gt;/dev/input/by-id/&lt;/code&gt; directory. your Input devices should be listed there with their human readable names.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ls -la /dev/input/by-id/
-drwxr-xr-x &lt;span class="m"&gt;2&lt;/span&gt; root root &lt;span class="m"&gt;160&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 .
-drwxr-xr-x &lt;span class="m"&gt;2&lt;/span&gt; root root &lt;span class="m"&gt;160&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 .
-drwxr-xr-x &lt;span class="m"&gt;4&lt;/span&gt; root root &lt;span class="m"&gt;320&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 ..
-lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-15ca_USB_Optical_Mouse-event-mouse -&amp;gt; ../event2
-lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-15ca_USB_Optical_Mouse-mouse -&amp;gt; ../mouse0
-lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-CHICONY_USB_Keyboard-event-if01 -&amp;gt; ../event4
-lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-CHICONY_USB_Keyboard-event-kbd -&amp;gt; ../event3
-lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-Logitech_Logitech_USB_Keyboard-event-if01 -&amp;gt; ../event1
-lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; 09:57 usb-Logitech_Logitech_USB_Keyboard-event-kbd -&amp;gt; ../event0
+drwxr-xr-x &lt;span class="m"&gt;2&lt;/span&gt; root root &lt;span class="m"&gt;160&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 .
+drwxr-xr-x &lt;span class="m"&gt;2&lt;/span&gt; root root &lt;span class="m"&gt;160&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 .
+drwxr-xr-x &lt;span class="m"&gt;4&lt;/span&gt; root root &lt;span class="m"&gt;320&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 ..
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 usb-15ca_USB_Optical_Mouse-event-mouse -&amp;gt; ../event2
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 usb-15ca_USB_Optical_Mouse-mouse -&amp;gt; ../mouse0
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 usb-CHICONY_USB_Keyboard-event-if01 -&amp;gt; ../event4
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 usb-CHICONY_USB_Keyboard-event-kbd -&amp;gt; ../event3
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 usb-Logitech_Logitech_USB_Keyboard-event-if01 -&amp;gt; ../event1
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&gt;9&lt;/span&gt; Apr &lt;span class="m"&gt;23&lt;/span&gt; &lt;span class="m"&gt;09&lt;/span&gt;:57 usb-Logitech_Logitech_USB_Keyboard-event-kbd -&amp;gt; ../event0
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -218,8 +446,8 @@ lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root   &lt;span class="m"&g
 &lt;p&gt;write your input device names with their related device file name somewhere cause we're going to need those later.&lt;/p&gt;
 &lt;p&gt;at last for Video Cards. Video cards are identified by their address on the PCI bus. so to find them we can use &lt;code&gt;lspci&lt;/code&gt; command.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ lspci &lt;span class="p"&gt;|&lt;/span&gt;  grep VGA
-00:09.0 VGA compatible controller: nVidia Corporation NV18 &lt;span class="o"&gt;[&lt;/span&gt;GeForce4 MX &lt;span class="m"&gt;4000&lt;/span&gt; AGP 8x&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;rev c1&lt;span class="o"&gt;)&lt;/span&gt;
-00:0a.0 VGA compatible controller: nVidia Corporation NV18 &lt;span class="o"&gt;[&lt;/span&gt;GeForce4 MX &lt;span class="m"&gt;4000&lt;/span&gt; AGP 8x&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;rev c1&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="m"&gt;00&lt;/span&gt;:09.0 VGA compatible controller: nVidia Corporation NV18 &lt;span class="o"&gt;[&lt;/span&gt;GeForce4 MX &lt;span class="m"&gt;4000&lt;/span&gt; AGP 8x&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;rev c1&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="m"&gt;00&lt;/span&gt;:0a.0 VGA compatible controller: nVidia Corporation NV18 &lt;span class="o"&gt;[&lt;/span&gt;GeForce4 MX &lt;span class="m"&gt;4000&lt;/span&gt; AGP 8x&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;rev c1&lt;span class="o"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -242,75 +470,75 @@ $ sudo nano xorg.conf.multiseat
 
 
 &lt;p&gt;First of all, we need to set &lt;a href="https://wiki.archlinux.org/index.php/Xorg_multiseat#The_basics"&gt;basic Xorg configuration&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Section &amp;quot;ServerFlags&amp;quot;
-    Option &amp;quot;AutoAddDevices&amp;quot;     &amp;quot;false&amp;quot;
-    Option &amp;quot;AutoEnableDevices&amp;quot;  &amp;quot;false&amp;quot;
-    Option &amp;quot;AllowMouseOpenFail&amp;quot; &amp;quot;on&amp;quot;
-    Option &amp;quot;AllowEmptyInput&amp;quot; &amp;quot;on&amp;quot;
-    Option &amp;quot;ZapWarning&amp;quot;         &amp;quot;on&amp;quot;
-    Option &amp;quot;HandleSpecialKeys&amp;quot;  &amp;quot;off&amp;quot; # Zapping on
-    Option &amp;quot;DRI2&amp;quot; &amp;quot;on&amp;quot;
-    Option &amp;quot;Xinerama&amp;quot; &amp;quot;off&amp;quot;
-EndSection
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;Section &amp;quot;ServerFlags&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;AutoAddDevices&amp;quot;     &amp;quot;false&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;AutoEnableDevices&amp;quot;  &amp;quot;false&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;AllowMouseOpenFail&amp;quot; &amp;quot;on&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;AllowEmptyInput&amp;quot; &amp;quot;on&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;ZapWarning&amp;quot;         &amp;quot;on&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;HandleSpecialKeys&amp;quot;  &amp;quot;off&amp;quot; # Zapping on&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;DRI2&amp;quot; &amp;quot;on&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;Xinerama&amp;quot; &amp;quot;off&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;EndSection&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;after that we need to define input devices, screens, monitors and layouts. do the following configuration for each seat you want to have. so first we need to define out input devices. look at the "Option Device". it is the device file name we detect earlier:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Section &amp;quot;InputDevice&amp;quot;
-    Identifier      &amp;quot;Keyboard0&amp;quot;
-    Driver          &amp;quot;evdev&amp;quot;
-    Option          &amp;quot;Device&amp;quot;                &amp;quot;/dev/input/event0&amp;quot;
-    Option &amp;quot;xkb_rules&amp;quot; &amp;quot;evdev&amp;quot;
-    Option &amp;quot;xkb_model&amp;quot; &amp;quot;evdev&amp;quot;
-    Option &amp;quot;xkb_layout&amp;quot; &amp;quot;us&amp;quot;
-    Option &amp;quot;GrabDevice&amp;quot; &amp;quot;on&amp;quot; # prevent send event to other X-servers
-EndSection
-Section &amp;quot;InputDevice&amp;quot;
-    Identifier &amp;quot;Mouse0&amp;quot;
-    Driver &amp;quot;evdev&amp;quot;
-    Option &amp;quot;Device&amp;quot; &amp;quot;/dev/input/event2&amp;quot;
-    Option &amp;quot;GrabDevice&amp;quot; &amp;quot;on&amp;quot;
-EndSection
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;Section &amp;quot;InputDevice&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Identifier      &amp;quot;Keyboard0&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Driver          &amp;quot;evdev&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option          &amp;quot;Device&amp;quot;                &amp;quot;/dev/input/event0&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;xkb_rules&amp;quot; &amp;quot;evdev&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;xkb_model&amp;quot; &amp;quot;evdev&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;xkb_layout&amp;quot; &amp;quot;us&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;GrabDevice&amp;quot; &amp;quot;on&amp;quot; # prevent send event to other X-servers&lt;/span&gt;
+&lt;span class="err"&gt;EndSection&lt;/span&gt;
+&lt;span class="err"&gt;Section &amp;quot;InputDevice&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Identifier &amp;quot;Mouse0&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Driver &amp;quot;evdev&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;Device&amp;quot; &amp;quot;/dev/input/event2&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;GrabDevice&amp;quot; &amp;quot;on&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;EndSection&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;now we need to define Screen with uses Monitor and Device which is our Video Card (you can tweak the Modes and ... if you like). the BusId Option is the PCI address we also found earlier.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Section &amp;quot;Device&amp;quot;
-    Identifier      &amp;quot;Nvidia0&amp;quot;
-    Driver          &amp;quot;nouveau&amp;quot;
-    BusId           &amp;quot;PCI:00:09.0&amp;quot;
-EndSection
-    Section &amp;quot;Monitor&amp;quot;
-    Identifier      &amp;quot;Lg0&amp;quot;
-    HorizSync       30-93
-    VertRefresh     60
-    Option          &amp;quot;dpms&amp;quot;
-EndSection
-Section &amp;quot;Screen&amp;quot;
-    Identifier              &amp;quot;Screen0&amp;quot;
-    Device                  &amp;quot;Nvidia0&amp;quot;
-    Monitor                 &amp;quot;Lg0&amp;quot;
-    DefaultDepth    24
-    Option                  &amp;quot;DPI&amp;quot;   &amp;quot;100x100&amp;quot;
-    Subsection &amp;quot;Display&amp;quot;
-        Depth   24
-        Modes   &amp;quot;1280x1024&amp;quot;     &amp;quot;1024x768&amp;quot;
-    EndSubsection
-EndSection
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;Section &amp;quot;Device&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Identifier      &amp;quot;Nvidia0&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Driver          &amp;quot;nouveau&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    BusId           &amp;quot;PCI:00:09.0&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;EndSection&lt;/span&gt;
+&lt;span class="err"&gt;    Section &amp;quot;Monitor&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Identifier      &amp;quot;Lg0&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    HorizSync       30-93&lt;/span&gt;
+&lt;span class="err"&gt;    VertRefresh     60&lt;/span&gt;
+&lt;span class="err"&gt;    Option          &amp;quot;dpms&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;EndSection&lt;/span&gt;
+&lt;span class="err"&gt;Section &amp;quot;Screen&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Identifier              &amp;quot;Screen0&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Device                  &amp;quot;Nvidia0&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Monitor                 &amp;quot;Lg0&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    DefaultDepth    24&lt;/span&gt;
+&lt;span class="err"&gt;    Option                  &amp;quot;DPI&amp;quot;   &amp;quot;100x100&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Subsection &amp;quot;Display&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;        Depth   24&lt;/span&gt;
+&lt;span class="err"&gt;        Modes   &amp;quot;1280x1024&amp;quot;     &amp;quot;1024x768&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    EndSubsection&lt;/span&gt;
+&lt;span class="err"&gt;EndSection&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;and finally, we need to define a Layout which we will later tell X to load it. it simply gathers the defined input devices and Screens.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Section &amp;quot;ServerLayout&amp;quot;
-    Identifier      &amp;quot;Seat0&amp;quot;
-    Screen          1               &amp;quot;Screen0&amp;quot;       1                   1
-    InputDevice     &amp;quot;Mouse0&amp;quot;        &amp;quot;CorePointer&amp;quot;
-    InputDevice     &amp;quot;keyboard0&amp;quot;      &amp;quot;CoreKeyboard&amp;quot;
-    Option &amp;quot;Clone&amp;quot; &amp;quot;off&amp;quot;
-    Option &amp;quot;AutoAddDevices&amp;quot; &amp;quot;off&amp;quot;
-    Option &amp;quot;DisableModInDev&amp;quot; &amp;quot;true&amp;quot;
-    Option &amp;quot;SingleCard&amp;quot; &amp;quot;on&amp;quot;   # use this to simplfied isolatedevice option
-EndSection
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;Section &amp;quot;ServerLayout&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Identifier      &amp;quot;Seat0&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Screen          1               &amp;quot;Screen0&amp;quot;       1                   1&lt;/span&gt;
+&lt;span class="err"&gt;    InputDevice     &amp;quot;Mouse0&amp;quot;        &amp;quot;CorePointer&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    InputDevice     &amp;quot;keyboard0&amp;quot;      &amp;quot;CoreKeyboard&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;Clone&amp;quot; &amp;quot;off&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;AutoAddDevices&amp;quot; &amp;quot;off&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;DisableModInDev&amp;quot; &amp;quot;true&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;    Option &amp;quot;SingleCard&amp;quot; &amp;quot;on&amp;quot;   # use this to simplfied isolatedevice option&lt;/span&gt;
+&lt;span class="err"&gt;EndSection&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -333,7 +561,7 @@ EndSection
 
 &lt;p&gt;if anything happend,read the log files and search the web.&lt;/p&gt;
 &lt;h3&gt;Configure Display Managers&lt;/h3&gt;
-&lt;p&gt;it is possible to configure your Display Manager (like KDM or GDM) to behave properly with Multiseat configuration at boot-up, but since i dont use any Display Manager, i can not tell you exactly how to do it. search the web for that matter. you can do it the easy way by configuring your Display Manager rc file or the hard way by editing the &lt;code&gt;/etc/inittab&lt;/code&gt; file if you have systemV.&lt;/p&gt;</content><category term="X11"></category><category term="config"></category><category term="xephyr"></category></entry><entry><title>Multiseat Linux Desktop</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html" rel="alternate"></link><published>2014-10-21T10:35:00+03:30</published><updated>2014-10-21T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-21:/blog/multiseat-linux-desktop.html</id><summary type="html">&lt;p&gt;here is the story. my 3 years old nephew (which i love him so much) is so curious about computers. every time he comes to visit (which is not rarely), he insist on helping me with my computer works. of course he thinks he is helping but i can't have …&lt;/p&gt;</summary><content type="html">&lt;p&gt;here is the story. my 3 years old nephew (which i love him so much) is so curious about computers. every time he comes to visit (which is not rarely), he insist on helping me with my computer works. of course he thinks he is helping but i can't have him messing my projects. so i wondered if i can (peacefully) share the computer with him. i searched and i found out about &lt;a href="en.wikipedia.org/wiki/Multiseat_configuration"&gt;Multiseat&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;it is possible to configure your Display Manager (like KDM or GDM) to behave properly with Multiseat configuration at boot-up, but since i dont use any Display Manager, i can not tell you exactly how to do it. search the web for that matter. you can do it the easy way by configuring your Display Manager rc file or the hard way by editing the &lt;code&gt;/etc/inittab&lt;/code&gt; file if you have systemV.&lt;/p&gt;</content><category term="Linux"></category><category term="X11"></category><category term="config"></category><category term="xephyr"></category></entry><entry><title>Multiseat Linux Desktop</title><link href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop.html" rel="alternate"></link><published>2014-10-21T10:35:00+03:30</published><updated>2014-10-21T10:35:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2014-10-21:/blog/multiseat-linux-desktop.html</id><summary type="html">&lt;p&gt;here is the story. my 3 years old nephew (which i love him so much) is so curious about computers. every time he comes to visit (which is not rarely), he insist on helping me with my computer works. of course he thinks he is helping but i can't have …&lt;/p&gt;</summary><content type="html">&lt;p&gt;here is the story. my 3 years old nephew (which i love him so much) is so curious about computers. every time he comes to visit (which is not rarely), he insist on helping me with my computer works. of course he thinks he is helping but i can't have him messing my projects. so i wondered if i can (peacefully) share the computer with him. i searched and i found out about &lt;a href="en.wikipedia.org/wiki/Multiseat_configuration"&gt;Multiseat&lt;/a&gt;.&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;A multiseat, multi-station or multiterminal configuration is a single computer which supports
 multiple independent local users at the same time. In modern usage the terms refer to multiple
@@ -344,7 +572,7 @@ a monitor, and possibly headphones --Wikipedia&lt;/p&gt;
 &lt;h3&gt;GNU/Linux Solutions&lt;/h3&gt;
 &lt;p&gt;as it may be obvious, there are numbers of solution to do configure the GNU/Linux system to fit my need. so, in the following next articles (below links), i will explain these solution as i experienced them. i try to do them separately and independently, so you can skip ones you are not interested about. here are what i found:&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;&lt;a href="{filename}/multiseat-linux-desktop-multiple-x-servers.md"&gt;Multiple X servers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://bijanebrahimi.github.io/blog/multiseat-linux-desktop-multiple-x-servers.html"&gt;Multiple X servers&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;Nested X servers (i will write about it very soon)&lt;/li&gt;
 &lt;li&gt;The Multi-seat display manager&lt;/li&gt;
-&lt;/ol&gt;</content><category term="X11"></category><category term="config"></category></entry></feed>
+&lt;/ol&gt;</content><category term="Linux"></category><category term="X11"></category><category term="config"></category></entry></feed>

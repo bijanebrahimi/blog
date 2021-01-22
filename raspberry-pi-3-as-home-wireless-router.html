@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Raspberry pi 3 as Home Wireless Router</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="http://bijanebrahimi.github.io/blog/" class="pure-menu-heading  pure-menu-link">Routines Excluded</a>
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"></li>
+
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/pages/bookmarks.html" class="pure-menu-link">Bookmarks</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/books.html" class="pure-menu-link">Books</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="pure-menu-link">FreeBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="pure-menu-link">Gist</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/git.html" class="pure-menu-link">Git</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="pure-menu-link">OpenBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
+        </ul>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="category">Linux</a><br />
+
+    <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+    &mdash; <abbr title="2021-01-22T14:37:00+03:30">Fri 22 January 2021</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image-small">
+                <div class="title-container">
+                    <h1>Raspberry pi 3 as Home Wireless Router</h1>
+                    <h4>A simple script to create a Home Wireless Router</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <p>I use The following script to configure a Raspbian OS on a Raspberry Pi 3
+as a home wireless router.</p>
+<p><strong>Note:</strong> Please configure the following variable before running the script.</p>
+<div class="highlight"><pre><span></span><span class="nv">DEVICE</span><span class="o">=</span>wlan1
+<span class="nv">PASWORD</span><span class="o">=</span>password
+<span class="nv">HOST</span><span class="o">=</span><span class="m">10</span>.0.0.1
+<span class="nv">DHCP_RANGE</span><span class="o">=</span><span class="m">10</span>.0.0.2,10.0.0.20
+<span class="nv">COUNTRY_CODE</span><span class="o">=</span>uk
+<span class="nv">SSID</span><span class="o">=</span>home-router
+<span class="nv">DNS_1</span><span class="o">=</span><span class="m">1</span>.0.0.1
+<span class="nv">DNS_2</span><span class="o">=</span><span class="m">1</span>.1.1.1
+
+apt update <span class="o">&amp;&amp;</span> apt upgrade
+
+<span class="c1"># Enable the wireless access point service and set it to start when your</span>
+<span class="c1"># Raspberry Pi boots:</span>
+apt install hostapd dnsmasq <span class="o">&amp;&amp;</span> <span class="se">\</span>
+systemctl unmask hostapd <span class="o">&amp;&amp;</span> <span class="se">\</span>
+systemctl <span class="nb">enable</span> hostapd
+
+<span class="c1"># Enable the wireless access point service and set it to start when your</span>
+<span class="c1"># Raspberry Pi boots:</span>
+sudo <span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive apt install -y netfilter-persistent iptables-persistent
+
+<span class="c1"># Define the wireless interface IP configuration:</span>
+cat &gt;&gt; /etc/dhcpcd.conf <span class="s">&lt;&lt;EOF</span>
+<span class="s">interface ${DEVICE}</span>
+<span class="s">    static ip_address=${HOST}/24</span>
+<span class="s">    static domain_name_servers=${DNS_1} ${DNS_2}</span>
+<span class="s">    nohook wpa_supplicant</span>
+<span class="s">EOF</span>
+
+<span class="c1"># Enable routing and IP masquerading</span>
+cat &gt; /etc/sysctl.d/routed-ap.conf <span class="s">&lt;&lt;EOF</span>
+<span class="s"># https://www.raspberrypi.org/documentation/configuration/wireless/access-point-routed.md</span>
+<span class="s"># Enable IPv4 routing</span>
+<span class="s">net.ipv4.ip_forward=1</span>
+<span class="s">EOF</span>
+
+<span class="c1">#systemctl reboot</span>
+
+<span class="c1"># update-alternatives --set iptables /usr/sbin/iptables-legacy</span>
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+netfilter-persistent save
+
+<span class="c1"># Configure the DHCP and DNS services for the wireless network:</span>
+mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
+cat &gt; /etc/dnsmasq.conf <span class="s">&lt;&lt;EOF</span>
+<span class="s">interface=${DEVICE} # Listening interface</span>
+<span class="s">dhcp-range=${DHCP_RANGE},255.255.255.0,24h</span>
+<span class="s">domain=wlan</span>
+<span class="s">address=/gw.wlan/${HOST}</span>
+<span class="s">EOF</span>
+
+<span class="c1"># Ensure wireless operation</span>
+rfkill unblock wlan
+
+<span class="c1"># Configure the access point software:</span>
+cat &gt; /etc/hostapd/hostapd.conf <span class="s">&lt;&lt;EOF</span>
+<span class="s">country_code=${COUNTRY_CODE}</span>
+<span class="s">interface=${DEVICE}</span>
+<span class="s">ssid=${SSID}</span>
+<span class="s">hw_mode=g</span>
+<span class="s">#hw_mode=a      # IEEE 802.11a (5 GHz)</span>
+<span class="s">#hw_mode=b      # IEEE 802.11b (2.4 GHz)</span>
+<span class="s">#hw_mode=g      # IEEE 802.11g (2.4 GHz)</span>
+<span class="s">#hw_mode=ad     # IEEE 802.11ad (60 GHz) </span>
+<span class="s">channel=7</span>
+<span class="s">macaddr_acl=0</span>
+<span class="s">auth_algs=3</span>
+<span class="s">ignore_broadcast_ssid=0</span>
+<span class="s">wpa=2</span>
+<span class="s">wpa_passphrase=${PASWORD}</span>
+<span class="s">wpa_key_mgmt=WPA-PSK</span>
+<span class="s">wpa_pairwise=TKIP</span>
+<span class="s">rsn_pairwise=CCMP</span>
+<span class="s">EOF</span>
+
+systemctl reboot
+</pre></div>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/linux.html">linux</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/rasbperry-pi.html">rasbperry pi</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/debian.html">debian</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/buster.html">buster</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/raspbian.html">raspbian</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/router.html">router</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/wireless.html">wireless</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
+                        <p class="author-description">
+                          
+            I Love to Read, Code and Explore the Possibilities.
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'bijanebrahimi';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="http://bijanebrahimi.github.io/blog/" title="Routines Excluded">Routines Excluded</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/books.html">Books</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/freebsd.html">FreeBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/gist.html">Gist</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/git.html">Git</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/linux.html">Linux</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html">OpenBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/projects.html">Projects</a>
+        <a href="https://github.com/bijanebrahimi/blog">Fork Me on Github</a>
+
+    </footer>
+
+</body>
+</html>

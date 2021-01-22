@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Fine Tuned Shell Scripting and Bash Automated Testing System Using Bats</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="http://bijanebrahimi.github.io/blog/" class="pure-menu-heading  pure-menu-link">Routines Excluded</a>
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"></li>
+
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/pages/bookmarks.html" class="pure-menu-link">Bookmarks</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/books.html" class="pure-menu-link">Books</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="pure-menu-link">FreeBSD</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="pure-menu-link">Gist</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/git.html" class="pure-menu-link">Git</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="pure-menu-link">OpenBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
+        </ul>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="category">Gist</a><br />
+
+    <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+    &mdash; <abbr title="2017-11-27T20:50:00+03:30">Mon 27 November 2017</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image-small">
+                <div class="title-container">
+                    <h1>Fine Tuned Shell Scripting and Bash Automated Testing System Using Bats</h1>
+                    <h4>A brief presentation at MashhadBUG</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <h1>Introduction</h1>
+<p>Last Saturday, I gave a brief presentation on shell scripting and bats, a bash
+based automated testing system at <a href="http://mashhadbug.org">MashhadBUG</a>. Please Don't forget to check
+the references at the end of the post.</p>
+<h1>Table of Contents</h1>
+<ul>
+<li>PART I: <a href="http://blackskyresearch.net/shelltables.txt">Shell Tables</a> by Isaac Levy</li>
+<li>PART II: <a href="http://www.nycbug.org/index.cgi?action=view&amp;id=10640">The 3 finger claw technique</a> by Isaac Levy</li>
+<li>PART III: <a href="https://github.com/sstephenson/bats">Bats</a>: Bash Automated Testing System</li>
+</ul>
+<h1>PART I: <a href="http://blackskyresearch.net/shelltables.txt">Shell Tables</a> by Isaac Levy</h1>
+<h2>I/O Redirection</h2>
+<div class="highlight"><pre><span></span>$ prog &gt; file       <span class="c1"># direct stdout to file</span>
+$ prog &gt;&gt; file      <span class="c1"># append stdout to file</span>
+$ prog &lt; file       <span class="c1"># take standard input from file</span>
+$ &lt; file prog
+$ prog1 <span class="p">|</span> prog2 <span class="c1"># connect standard output of p1 to standard input of p2</span>
+$ prog <span class="s">&lt;&lt;HEREDOC    # H</span>ereDoc
+</pre></div>
+
+
+<h2>Commands</h2>
+<div class="highlight"><pre><span></span>$ prog1<span class="p">;</span> prog2      <span class="c1"># command terminator</span>
+$ prog1 <span class="p">&amp;</span> prog2     <span class="c1"># like ; but doesn&#39;t wait for p1 to finish</span>
+$ <span class="sb">`</span>prog1<span class="sb">`</span>       <span class="c1"># run command, output replaces</span>
+$ <span class="o">(</span>prog1<span class="o">)</span>       <span class="c1"># run command in sub-shell</span>
+$ <span class="o">{</span>prog1<span class="o">}</span>       <span class="c1"># run command in current-shell</span>
+</pre></div>
+
+
+<h2>Shell Scripts</h2>
+<div class="highlight"><pre><span></span><span class="nv">$0</span>...<span class="nv">$9</span>         <span class="c1"># positional arguments</span>
+<span class="nv">$#</span>          <span class="c1"># total number of arguments</span>
+<span class="nv">$*</span>          <span class="c1"># all the arguments as a single string (expanded/double-quoted)</span>
+<span class="nv">$@</span>          <span class="c1"># all the arguments as separate strings (expanded/double-quoted)</span>
+<span class="nv">$$</span>          <span class="c1"># pid of current shell process</span>
+<span class="nv">$!</span>          <span class="c1"># pid of last background command</span>
+<span class="nv">$?</span>          <span class="c1"># exit status of previous command</span>
+</pre></div>
+
+
+<h2>Evaluation and Substitution of Shell Variables</h2>
+<div class="highlight"><pre><span></span><span class="nv">$var</span>            <span class="c1"># Value of &#39;var&#39;</span>
+<span class="si">${</span><span class="nv">var</span><span class="si">}</span>          <span class="c1"># useful if alphanumerics follows</span>
+<span class="si">${</span><span class="nv">var</span><span class="p">-thing</span><span class="si">}</span>        <span class="c1"># &#39;var&#39; if defined, O.W thing</span>
+<span class="si">${</span><span class="nv">var</span><span class="k">:-</span><span class="nv">word</span><span class="si">}</span>        <span class="c1"># &#39;var&#39; if exists and isn&#39;t null, O.W &#39;word&#39;</span>
+<span class="si">${</span><span class="nv">var</span><span class="p">:=word</span><span class="si">}</span>        <span class="c1"># like above but changes var</span>
+<span class="si">${</span><span class="nv">var</span><span class="p">:?message</span><span class="si">}</span>     <span class="c1"># abort if var doesn&#39;t exist or is null</span>
+<span class="si">${</span><span class="nv">var</span><span class="p">:+word</span><span class="si">}</span>        <span class="c1"># returns word if var exists and isn&#39;t null</span>
+</pre></div>
+
+
+<h1>PART II: <a href="http://www.nycbug.org/index.cgi?action=view&amp;id=10640">The 3 finger claw technique</a> by Isaac Levy</h1>
+<h1>The Original 3 short functions</h1>
+<div class="highlight"><pre><span></span>shout<span class="o">()</span> <span class="o">{</span> <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">: </span><span class="nv">$*</span><span class="s2">&quot;</span> &gt;<span class="p">&amp;</span><span class="m">2</span><span class="p">;</span> <span class="o">}</span> 
+barf<span class="o">()</span> <span class="o">{</span> shout <span class="s2">&quot;</span><span class="nv">$*</span><span class="s2">&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">100</span><span class="p">;</span> <span class="o">}</span> 
+safe<span class="o">()</span> <span class="o">{</span> <span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span> <span class="o">||</span> barf <span class="s2">&quot;cannot </span><span class="nv">$*</span><span class="s2">&quot;</span><span class="p">;</span> <span class="o">}</span>
+</pre></div>
+
+
+<h1>The 3 short functions</h1>
+<div class="highlight"><pre><span></span>yell<span class="o">()</span> <span class="o">{</span> <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">: </span><span class="nv">$*</span><span class="s2">&quot;</span> &gt;<span class="p">&amp;</span><span class="m">2</span><span class="p">;</span> <span class="o">}</span>
+die<span class="o">()</span> <span class="o">{</span> yell <span class="s2">&quot;</span><span class="nv">$*</span><span class="s2">&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">111</span><span class="p">;</span> <span class="o">}</span>
+try<span class="o">()</span> <span class="o">{</span> <span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span> <span class="o">||</span> die <span class="s2">&quot;cannot </span><span class="nv">$*</span><span class="s2">&quot;</span><span class="p">;</span> <span class="o">}</span>
+</pre></div>
+
+
+<h1>Using The 3 finger claw technique</h1>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+
+yell<span class="o">()</span> <span class="o">{</span> <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">: </span><span class="nv">$*</span><span class="s2">&quot;</span> &gt;<span class="p">&amp;</span><span class="m">2</span><span class="p">;</span> <span class="o">}</span>
+die<span class="o">()</span> <span class="o">{</span> yell <span class="s2">&quot;</span><span class="nv">$*</span><span class="s2">&quot;</span><span class="p">;</span> <span class="nb">exit</span> <span class="m">111</span><span class="p">;</span> <span class="o">}</span>
+try<span class="o">()</span> <span class="o">{</span> <span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span> <span class="o">||</span> die <span class="s2">&quot;cannot </span><span class="nv">$*</span><span class="s2">&quot;</span><span class="p">;</span> <span class="o">}</span>
+
+<span class="c1"># using it</span>
+try <span class="nb">cd</span> /some/place
+tar tar xzvfp /another/place/stuff.tbz
+
+<span class="nb">exit</span> <span class="m">0</span>
+</pre></div>
+
+
+<h1>PART III: <a href="https://github.com/sstephenson/bats">Bats</a>: Bash Automated Testing System</h1>
+<blockquote>
+<p>Bats is a <a href="http://testanything.org/">TAP</a>-compliant testing framework for Bash. It provides a simple way to verify that the UNIX programs you write behave as expected.</p>
+</blockquote>
+<h2><a href="http://testanything.org/">TAP</a>: Test Anything Protocol</h2>
+<blockquote>
+<p>TAP, the Test Anything Protocol, is a simple text-based interface between testing modules in a test harness. TAP started life as part of the test harness for Perl but now has implementations in C, C++, Python, PHP, Perl, Java, JavaScript, and others.</p>
+</blockquote>
+<div class="highlight"><pre><span></span><span class="err">1..4</span>
+<span class="err">ok 1 - Input file opened</span>
+<span class="err">not ok 2 - First line of the input valid</span>
+<span class="err">ok 3 - Read the rest of the file</span>
+<span class="err">not ok 4 - Summarized correctly # TODO Not written yet</span>
+</pre></div>
+
+
+<h2><a href="http://testanything.org/">TAP</a>: Resources</h2>
+<ul>
+<li><a href="http://testanything.org/tap-specification.html">TAP Specification</a></li>
+<li><a href="http://testanything.org/producers.html">TAP Producers</a></li>
+<li><a href="http://testanything.org/consumers.html">TAP Consumers</a></li>
+<li><a href="http://testanything.org/history.html">TAP History</a></li>
+</ul>
+<h2><a href="https://github.com/sstephenson/bats">Bats</a>: Bash Automated Testing System</h2>
+<blockquote>
+<p>Bats is a <a href="http://testanything.org/">TAP</a>-compliant testing framework for Bash. It provides a simple way to verify that the UNIX programs you write behave as expected.</p>
+</blockquote>
+<h2><a href="https://github.com/sstephenson/bats">Bats</a>: Installation</h2>
+<div class="highlight"><pre><span></span>$ git clone https://github.com/sstephenson/bats.git
+$ <span class="nb">cd</span> bats
+$ doas ./install.sh /usr/local
+</pre></div>
+
+
+<h2><a href="https://github.com/sstephenson/bats">Bats</a>: Writing Tests</h2>
+<div class="highlight"><pre><span></span>$ cat test.bats
+<span class="c1">#!/usr/bin/env bats</span>
+
+@test <span class="s2">&quot;addition using bc&quot;</span> <span class="o">{</span>
+  <span class="nv">result</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">echo</span> <span class="m">2</span>+2 <span class="p">|</span> bc<span class="k">)</span><span class="s2">&quot;</span>
+  <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$result</span><span class="s2">&quot;</span> -eq <span class="m">4</span> <span class="o">]</span>
+<span class="o">}</span>
+
+@test <span class="s2">&quot;addition using dc&quot;</span> <span class="o">{</span>
+  <span class="nv">result</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">echo</span> <span class="m">2</span> <span class="m">2</span>+p <span class="p">|</span> dc<span class="k">)</span><span class="s2">&quot;</span>
+  <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$result</span><span class="s2">&quot;</span> -eq <span class="m">4</span> <span class="o">]</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h3><a href="https://github.com/sstephenson/bats">Bats</a>: Running Tests</h3>
+<div class="highlight"><pre><span></span>$ bats test.bats 
+ ✓ addition using bc
+ ✓ addition using dc
+</pre></div>
+
+
+<p><strong>WAIT, THAT'S NOT TAP COMPLIANT</strong></p>
+<h3><a href="https://github.com/sstephenson/bats">Bats</a>: Running Tests (Cont.)</h3>
+<div class="highlight"><pre><span></span>$ bats --tap test.bats
+<span class="m">1</span>..2
+ok <span class="m">1</span> addition using bc
+ok <span class="m">2</span> addition using dc
+</pre></div>
+
+
+<h3><a href="https://github.com/sstephenson/bats">Bats</a>: Writing Tests; <code>run</code> command</h3>
+<div class="highlight"><pre><span></span>@test <span class="s2">&quot;invoking foo with a nonexistent file prints an error&quot;</span> <span class="o">{</span>
+  run foo nonexistent_filename
+  <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$status</span><span class="s2">&quot;</span> -eq <span class="m">1</span> <span class="o">]</span>
+  <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$output</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="s2">&quot;foo: no such file &#39;nonexistent_filename&#39;&quot;</span> <span class="o">]</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h3><a href="https://github.com/sstephenson/bats">Bats</a>: Writing Tests; <code>load</code> command</h3>
+<div class="highlight"><pre><span></span>load test_helper
+</pre></div>
+
+
+<h3><a href="https://github.com/sstephenson/bats">Bats</a>: Writing Tests; <code>skip</code> command</h3>
+<div class="highlight"><pre><span></span>$ cat test.bats
+@test <span class="s2">&quot;A test I don`t want to execute for now&quot;</span> <span class="o">{</span>
+  skip <span class="s2">&quot;This command will return zero soon, but not now&quot;</span>
+  run foo
+  <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$status</span><span class="s2">&quot;</span> -eq <span class="m">0</span> <span class="o">]</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>Running Skiped Tests</p>
+<div class="highlight"><pre><span></span>$ bats test.bats
+ - A <span class="nb">test</span> I don<span class="sb">`</span>t want to execute <span class="k">for</span> now <span class="o">(</span>skipped: This <span class="nb">command</span> will <span class="k">return</span> zero soon, but not now<span class="o">)</span>
+
+<span class="m">1</span> test, <span class="m">0</span> failures, <span class="m">1</span> skipped
+</pre></div>
+
+
+<h3><a href="https://github.com/sstephenson/bats">Bats</a>: Writing Tests; <code>skip</code> command (Cont.)</h3>
+<div class="highlight"><pre><span></span>@test <span class="s2">&quot;A test which should run only when bar is foo&quot;</span> <span class="o">{</span>
+  <span class="o">[</span> foo !<span class="o">=</span> bar <span class="o">]</span> <span class="o">&amp;&amp;</span> skip <span class="s2">&quot;foo isn&#39;t bar&quot;</span>
+
+  run foo
+  <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$status</span><span class="s2">&quot;</span> -eq <span class="m">0</span> <span class="o">]</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h3><a href="https://github.com/sstephenson/bats">Bats</a>: Writing Tests; <code>setup</code> and <code>teardown</code> functions</h3>
+<div class="highlight"><pre><span></span>setup<span class="o">()</span>
+<span class="o">{</span>
+  /* Initialization call per <span class="nb">test</span> calls */
+<span class="o">}</span>
+
+teardown<span class="o">()</span>
+<span class="o">{</span>
+  /* Finalization call per <span class="nb">test</span> calls */
+<span class="o">}</span>
+</pre></div>
+
+
+<h2><a href="https://github.com/sstephenson/bats">Bats</a>: Continues Integration Support</h2>
+<div class="highlight"><pre><span></span>$ cat .travis.yml
+before_install:
+  - sudo add-apt-repository ppa:duggan/bats --yes
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq bats
+script:
+  - bats test/bats
+</pre></div>
+
+
+<h3><a href="https://github.com/sstephenson/bats">Bats</a>: Helpers</h3>
+<ul>
+<li><a href="https://github.com/ztombol/bats-support">bats-support</a></li>
+<li><a href="https://github.com/ztombol/bats-assert">bats-assert</a></li>
+<li>Definitely your own helper</li>
+</ul>
+<h3><a href="https://github.com/sstephenson/bats">Bats</a>: Helpers (Cont)</h3>
+<div class="highlight"><pre><span></span>config<span class="o">()</span> <span class="o">{</span>
+  <span class="nv">command</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+  <span class="k">while</span> <span class="nb">read</span> line<span class="p">;</span> <span class="k">do</span>
+    <span class="nv">command</span><span class="o">+=</span><span class="s2">&quot;-c &#39;</span><span class="nv">$line</span><span class="s2">&#39; &quot;</span>
+  <span class="k">done</span>
+  bash -c <span class="s2">&quot;prog </span><span class="nv">$command</span><span class="s2">&quot;</span>
+<span class="o">}</span>
+remote<span class="o">()</span> <span class="o">{</span>
+ <span class="nv">host</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span>
+ <span class="nv">command</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="p">@:</span><span class="nv">2</span><span class="si">}</span><span class="s2">&quot;</span>
+ ssh <span class="nv">$host</span> <span class="s2">&quot;</span><span class="k">$(</span><span class="nb">typeset</span> -f<span class="k">)</span><span class="s2">; </span><span class="nv">$command</span><span class="s2">&quot;</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h1>Resources</h1>
+<ul>
+<li><a href="http://www.nycbug.org/index.cgi?action=view&amp;id=10640">shell-fu, NYCBUG (2016)</a></li>
+<li><a href="https://www.engineyard.com/blog/bats-test-command-line-tools">How to use Bats to test your command line tools</a></li>
+<li><a href="https://medium.com/@pimterry/testing-your-shell-scripts-with-bats-abfca9bdc5b9">Testing Your Shell Scripts, with Bats</a></li>
+<li><a href="http://softwaretester.info/automate-bash-testing-with-bats/">Automate Bash testing with Bats</a></li>
+<li><a href="http://rnowling.github.io/software/engineering/2017/02/04/testing-cli-apps-with-bats.html">Testing CLI Apps with Bats</a></li>
+</ul>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/shell.html">Shell</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/scripting.html">Scripting</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/bats.html">Bats</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/sh.html">sh</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
+                        <p class="author-description">
+                          
+            I Love to Read, Code and Explore the Possibilities.
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'bijanebrahimi';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="http://bijanebrahimi.github.io/blog/" title="Routines Excluded">Routines Excluded</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/books.html">Books</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/freebsd.html">FreeBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/gist.html">Gist</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/git.html">Git</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/linux.html">Linux</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html">OpenBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/projects.html">Projects</a>
+        <a href="https://github.com/bijanebrahimi/blog">Fork Me on Github</a>
+
+    </footer>
+
+</body>
+</html>

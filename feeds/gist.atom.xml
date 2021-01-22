@@ -1,5 +1,271 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - Gist</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/gist.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-02-20T20:12:00+03:30</updated><entry><title>Graphviz in markdown</title><link href="http://bijanebrahimi.github.io/blog/graphviz-in-markdown.html" rel="alternate"></link><published>2017-02-20T20:12:00+03:30</published><updated>2017-02-20T20:12:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-20:/blog/graphviz-in-markdown.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - Gist</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/gist.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-11-27T20:50:00+03:30</updated><entry><title>Fine Tuned Shell Scripting and Bash Automated Testing System Using Bats</title><link href="http://bijanebrahimi.github.io/blog/fine-tuned-shell-scripting-and-bash-automated-testing-system-using-bats.html" rel="alternate"></link><published>2017-11-27T20:50:00+03:30</published><updated>2017-11-27T20:50:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-11-27:/blog/fine-tuned-shell-scripting-and-bash-automated-testing-system-using-bats.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Last Saturday, I gave a brief presentation on shell scripting and bats, a bash
+based automated testing system at &lt;a href="http://mashhadbug.org"&gt;MashhadBUG&lt;/a&gt;. Please Don't forget to check
+the references at the end of the post.&lt;/p&gt;
+&lt;h1&gt;Table of Contents&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;PART I: &lt;a href="http://blackskyresearch.net/shelltables.txt"&gt;Shell Tables&lt;/a&gt; by Isaac Levy&lt;/li&gt;
+&lt;li&gt;PART II: &lt;a href="http://www.nycbug.org/index.cgi?action=view&amp;amp;id=10640"&gt;The 3 finger claw …&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Last Saturday, I gave a brief presentation on shell scripting and bats, a bash
+based automated testing system at &lt;a href="http://mashhadbug.org"&gt;MashhadBUG&lt;/a&gt;. Please Don't forget to check
+the references at the end of the post.&lt;/p&gt;
+&lt;h1&gt;Table of Contents&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;PART I: &lt;a href="http://blackskyresearch.net/shelltables.txt"&gt;Shell Tables&lt;/a&gt; by Isaac Levy&lt;/li&gt;
+&lt;li&gt;PART II: &lt;a href="http://www.nycbug.org/index.cgi?action=view&amp;amp;id=10640"&gt;The 3 finger claw technique&lt;/a&gt; by Isaac Levy&lt;/li&gt;
+&lt;li&gt;PART III: &lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Bash Automated Testing System&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;PART I: &lt;a href="http://blackskyresearch.net/shelltables.txt"&gt;Shell Tables&lt;/a&gt; by Isaac Levy&lt;/h1&gt;
+&lt;h2&gt;I/O Redirection&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ prog &amp;gt; file       &lt;span class="c1"&gt;# direct stdout to file&lt;/span&gt;
+$ prog &amp;gt;&amp;gt; file      &lt;span class="c1"&gt;# append stdout to file&lt;/span&gt;
+$ prog &amp;lt; file       &lt;span class="c1"&gt;# take standard input from file&lt;/span&gt;
+$ &amp;lt; file prog
+$ prog1 &lt;span class="p"&gt;|&lt;/span&gt; prog2 &lt;span class="c1"&gt;# connect standard output of p1 to standard input of p2&lt;/span&gt;
+$ prog &lt;span class="s"&gt;&amp;lt;&amp;lt;HEREDOC    # H&lt;/span&gt;ereDoc
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Commands&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ prog1&lt;span class="p"&gt;;&lt;/span&gt; prog2      &lt;span class="c1"&gt;# command terminator&lt;/span&gt;
+$ prog1 &lt;span class="p"&gt;&amp;amp;&lt;/span&gt; prog2     &lt;span class="c1"&gt;# like ; but doesn&amp;#39;t wait for p1 to finish&lt;/span&gt;
+$ &lt;span class="sb"&gt;`&lt;/span&gt;prog1&lt;span class="sb"&gt;`&lt;/span&gt;       &lt;span class="c1"&gt;# run command, output replaces&lt;/span&gt;
+$ &lt;span class="o"&gt;(&lt;/span&gt;prog1&lt;span class="o"&gt;)&lt;/span&gt;       &lt;span class="c1"&gt;# run command in sub-shell&lt;/span&gt;
+$ &lt;span class="o"&gt;{&lt;/span&gt;prog1&lt;span class="o"&gt;}&lt;/span&gt;       &lt;span class="c1"&gt;# run command in current-shell&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Shell Scripts&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;$0&lt;/span&gt;...&lt;span class="nv"&gt;$9&lt;/span&gt;         &lt;span class="c1"&gt;# positional arguments&lt;/span&gt;
+&lt;span class="nv"&gt;$#&lt;/span&gt;          &lt;span class="c1"&gt;# total number of arguments&lt;/span&gt;
+&lt;span class="nv"&gt;$*&lt;/span&gt;          &lt;span class="c1"&gt;# all the arguments as a single string (expanded/double-quoted)&lt;/span&gt;
+&lt;span class="nv"&gt;$@&lt;/span&gt;          &lt;span class="c1"&gt;# all the arguments as separate strings (expanded/double-quoted)&lt;/span&gt;
+&lt;span class="nv"&gt;$$&lt;/span&gt;          &lt;span class="c1"&gt;# pid of current shell process&lt;/span&gt;
+&lt;span class="nv"&gt;$!&lt;/span&gt;          &lt;span class="c1"&gt;# pid of last background command&lt;/span&gt;
+&lt;span class="nv"&gt;$?&lt;/span&gt;          &lt;span class="c1"&gt;# exit status of previous command&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Evaluation and Substitution of Shell Variables&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;$var&lt;/span&gt;            &lt;span class="c1"&gt;# Value of &amp;#39;var&amp;#39;&lt;/span&gt;
+&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;          &lt;span class="c1"&gt;# useful if alphanumerics follows&lt;/span&gt;
+&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="p"&gt;-thing&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;        &lt;span class="c1"&gt;# &amp;#39;var&amp;#39; if defined, O.W thing&lt;/span&gt;
+&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="k"&gt;:-&lt;/span&gt;&lt;span class="nv"&gt;word&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;        &lt;span class="c1"&gt;# &amp;#39;var&amp;#39; if exists and isn&amp;#39;t null, O.W &amp;#39;word&amp;#39;&lt;/span&gt;
+&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="p"&gt;:=word&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;        &lt;span class="c1"&gt;# like above but changes var&lt;/span&gt;
+&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="p"&gt;:?message&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;     &lt;span class="c1"&gt;# abort if var doesn&amp;#39;t exist or is null&lt;/span&gt;
+&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="p"&gt;:+word&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;        &lt;span class="c1"&gt;# returns word if var exists and isn&amp;#39;t null&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;PART II: &lt;a href="http://www.nycbug.org/index.cgi?action=view&amp;amp;id=10640"&gt;The 3 finger claw technique&lt;/a&gt; by Isaac Levy&lt;/h1&gt;
+&lt;h1&gt;The Original 3 short functions&lt;/h1&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;shout&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$0&lt;/span&gt;&lt;span class="s2"&gt;: &lt;/span&gt;&lt;span class="nv"&gt;$*&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;}&lt;/span&gt; 
+barf&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt; shout &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$*&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;100&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;}&lt;/span&gt; 
+safe&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$@&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; barf &lt;span class="s2"&gt;&amp;quot;cannot &lt;/span&gt;&lt;span class="nv"&gt;$*&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;The 3 short functions&lt;/h1&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;yell&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$0&lt;/span&gt;&lt;span class="s2"&gt;: &lt;/span&gt;&lt;span class="nv"&gt;$*&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;}&lt;/span&gt;
+die&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt; yell &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$*&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;111&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;}&lt;/span&gt;
+try&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$@&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; die &lt;span class="s2"&gt;&amp;quot;cannot &lt;/span&gt;&lt;span class="nv"&gt;$*&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;Using The 3 finger claw technique&lt;/h1&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/sh&lt;/span&gt;
+
+yell&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$0&lt;/span&gt;&lt;span class="s2"&gt;: &lt;/span&gt;&lt;span class="nv"&gt;$*&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;}&lt;/span&gt;
+die&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt; yell &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$*&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;111&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;}&lt;/span&gt;
+try&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$@&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; die &lt;span class="s2"&gt;&amp;quot;cannot &lt;/span&gt;&lt;span class="nv"&gt;$*&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# using it&lt;/span&gt;
+try &lt;span class="nb"&gt;cd&lt;/span&gt; /some/place
+tar tar xzvfp /another/place/stuff.tbz
+
+&lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;PART III: &lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Bash Automated Testing System&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Bats is a &lt;a href="http://testanything.org/"&gt;TAP&lt;/a&gt;-compliant testing framework for Bash. It provides a simple way to verify that the UNIX programs you write behave as expected.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;&lt;a href="http://testanything.org/"&gt;TAP&lt;/a&gt;: Test Anything Protocol&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;TAP, the Test Anything Protocol, is a simple text-based interface between testing modules in a test harness. TAP started life as part of the test harness for Perl but now has implementations in C, C++, Python, PHP, Perl, Java, JavaScript, and others.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;1..4&lt;/span&gt;
+&lt;span class="err"&gt;ok 1 - Input file opened&lt;/span&gt;
+&lt;span class="err"&gt;not ok 2 - First line of the input valid&lt;/span&gt;
+&lt;span class="err"&gt;ok 3 - Read the rest of the file&lt;/span&gt;
+&lt;span class="err"&gt;not ok 4 - Summarized correctly # TODO Not written yet&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;&lt;a href="http://testanything.org/"&gt;TAP&lt;/a&gt;: Resources&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://testanything.org/tap-specification.html"&gt;TAP Specification&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://testanything.org/producers.html"&gt;TAP Producers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://testanything.org/consumers.html"&gt;TAP Consumers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://testanything.org/history.html"&gt;TAP History&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Bash Automated Testing System&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Bats is a &lt;a href="http://testanything.org/"&gt;TAP&lt;/a&gt;-compliant testing framework for Bash. It provides a simple way to verify that the UNIX programs you write behave as expected.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Installation&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ git clone https://github.com/sstephenson/bats.git
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; bats
+$ doas ./install.sh /usr/local
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Writing Tests&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat test.bats
+&lt;span class="c1"&gt;#!/usr/bin/env bats&lt;/span&gt;
+
+@test &lt;span class="s2"&gt;&amp;quot;addition using bc&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="nv"&gt;result&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;+2 &lt;span class="p"&gt;|&lt;/span&gt; bc&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+  &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; -eq &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+@test &lt;span class="s2"&gt;&amp;quot;addition using dc&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="nv"&gt;result&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;+p &lt;span class="p"&gt;|&lt;/span&gt; dc&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+  &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; -eq &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Running Tests&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ bats test.bats 
+ ✓ addition using bc
+ ✓ addition using dc
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;WAIT, THAT'S NOT TAP COMPLIANT&lt;/strong&gt;&lt;/p&gt;
+&lt;h3&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Running Tests (Cont.)&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ bats --tap test.bats
+&lt;span class="m"&gt;1&lt;/span&gt;..2
+ok &lt;span class="m"&gt;1&lt;/span&gt; addition using bc
+ok &lt;span class="m"&gt;2&lt;/span&gt; addition using dc
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Writing Tests; &lt;code&gt;run&lt;/code&gt; command&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;@test &lt;span class="s2"&gt;&amp;quot;invoking foo with a nonexistent file prints an error&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+  run foo nonexistent_filename
+  &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$status&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; -eq &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;
+  &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$output&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;foo: no such file &amp;#39;nonexistent_filename&amp;#39;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Writing Tests; &lt;code&gt;load&lt;/code&gt; command&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;load test_helper
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Writing Tests; &lt;code&gt;skip&lt;/code&gt; command&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat test.bats
+@test &lt;span class="s2"&gt;&amp;quot;A test I don`t want to execute for now&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+  skip &lt;span class="s2"&gt;&amp;quot;This command will return zero soon, but not now&amp;quot;&lt;/span&gt;
+  run foo
+  &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$status&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; -eq &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Running Skiped Tests&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ bats test.bats
+ - A &lt;span class="nb"&gt;test&lt;/span&gt; I don&lt;span class="sb"&gt;`&lt;/span&gt;t want to execute &lt;span class="k"&gt;for&lt;/span&gt; now &lt;span class="o"&gt;(&lt;/span&gt;skipped: This &lt;span class="nb"&gt;command&lt;/span&gt; will &lt;span class="k"&gt;return&lt;/span&gt; zero soon, but not now&lt;span class="o"&gt;)&lt;/span&gt;
+
+&lt;span class="m"&gt;1&lt;/span&gt; test, &lt;span class="m"&gt;0&lt;/span&gt; failures, &lt;span class="m"&gt;1&lt;/span&gt; skipped
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Writing Tests; &lt;code&gt;skip&lt;/code&gt; command (Cont.)&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;@test &lt;span class="s2"&gt;&amp;quot;A test which should run only when bar is foo&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="o"&gt;[&lt;/span&gt; foo !&lt;span class="o"&gt;=&lt;/span&gt; bar &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; skip &lt;span class="s2"&gt;&amp;quot;foo isn&amp;#39;t bar&amp;quot;&lt;/span&gt;
+
+  run foo
+  &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$status&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; -eq &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Writing Tests; &lt;code&gt;setup&lt;/code&gt; and &lt;code&gt;teardown&lt;/code&gt; functions&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;setup&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;span class="o"&gt;{&lt;/span&gt;
+  /* Initialization call per &lt;span class="nb"&gt;test&lt;/span&gt; calls */
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+teardown&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;span class="o"&gt;{&lt;/span&gt;
+  /* Finalization call per &lt;span class="nb"&gt;test&lt;/span&gt; calls */
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Continues Integration Support&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat .travis.yml
+before_install:
+  - sudo add-apt-repository ppa:duggan/bats --yes
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq bats
+script:
+  - bats test/bats
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Helpers&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/ztombol/bats-support"&gt;bats-support&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/ztombol/bats-assert"&gt;bats-assert&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Definitely your own helper&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;&lt;a href="https://github.com/sstephenson/bats"&gt;Bats&lt;/a&gt;: Helpers (Cont)&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;config&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="nv"&gt;command&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;
+  &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="nb"&gt;read&lt;/span&gt; line&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+    &lt;span class="nv"&gt;command&lt;/span&gt;&lt;span class="o"&gt;+=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-c &amp;#39;&lt;/span&gt;&lt;span class="nv"&gt;$line&lt;/span&gt;&lt;span class="s2"&gt;&amp;#39; &amp;quot;&lt;/span&gt;
+  &lt;span class="k"&gt;done&lt;/span&gt;
+  bash -c &lt;span class="s2"&gt;&amp;quot;prog &lt;/span&gt;&lt;span class="nv"&gt;$command&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+remote&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+ &lt;span class="nv"&gt;host&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+ &lt;span class="nv"&gt;command&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="p"&gt;@:&lt;/span&gt;&lt;span class="nv"&gt;2&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+ ssh &lt;span class="nv"&gt;$host&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nb"&gt;typeset&lt;/span&gt; -f&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;; &lt;/span&gt;&lt;span class="nv"&gt;$command&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;Resources&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://www.nycbug.org/index.cgi?action=view&amp;amp;id=10640"&gt;shell-fu, NYCBUG (2016)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.engineyard.com/blog/bats-test-command-line-tools"&gt;How to use Bats to test your command line tools&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://medium.com/@pimterry/testing-your-shell-scripts-with-bats-abfca9bdc5b9"&gt;Testing Your Shell Scripts, with Bats&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://softwaretester.info/automate-bash-testing-with-bats/"&gt;Automate Bash testing with Bats&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://rnowling.github.io/software/engineering/2017/02/04/testing-cli-apps-with-bats.html"&gt;Testing CLI Apps with Bats&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Gist"></category><category term="Shell"></category><category term="Scripting"></category><category term="Bats"></category><category term="sh"></category></entry><entry><title>Smallest and Longest Manpage you ever read</title><link href="http://bijanebrahimi.github.io/blog/smallest-and-longest-manpage-you-ever-read.html" rel="alternate"></link><published>2017-10-31T21:53:00+03:30</published><updated>2017-10-31T21:53:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-31:/blog/smallest-and-longest-manpage-you-ever-read.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Recently I asked a question on OpenSD IRC channel which led to a question
+entirely different. What's the smallest/longest manpage you ever read?&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ find /usr/local/share/man -type f -exec wc -l &lt;span class="o"&gt;{}&lt;/span&gt; &lt;span class="se"&gt;\;&lt;/span&gt;  &lt;span class="p"&gt;|&lt;/span&gt; sort
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;On OpenBSD 6.2, the smallest is &lt;a href="https://man.openbsd.org/dcphy.4"&gt;dcphy(4)&lt;/a&gt; with 23 lines and the …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Recently I asked a question on OpenSD IRC channel which led to a question
+entirely different. What's the smallest/longest manpage you ever read?&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ find /usr/local/share/man -type f -exec wc -l &lt;span class="o"&gt;{}&lt;/span&gt; &lt;span class="se"&gt;\;&lt;/span&gt;  &lt;span class="p"&gt;|&lt;/span&gt; sort
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;On OpenBSD 6.2, the smallest is &lt;a href="https://man.openbsd.org/dcphy.4"&gt;dcphy(4)&lt;/a&gt; with 23 lines and the longest
+(by far distance) is &lt;a href="https://man.openbsd.org/perltoc.1"&gt;perltoc(1)&lt;/a&gt; with 33106 lines. But what's the longest
+manpage you actually read?&lt;/p&gt;</content><category term="Gist"></category><category term="OpenBSD"></category><category term="Manpages"></category></entry><entry><title>Graphviz in markdown</title><link href="http://bijanebrahimi.github.io/blog/graphviz-in-markdown.html" rel="alternate"></link><published>2017-02-20T20:12:00+03:30</published><updated>2017-02-20T20:12:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-20:/blog/graphviz-in-markdown.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;There is a good tutorial on &lt;a href="https://github.com/TLmaK0/gravizo"&gt;How to include graphviz graphs in github&lt;/a&gt;. Basically it introduced me to an online web service which takes graphviz scripts as part of a url query string and renders it into an image type. It is a very good idea for many reasons …&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;There is a good tutorial on &lt;a href="https://github.com/TLmaK0/gravizo"&gt;How to include graphviz graphs in github&lt;/a&gt;. Basically it introduced me to an online web service which takes graphviz scripts as part of a url query string and renders it into an image type. It is a very good idea for many reasons. One, the graph is still plain text and searchable inside source files, Second, editing an already drawn graph inside a wiki page is now very easy and the dot files are pretty easy to write.&lt;/p&gt;
 &lt;h1&gt;Problem?&lt;/h1&gt;
@@ -76,7 +342,7 @@ $ gitlab-ctl restart nginx
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Hope it helps other people as well :-)&lt;/p&gt;</content><category term="gitlab"></category><category term="wiki"></category><category term="graphviz"></category><category term="debian"></category><category term="omnibus"></category><category term="apache"></category><category term="nginx"></category><category term="php"></category><category term="dot"></category><category term="svg"></category></entry><entry><title>GCC Cross-Compiler</title><link href="http://bijanebrahimi.github.io/blog/gcc-cross-compiler.html" rel="alternate"></link><published>2017-02-17T12:04:00+03:30</published><updated>2017-02-17T12:04:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-17:/blog/gcc-cross-compiler.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Hope it helps other people as well :-)&lt;/p&gt;</content><category term="Gist"></category><category term="gitlab"></category><category term="wiki"></category><category term="graphviz"></category><category term="debian"></category><category term="omnibus"></category><category term="apache"></category><category term="nginx"></category><category term="php"></category><category term="dot"></category><category term="svg"></category></entry><entry><title>GCC Cross-Compiler</title><link href="http://bijanebrahimi.github.io/blog/gcc-cross-compiler.html" rel="alternate"></link><published>2017-02-17T12:04:00+03:30</published><updated>2017-02-17T12:04:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-17:/blog/gcc-cross-compiler.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;blockquote&gt;
 &lt;p&gt;A cross compiler is a compiler capable of creating executable code for a platform other than the one on which the compiler is running. For example, a compiler that runs on a Windows 7 PC but generates code that runs on Android smartphone is a cross compiler.&lt;/p&gt;
 &lt;p&gt;--&lt;a href="https://en.wikipedia.org/wiki/Crosscompiler"&gt;Wikipedia&lt;/a&gt;&lt;/p&gt;
@@ -105,8 +371,8 @@ $ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/spa
 
 
 &lt;p&gt;One more important note before start compiling is that we need the head-files and libraries of the target machine. So we should copy &lt;code&gt;/lib&lt;/code&gt; and &lt;code&gt;/include&lt;/code&gt; directories from our freebsd machine to our cross-build directory:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="n"&gt;mkdir&lt;/span&gt; -&lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="nv"&gt;$TARGET_PREFIX&lt;/span&gt;{,&lt;span class="sr"&gt;/lib,/&lt;/span&gt;&lt;span class="n"&gt;include&lt;/span&gt;}
-&lt;span class="c c-Singleline"&gt;# copy /lib and /include directories from our freebsd machine in our target $TARGET_PREFIX directory.&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;mkdir&lt;/span&gt; -&lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="nv"&gt;$TARGET_PREFIX&lt;/span&gt;{,&lt;span class="sr"&gt;/lib,/&lt;/span&gt;&lt;span class="n"&gt;include&lt;/span&gt;}
+&lt;span class="c1"&gt;# copy /lib and /include directories from our freebsd machine in our target $TARGET_PREFIX directory.&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -116,14 +382,14 @@ $ wget https://ftp.gnu.org/gnu/binutils/binutils-2.27.tar.gz
 $ tar zxvf binutils-2.27.tar.gz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-binutils
 $ ../binutils-2.27/configure --target&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt; --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; -v
-$ make -j 4
+$ make -j &lt;span class="m"&gt;4&lt;/span&gt;
 $ sudo make install
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;GCC also depends on the following components:
-&lt;em&gt; GMP: GNU Multiple Precision Arithmetic Library
-&lt;/em&gt; MPFR: GNU Multiple-precision floating-point rounding library
+* GMP: GNU Multiple Precision Arithmetic Library
+* MPFR: GNU Multiple-precision floating-point rounding library
 * MPC: GNU Multiple-precision C library&lt;/p&gt;
 &lt;p&gt;To build our cross-compiler, we need to compile these dependencies but since these dependencies should produce code for our target machine, we need to build them for the host option set to our tagret (&lt;code&gt;--host=amd64-marcel-freebsd9.2&lt;/code&gt;):&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ mkdir build-gmp
@@ -131,7 +397,7 @@ $ wget https://ftp.gnu.org/gnu/gmp/gmp-6.1.1.tar.xz
 $ tar xvf gmp-6.1.1.tar.xz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-gmp
 $ ../gmp-6.1.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --enable-shared --enable-static --enable-mpbsd --enable-fft --enable-cxx --host&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
-$ make -j 4
+$ make -j &lt;span class="m"&gt;4&lt;/span&gt;
 $ sudo make install
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
 
@@ -140,7 +406,7 @@ $ wget https://ftp.gnu.org/gnu/mpfr/mpfr-3.1.5.tar.xz
 $ tar xvf mpfr-3.1.5.tar.xz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-mpfr
 $ ../mpfr-3.1.5/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;  --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
-$ make -j 4
+$ make -j &lt;span class="m"&gt;4&lt;/span&gt;
 $ sudo make install
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
 
@@ -149,7 +415,7 @@ $ wget https://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz
 $ tar zxvf mpc-1.0.3.tar.gz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-mpc
 $ ../mpc-1.0.3/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-gnu-ld --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --enable-static --enable-shared --host&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
-$ make -j 4
+$ make -j &lt;span class="m"&gt;4&lt;/span&gt;
 $ sudo make install
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; ..
 &lt;/pre&gt;&lt;/div&gt;
@@ -161,23 +427,23 @@ $ wget https://ftp.gnu.org/gnu/gcc/gcc-6.2.0/gcc-6.2.0.tar.gz
 $ tar zxvf gcc-6.2.0.tar.gz
 $ &lt;span class="nb"&gt;cd&lt;/span&gt; build-gcc
 $ ../gcc-6.2.0/configure --without-headers --with-gnu-as --with-gnu-ld --enable-languages&lt;span class="o"&gt;=&lt;/span&gt;c,c++ --disable-nls --enable-libssp --enable-gold --enable-ld --target&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt; --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-gmp&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-mpc&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --with-mpfr&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --disable-libgomp
-$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/lib make -j 4
+$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/lib make -j &lt;span class="m"&gt;4&lt;/span&gt;
 $ sudo make install
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Now, we should have our own cross-compiler's toolchain in &lt;code&gt;/usr/cross-build/bin&lt;/code&gt; directory. To use it we should include it in our &lt;code&gt;$PATH&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="x"&gt;export PATH=&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="x"&gt;:&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;PREFIX&lt;/span&gt;&lt;span class="x"&gt;/bin&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;export&lt;/span&gt; &lt;span class="n"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=$&lt;/span&gt;&lt;span class="n"&gt;PATH&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;PREFIX&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;bin&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;To test our own cross-compiler, we simply run:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcc main.c -o helloworld-linux
-$ file helloword-linux
-main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;SYSV&lt;span class="o"&gt;)&lt;/span&gt;, dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, &lt;span class="k"&gt;for&lt;/span&gt; GNU/Linux 2.6.32, BuildID&lt;span class="o"&gt;[&lt;/span&gt;sha1&lt;span class="o"&gt;]=&lt;/span&gt;ca5ba57ac722ef8521d50ee8ecbbdca4b44a76e1, not stripped
-$ &lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt;/lib amd64-marcel-freebsd9.2-gcc helloworld.c -o helloworld-freebsd
-$ file helloworld-freebsd
-main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;FreeBSD&lt;span class="o"&gt;)&lt;/span&gt;, dynamically linked, interpreter /libexec/ld-elf.so.1, &lt;span class="k"&gt;for&lt;/span&gt; FreeBSD 9.2, not stripped
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;gcc&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;o&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;helloworld&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;linux&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;file&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;helloword&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;linux&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="nl"&gt;main&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ELF&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nc"&gt;bit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;LSB&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;executable&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;x86&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;64&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;SYSV&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dynamically&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linked&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;interpreter&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;lib64&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;ld&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;linux&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x86&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;64.&lt;/span&gt;&lt;span class="n"&gt;so&lt;/span&gt;&lt;span class="mf"&gt;.2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;GNU&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;Linux&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;2.6.32&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;BuildID&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="n"&gt;sha1&lt;/span&gt;&lt;span class="o"&gt;]=&lt;/span&gt;&lt;span class="n"&gt;ca5ba57ac722ef8521d50ee8ecbbdca4b44a76e1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ow"&gt;not&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;stripped&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="k"&gt;PREFIX&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;lib&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;amd64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;marcel&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;freebsd9&lt;/span&gt;&lt;span class="mf"&gt;.2&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;gcc&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;helloworld&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;o&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;helloworld&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;freebsd&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;file&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;helloworld&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;freebsd&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="nl"&gt;main&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ELF&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nc"&gt;bit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;LSB&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;executable&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;x86&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;64&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;FreeBSD&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dynamically&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;linked&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;interpreter&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;libexec&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;ld&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;elf&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;so&lt;/span&gt;&lt;span class="mf"&gt;.1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;FreeBSD&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;9.2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ow"&gt;not&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;stripped&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -185,12 +451,12 @@ main: ELF 64-bit LSB executable, x86-64, version &lt;span class="m"&gt;1&lt;/spa
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ wget https://ftp.gnu.org/gnu/gdb/gdb-7.11.tar.xz
 $ tar xvf gdb-7.11.tar.xz
 $ ../gdb-7.11.1/configure --prefix&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$PREFIX&lt;/span&gt; --target&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$TARGET&lt;/span&gt;
-$ make -j 4
+$ make -j &lt;span class="m"&gt;4&lt;/span&gt;
 $ sudo make install
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;You can see the whole compile process in my &lt;a href="https://gist.github.com/bijanebrahimi/62596745808f8667c40ff91b07d9e7b8"&gt;github gist&lt;/a&gt;.&lt;/p&gt;</content><category term="gist"></category><category term="gcc"></category><category term="cross-compiler"></category><category term="freebsd"></category><category term="linux"></category><category term="compiler"></category></entry><entry><title>A dropdown Tiling Terminal for i3-wm</title><link href="http://bijanebrahimi.github.io/blog/a-dropdown-tiling-terminal-for-i3-wm.html" rel="alternate"></link><published>2016-02-27T14:27:00+03:30</published><updated>2016-02-27T14:27:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-27:/blog/a-dropdown-tiling-terminal-for-i3-wm.html</id><summary type="html">&lt;p&gt;&lt;a href="http://i3wm.org/docs/userguide.html#_scratchpad"&gt;Scratchpad&lt;/a&gt; is one of the
+&lt;p&gt;You can see the whole compile process in my &lt;a href="https://gist.github.com/bijanebrahimi/62596745808f8667c40ff91b07d9e7b8"&gt;github gist&lt;/a&gt;.&lt;/p&gt;</content><category term="Gist"></category><category term="gist"></category><category term="gcc"></category><category term="cross-compiler"></category><category term="freebsd"></category><category term="linux"></category><category term="compiler"></category></entry><entry><title>A dropdown Tiling Terminal for i3-wm</title><link href="http://bijanebrahimi.github.io/blog/a-dropdown-tiling-terminal-for-i3-wm.html" rel="alternate"></link><published>2016-02-27T14:27:00+03:30</published><updated>2016-02-27T14:27:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2016-02-27:/blog/a-dropdown-tiling-terminal-for-i3-wm.html</id><summary type="html">&lt;p&gt;&lt;a href="http://i3wm.org/docs/userguide.html#_scratchpad"&gt;Scratchpad&lt;/a&gt; is one of the
 coolest, and unique features in &lt;a href="http://i3wm.org"&gt;i3&lt;/a&gt;. Scratchpad is basically a
 hidden workspace that you can send your programs into it.&lt;/p&gt;
 &lt;blockquote&gt;
@@ -206,10 +472,10 @@ workspace&lt;/p&gt;
 &lt;p&gt;Using scratchpad, we can turn any terminal into a drop-down terminal. I'm using &lt;a href="http://www.tenshu.net/p/terminator.html"&gt;terminator&lt;/a&gt; which supports tiling (and more)
 and &lt;code&gt;F1&lt;/code&gt; key as hot key to toggle terminator since I have no other use for formally
 known help button key on linux.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Add this to your i3 config (~/.config/i3/config) and restart i3 (Super+Shift+R)
-exec --no-startup-id &amp;quot;terminator -m&amp;quot;
-for_window [class=&amp;quot;Terminator&amp;quot; title=&amp;quot;^((?!Terminator Preferences).)*$&amp;quot;] move scratchpad, move position 0 0, resize set 1366 768;
-bindsym F1 [class=&amp;quot;Terminator&amp;quot;] scratchpad show;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;# Add this to your i3 config (~/.config/i3/config) and restart i3 (Super+Shift+R)&lt;/span&gt;
+&lt;span class="err"&gt;exec --no-startup-id &amp;quot;terminator -m&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;for_window [class=&amp;quot;Terminator&amp;quot; title=&amp;quot;^((?!Terminator Preferences).)*$&amp;quot;] move scratchpad, move position 0 0, resize set 1366 768;&lt;/span&gt;
+&lt;span class="err"&gt;bindsym F1 [class=&amp;quot;Terminator&amp;quot;] scratchpad show;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -220,6 +486,6 @@ which is also in Scratchpad from showing. for example, Using the code below we
 can simply send any active programs into Scratchpad using &lt;code&gt;Super+Shift+F1&lt;/code&gt; key
 and retrieve them one by one by hitting &lt;code&gt;Super+F1&lt;/code&gt; and only by pressing &lt;code&gt;F1&lt;/code&gt; we
 can toggle &lt;strong&gt;Terminator&lt;/strong&gt;:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="x"&gt;bindsym &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;mod&lt;/span&gt;&lt;span class="x"&gt;+Shift+F1 move container to scratchpad&lt;/span&gt;
-&lt;span class="x"&gt;bindsym &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;mod&lt;/span&gt;&lt;span class="x"&gt;+F1 [class=&amp;quot;^((?!Terminator).)*&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt;&amp;quot;] scratchpad show&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</content><category term="linux"></category><category term="terminal"></category><category term="terminator"></category><category term="i3"></category><category term="scratchpad"></category></entry></feed>
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;bindsym $mod+Shift+F1 move container to scratchpad&lt;/span&gt;
+&lt;span class="err"&gt;bindsym $mod+F1 [class=&amp;quot;^((?!Terminator).)*$&amp;quot;] scratchpad show&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="Gist"></category><category term="linux"></category><category term="terminal"></category><category term="terminator"></category><category term="i3"></category><category term="scratchpad"></category></entry></feed>

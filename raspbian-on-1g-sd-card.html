@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Raspbian on 1G SD-Card</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="http://bijanebrahimi.github.io/blog/" class="pure-menu-heading  pure-menu-link">Routines Excluded</a>
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"></li>
+
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/pages/bookmarks.html" class="pure-menu-link">Bookmarks</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/books.html" class="pure-menu-link">Books</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="pure-menu-link">FreeBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="pure-menu-link">Gist</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/git.html" class="pure-menu-link">Git</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="pure-menu-link">OpenBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
+        </ul>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="category">Linux</a><br />
+
+    <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+    &mdash; <abbr title="2021-01-22T19:20:00+03:30">Fri 22 January 2021</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image-small">
+                <div class="title-container">
+                    <h1>Raspbian on 1G SD-Card</h1>
+                    <h4>How to Create a alter the Rasbian image to fit into 1G SD-Card</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <p>Recently I setup a raspberry pi as my home wireless router. It worked great,
+until I accidently broke the sd-card. I had a spare SD-Card but it was only
+a 1GB memory. Considering the 1.8GB raspbian image (after decompressing),
+something had to be done to shrink
+the image size to fit into a 1GB SD-Card. Here's the <strong>How To</strong> but I should
+warn, the following instructions to be executed very carefully or you might wipe
+the wrong storage and lose the precious data.</p>
+<p><strong>Note:</strong> Most of the following commands are to be executed with root privileges.
+Please ensure you understand them before trying to execute them.</p>
+<p>First I needed to create an image, with the right size to fit exactly into my
+1GB SC-Card. To check the size of the media, simply execute <code>fdisk -l</code>. My SD-Card
+has around <strong>940MB</strong> capacity, So the following command creates an image file
+with the exact size:</p>
+<div class="highlight"><pre><span></span>truncate -s 940M sd-card.img
+</pre></div>
+
+
+<p>The instructions to create partition table on the image, should be done
+on a block device.
+The next step is to create block devices from the raspberry image and my
+own image. Here I choose <code>/dev/loop1</code> for the rasbian image file and <code>/dev/loop2</code>
+for the custom image file.</p>
+<div class="highlight"><pre><span></span>losetup /dev/loop1 <span class="m">2020</span>-05-27-raspios-buster-lite-armhf.img
+losetup /dev/loop2 sd-card.img
+</pre></div>
+
+
+<p>So, from now on, the <code>/dev/loop1</code> device, represents the raspbian image and the
+<code>/dev/loop2</code> device should represents my custom image device.</p>
+<p>Then, I needed to properly copy the boot instructions from the Raspbian into the image.
+The boot instructions are located after the partition table at sector zero and ends before
+the start position of the first partition. </p>
+<div class="highlight"><pre><span></span>fdisk -l /dev/loop1
+&lt;sniped&gt;
+Units: sectors of <span class="m">1</span> * <span class="nv">512</span> <span class="o">=</span> <span class="m">512</span> bytes
+&lt;sniped&gt;
+Device       Boot  Start     End Sectors  Size Id Type
+/dev/loop1p1        <span class="m">8192</span>  <span class="m">532479</span>  <span class="m">524288</span>  256M  c W95 FAT32 <span class="o">(</span>LBA<span class="o">)</span>
+/dev/loop1p2      <span class="m">532480</span> <span class="m">3620863</span> <span class="m">3088384</span>  <span class="m">1</span>.5G <span class="m">83</span> Linux
+</pre></div>
+
+
+<p>From the <code>fdisk</code> output, it's clear that I need to copy the sectors from <code>0</code> to
+<code>8191</code>, just before the start of the first partition.</p>
+<div class="highlight"><pre><span></span>sudo dd <span class="k">if</span><span class="o">=</span>/dev/loop1 <span class="nv">of</span><span class="o">=</span>/dev/loop2 <span class="nv">bs</span><span class="o">=</span><span class="m">512</span> <span class="nv">count</span><span class="o">=</span><span class="m">8192</span>
+</pre></div>
+
+
+<p>Then, I needed to recreate the <strong>boot</strong> and <strong>root</strong> partitions according to the
+size of the media. So, I reserved <code>55MB</code> for the boot partition and the reset for
+the root partition. The following script, did just that:</p>
+<div class="highlight"><pre><span></span>sudo fdisk /dev/loop2 <span class="s">&lt;&lt;EOF</span>
+<span class="s">d</span>
+<span class="s">1</span>
+<span class="s">d</span>
+<span class="s">2</span>
+<span class="s">n</span>
+<span class="s">p</span>
+<span class="s">1</span>
+<span class="s">8192</span>
+<span class="s">+55M</span>
+<span class="s">t</span>
+<span class="s">c</span>
+<span class="s">n</span>
+<span class="s">p</span>
+<span class="s">2</span>
+<span class="s">120832</span>
+
+<span class="s">p</span>
+<span class="s">w</span>
+<span class="s">EOF</span>
+</pre></div>
+
+
+<p>After creating the new paritions with the right size, I needed to force the kernel
+to re-read the new partition table containing the new partition sizes and then
+reformat.</p>
+<div class="highlight"><pre><span></span>partprobe /dev/loop2
+sudo mkfs.fat /dev/loop2p1
+sudo mkfs.ext4 /dev/loop2p2
+</pre></div>
+
+
+<p>Now, all left to do is to copy all the files to the new image excluding the ones
+that's not actually useful, just to spare some space on SD-Card. First the boot
+partition:</p>
+<div class="highlight"><pre><span></span>mkdir -p /tmp/raspbian-boot
+mkdir -p /tmp/sdcard-boot
+
+mount /dev/loop1p1 /tmp/raspbian-boot
+mount /dev/loop2p1 /tmp/sdcard-boot
+cp -a /tmp/raspbian-boot/* /tmp/sdcard-boot
+
+<span class="c1"># Enable ssh automatically on boot</span>
+touch /tmp/sdcard-boot/ssh
+
+umount /dev/loop1p1
+umount /dev/loop2p1
+rmdir /tmp/raspbian-boot
+rmdir /tmp/sdcard-boot
+</pre></div>
+
+
+<p>Then, to Copy the root filesystem contents, I decided copy all the files except
+the files that are not necessary, like man-pages, linux kernel modules for
+different kernel versions and so one. The following commands copies exactly the
+needed files to boot on regular Raspberry pi 3:</p>
+<div class="highlight"><pre><span></span>mkdir -p /tmp/raspbian-root
+mkdir -p /tmp/sdcard-root
+
+mount /dev/loop1p2 /tmp/raspbian-root
+mount /dev/loop2p2 /tmp/sdcard-root
+
+mkdir -p /tmp/sdcard-root/lib/modules
+mkdir -p /tmp/sdcard-root/usr/<span class="o">{</span>games,src,local,include,share<span class="o">}</span>
+
+<span class="c1"># Copying necessary files</span>
+cp -a /tmp/raspbian-root/<span class="o">{</span>boot,media,mnt,proc,srv,sys,tmp,dev,root,run,home,etc,sbin,bin,var<span class="o">}</span> /tmp/sdcard-root
+cp -a /tmp/raspbian-root/lib/<span class="o">{</span>arm-linux-gnueabihf,cpp,dhcpcd,ifupdown,klibc-fAGGTaZfOmYXUytsXgfSuL5MT48.so,ld-linux.so.3,modprobe.d,resolvconf,terminfo,console-setup,crda,firmware,init,ld-linux-armhf.so.3,lsb,systemd,udev<span class="o">}</span> /tmp/sdcard-root/lib/
+cp -a /tmp/raspbian-root/lib/modules/4.19.118-v7+ /tmp/sdcard-root/lib/modules/
+cp -a /tmp/raspbian-root/usr/<span class="o">{</span>sbin,bin,lib<span class="o">}</span> /tmp/sdcard-root/usr/
+cp -a /tmp/raspbian-root/usr/lib /tmp/sdcard-root/usr/
+sudo cp -a /tmp/raspbian-root/usr/share/<span class="o">{</span>GeoIP,X11,aclocal,adduser,alsa,applications,apport,apps,apt-listchanges,avahi,base-files,base-passwd,bash-completion,binfmts,bug,build-essential,ca-certificates,calendar,cmake,common-licenses,console-setup,consolefonts,consoletrans,dbus-1,debconf,debhelper,debianutils,dhcpcd,dict,distro-info,doc-base,dpkg,file,gcc-8,gdb,gettext,glib-2.0,gnupg,groff,hal,i18n,icons,info,initramfs-tools,iptables,iso-codes,java,keyrings,keyutils,libc-bin,lintian,luajit-2.1.0-beta3,man,man-db,menu,metainfo,mime,misc,nano,nfs-common,openssh,pam,pam-configs,perl,perl5,pixmaps,pkg-config-crosswrapper,pkg-config-dpkghook,pkgconfig,polkit-1,publicsuffix,pyshared,python,python-apt,python3,raspi-config,readline,sensible-utils,sounds,systemd,tabset,tasksel,terminfo,usb_modeswitch,vim,vl805fw,xml,zoneinfo,zsh<span class="o">}</span> /tmp/sdcard-root/usr/share/
+
+<span class="c1"># Removing unnecessary files to make enough free space available</span>
+rm /tmp/sdcard-root/var/cache/apt/srcpkgcache.bin
+rm -rf /tmp/sdcard-root/usr/share/<span class="o">{</span>GeoIP,i18n,man,bash-completion,sounds,misc<span class="o">}</span>
+
+umount /dev/loop1p2
+umount /dev/loop2p2
+rmdir /tmp/raspbian-root
+rmdir /tmp/sdcard-root
+</pre></div>
+
+
+<p>That's it. Hopefully after boot, there's enough space for upgrade and installing
+missing softwares. If it's not, try removing other unnecessary files. Lucky for
+me, the home wireless router worked (almost) out of the box and very little installation
+was needed.</p>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/linux.html">linux</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/rasbperry-pi.html">rasbperry pi</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/debian.html">debian</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/buster.html">buster</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/raspbian.html">raspbian</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
+                        <p class="author-description">
+                          
+            I Love to Read, Code and Explore the Possibilities.
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'bijanebrahimi';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="http://bijanebrahimi.github.io/blog/" title="Routines Excluded">Routines Excluded</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/books.html">Books</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/freebsd.html">FreeBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/gist.html">Gist</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/git.html">Git</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/linux.html">Linux</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html">OpenBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/projects.html">Projects</a>
+        <a href="https://github.com/bijanebrahimi/blog">Fork Me on Github</a>
+
+    </footer>
+
+</body>
+</html>

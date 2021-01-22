@@ -46,18 +46,20 @@
     <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="category">OpenBSD</a><br />
 
     <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
-    &mdash; <abbr title="2018-04-14T15:30:00+04:30">Sat 14 April 2018</abbr>
+    &mdash; <abbr title="2017-12-26T22:31:00+03:30">Tue 26 December 2017</abbr>
 </div>    </div>
-    <h2><a href="http://bijanebrahimi.github.io/blog/remote-debugging-the-running-openbsd-kernel.html" rel="bookmark" title="Permalink to Remote Debugging the running OpenBSD kernel">Remote Debugging the running OpenBSD kernel</a></h2>
+    <h2><a href="http://bijanebrahimi.github.io/blog/openbsd-hotplugd-scripting.html" rel="bookmark" title="Permalink to OpenBSD hotplugd scripting">OpenBSD hotplugd scripting</a></h2>
     <div class="post-content">
-        <h2>The Problem</h2>
-<p>A few month ago, I tried porting the FreeBSD kdb along with it's <a href="https://github.com/freebsd/freebsd/blob/master/sys/gdb/gdb_main.c#L127">gdb stub</a>
-implementations to OpenBSD as a practice of learning the internals of an
-BSD operating system. The ddb code in both FreeBSD and OpenBSD looks
-pretty much the same and the <a href="https://sourceware.org/gdb/onlinedocs/gdb/Remote-Protocol.html">GDB Remote Serial …</a></p>
+        <h2>The OpenBSD hotplugd script</h2>
+<blockquote>
+<p>The hotplugd daemon monitors the <a href="http://man.openbsd.org/hotplugd.8">hotplug(4)</a> pseudo-device, acting on
+signaled events by executing the scripts in the <code>/etc/hotplug</code> directory.</p>
+</blockquote>
+<p>The following is a modified version of <a href="https://www.tumfatig.net/20110903/automount-usb-stick-on-openbsd/">TuM'Fatig's Automount USB stick on OpenBSD</a>.
+You can also find <a href="http://bijanebrahimi.github.io/blog/my-openbsd-setup.html">My OpenBSD Setup</a> post describing my personal experience …</p>
     </div>
     <div class="post-footer">
-        <a href="http://bijanebrahimi.github.io/blog/remote-debugging-the-running-openbsd-kernel.html">Read more</a>
+        <a href="http://bijanebrahimi.github.io/blog/openbsd-hotplugd-scripting.html">Read more</a>
     </div>
 </div>
 <div class="post">
@@ -68,17 +70,43 @@ pretty much the same and the <a href="https://sourceware.org/gdb/onlinedocs/gdb/
     <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="category">OpenBSD</a><br />
 
     <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
-    &mdash; <abbr title="2018-04-08T21:35:00+04:30">Sun 08 April 2018</abbr>
+    &mdash; <abbr title="2017-12-15T13:15:00+03:30">Fri 15 December 2017</abbr>
 </div>    </div>
-    <h2><a href="http://bijanebrahimi.github.io/blog/installing-openbsd-63-on-raspberry-pi-3.html" rel="bookmark" title="Permalink to Installing OpenBSD 6.3 on Raspberry pi 3">Installing OpenBSD 6.3 on Raspberry pi 3</a></h2>
+    <h2><a href="http://bijanebrahimi.github.io/blog/openbsds-network-stack-part-1.html" rel="bookmark" title="Permalink to OpenBSD's Network stack (PART 1)">OpenBSD's Network stack (PART 1)</a></h2>
     <div class="post-content">
-        <p>Installing the OpenBSD on raspberry pi 3 is very easy and <a href="https://ftp.openbsd.org/pub/OpenBSD/6.3/arm64/INSTALL.arm64">well documented</a>
-which almost convinced me of not writing about it, but still I felt like it may
-help somebody new to the project (But again I really recommend reading the
-document if you are interested and have the …</p>
+        <h2>The OpenBSD Network Stack Graph</h2>
+<p>Since <a href="https://www.openbsd.org/papers/asiabsdcon08-network.pdf">OpenBSD Network Stack Internals</a> by Claudio Jeker at AsiaBSDCon 2008,
+there's a noticeable changes in OpenBSD network stack. obviously the removal
+of using softnet task queue for forwarding IP packets which is now done by almost
+a complete run (passing packets from Incoming Interface …</p>
     </div>
     <div class="post-footer">
-        <a href="http://bijanebrahimi.github.io/blog/installing-openbsd-63-on-raspberry-pi-3.html">Read more</a>
+        <a href="http://bijanebrahimi.github.io/blog/openbsds-network-stack-part-1.html">Read more</a>
+    </div>
+</div>
+<div class="post">
+    <div class="post-meta pure-g">
+
+
+<div class="pure-u-3-4 meta-data">
+    <a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="category">Gist</a><br />
+
+    <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+    &mdash; <abbr title="2017-10-31T21:53:00+03:30">Tue 31 October 2017</abbr>
+</div>    </div>
+    <h2><a href="http://bijanebrahimi.github.io/blog/smallest-and-longest-manpage-you-ever-read.html" rel="bookmark" title="Permalink to Smallest and Longest Manpage you ever read">Smallest and Longest Manpage you ever read</a></h2>
+    <div class="post-content">
+        <h1>Introduction</h1>
+<p>Recently I asked a question on OpenSD IRC channel which led to a question
+entirely different. What's the smallest/longest manpage you ever read?</p>
+<div class="highlight"><pre><span></span>$ find /usr/local/share/man -type f -exec wc -l <span class="o">{}</span> <span class="se">\;</span>  <span class="p">|</span> sort
+</pre></div>
+
+
+<p>On OpenBSD 6.2, the smallest is <a href="https://man.openbsd.org/dcphy.4">dcphy(4)</a> with 23 lines and the …</p>
+    </div>
+    <div class="post-footer">
+        <a href="http://bijanebrahimi.github.io/blog/smallest-and-longest-manpage-you-ever-read.html">Read more</a>
     </div>
 </div>
 <div class="post">
@@ -89,18 +117,44 @@ document if you are interested and have the …</p>
     <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="category">OpenBSD</a><br />
 
     <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
-    &mdash; <abbr title="2017-10-10T22:49:00+03:30">Tue 10 October 2017</abbr>
+    &mdash; <abbr title="2017-10-31T21:15:00+03:30">Tue 31 October 2017</abbr>
 </div>    </div>
-    <h2><a href="http://bijanebrahimi.github.io/blog/openbsd-62-upgrade.html" rel="bookmark" title="Permalink to OpenBSD 6.2 Upgrade">OpenBSD 6.2 Upgrade</a></h2>
+    <h2><a href="http://bijanebrahimi.github.io/blog/my-openbsd-setup.html" rel="bookmark" title="Permalink to My OpenBSD Setup">My OpenBSD Setup</a></h2>
     <div class="post-content">
-        <p>The Upgrading Process is stupidly easy. The process is <a href="https://www.openbsd.org/faq/upgrade62.html">well documented</a> for each release
-and is available after the release of binary packages and when install images are out but
-before going any further, please read the OpenBSD 6.2 <a href="4">new features</a> for the list of
-changes and improvements. </p>
-<p>The …</p>
+        <p>Today, I'm going to write about my personal experience with OpenBSD on my Laptop
+as an OpenBSD user. I think I will come back day to day and update this blog
+post, but currently the following topics are coeverd:</p>
+<ul>
+<li><a href="#network-managers">Network Managers</a></li>
+<li><a href="#filesystem-auto-mount">Filesystem Auto-Mount</a></li>
+<li><a href="#desktop-notification-daemon">Desktop Notification Daemon</a></li>
+<li><a href="#integrated-development-window-manager">Integrated Development Window Manager …</a></li></ul>
     </div>
     <div class="post-footer">
-        <a href="http://bijanebrahimi.github.io/blog/openbsd-62-upgrade.html">Read more</a>
+        <a href="http://bijanebrahimi.github.io/blog/my-openbsd-setup.html">Read more</a>
+    </div>
+</div>
+<div class="post">
+    <div class="post-meta pure-g">
+
+
+<div class="pure-u-3-4 meta-data">
+    <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="category">OpenBSD</a><br />
+
+    <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+    &mdash; <abbr title="2017-10-24T20:17:00+03:30">Tue 24 October 2017</abbr>
+</div>    </div>
+    <h2><a href="http://bijanebrahimi.github.io/blog/privileged-seperated-processes.html" rel="bookmark" title="Permalink to Privileged Seperated Processes">Privileged Seperated Processes</a></h2>
+    <div class="post-content">
+        <h2>An Intorduction</h2>
+<blockquote>
+<p>In computer programming and computer security, privilege separation is a
+technique in which a program is divided into parts which are limited to the
+specific privileges they require in order to perform a specific task. This is
+used to mitigate the potential damage of a computer security vulnerability …</p></blockquote>
+    </div>
+    <div class="post-footer">
+        <a href="http://bijanebrahimi.github.io/blog/privileged-seperated-processes.html">Read more</a>
     </div>
 </div>
 
@@ -109,6 +163,7 @@ changes and improvements. </p>
         <div class="pure-u-1-2 left">
         </div>
         <div class="pure-u-1-2 right">
+            <a href="http://bijanebrahimi.github.io/blog/tag/openbsd2.html">More articles</a>
         </div>
     </div>
 </div>
@@ -122,21 +177,46 @@ changes and improvements. </p>
                          Tags
                     </div>
                     <div class="tags">
+                    <a href="http://bijanebrahimi.github.io/blog/tag/linux.html">linux</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/rasbperry-pi.html">rasbperry pi</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/debian.html">debian</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/buster.html">buster</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/raspbian.html">raspbian</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/router.html">router</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/wireless.html">wireless</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/openbsd.html">openbsd</a>
-                    <a href="http://bijanebrahimi.github.io/blog/tag/kernel.html">kernel</a>
-                    <a href="http://bijanebrahimi.github.io/blog/tag/debugging.html">debugging</a>
-                    <a href="http://bijanebrahimi.github.io/blog/tag/gdb.html">gdb</a>
-                    <a href="http://bijanebrahimi.github.io/blog/tag/qemu.html">qemu</a>
-                    <a href="http://bijanebrahimi.github.io/blog/tag/raspberrypi.html">raspberrypi</a>
-                    <a href="http://bijanebrahimi.github.io/blog/tag/upgrade.html">upgrade</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/hotplugd.html">hotplugd</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/mount.html">mount</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/bsd.html">bsd</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/src.html">src</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/network-stack.html">network stack</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/shell.html">Shell</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/scripting.html">Scripting</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/bats.html">Bats</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/sh.html">sh</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/manpages.html">Manpages</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/netctl.html">netctl</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/wifi.html">wifi</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/nmctl.html">nmctl</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/network-manager.html">network-manager</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/automount.html">automount</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/dunst.html">dunst</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/freebsd.html">freebsd</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/kernel.html">kernel</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/compile.html">compile</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/imsg_init.html">imsg_init</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/socket_pair.html">socket_pair</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/privsep.html">privsep</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/pelican.html">pelican</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/makefile.html">Makefile</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/python.html">python</a>
+                    <a href="http://bijanebrahimi.github.io/blog/tag/upgrade.html">upgrade</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/grub.html">grub</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/iso.html">iso</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/mountconf.html">mount.conf</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/gitlab.html">gitlab</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/wiki.html">wiki</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/graphviz.html">graphviz</a>
-                    <a href="http://bijanebrahimi.github.io/blog/tag/debian.html">debian</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/omnibus.html">omnibus</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/apache.html">apache</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/nginx.html">nginx</a>
@@ -146,7 +226,6 @@ changes and improvements. </p>
                     <a href="http://bijanebrahimi.github.io/blog/tag/gist.html">gist</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/gcc.html">gcc</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/cross-compiler.html">cross-compiler</a>
-                    <a href="http://bijanebrahimi.github.io/blog/tag/linux.html">linux</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/compiler.html">compiler</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/git.html">git</a>
                     <a href="http://bijanebrahimi.github.io/blog/tag/svn.html">svn</a>

@@ -106,14 +106,14 @@ $ git submodule update --remote
 
 &lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_03.svg"&gt;&lt;/p&gt;
 &lt;p&gt;To make a change in lib-shared, he needs to fork a new feature-branch from lib-shared's dev branch and simply pushes his branch to remote and notify the manager:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cd libs/lib-shared
-git checkout -b feature-authors remotes/origin/dev
-touch AUTHORS
-git add AUTHORS
-git commit -m &amp;quot;added AUTHORS file&amp;quot;
-echo &amp;quot;bijan-e&amp;quot; &amp;gt; AUTHORS
-git commit -a -m &amp;quot;added bijan-e to AUTHORS&amp;quot;
-git push origin feature-authors
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;cd libs/lib-shared&lt;/span&gt;
+&lt;span class="err"&gt;git checkout -b feature-authors remotes/origin/dev&lt;/span&gt;
+&lt;span class="err"&gt;touch AUTHORS&lt;/span&gt;
+&lt;span class="err"&gt;git add AUTHORS&lt;/span&gt;
+&lt;span class="err"&gt;git commit -m &amp;quot;added AUTHORS file&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;echo &amp;quot;bijan-e&amp;quot; &amp;gt; AUTHORS&lt;/span&gt;
+&lt;span class="err"&gt;git commit -a -m &amp;quot;added bijan-e to AUTHORS&amp;quot;&lt;/span&gt;
+&lt;span class="err"&gt;git push origin feature-authors&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -205,4 +205,4 @@ $ git push origin master
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_09.svg"&gt;&lt;/p&gt;</content><category term="git"></category><category term="svn"></category><category term="git submodules"></category></entry></feed>
+&lt;p&gt;&lt;img alt="image" src="/blog/assets/images/git_submodules_diagram_09.svg"&gt;&lt;/p&gt;</content><category term="Git"></category><category term="git"></category><category term="svn"></category><category term="git submodules"></category></entry></feed>

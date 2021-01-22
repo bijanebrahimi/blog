@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
         <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
-        <link href="http://bijanebrahimi.github.io/blog/feeds/gist.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
 </head>
 <body>
 
@@ -65,10 +65,10 @@ workspace</p>
 <p>Using scratchpad, we can turn any terminal into a drop-down terminal. I'm using <a href="http://www.tenshu.net/p/terminator.html">terminator</a> which supports tiling (and more)
 and <code>F1</code> key as hot key to toggle terminator since I have no other use for formally
 known help button key on linux.</p>
-<div class="highlight"><pre><span></span># Add this to your i3 config (~/.config/i3/config) and restart i3 (Super+Shift+R)
-exec --no-startup-id &quot;terminator -m&quot;
-for_window [class=&quot;Terminator&quot; title=&quot;^((?!Terminator Preferences).)*$&quot;] move scratchpad, move position 0 0, resize set 1366 768;
-bindsym F1 [class=&quot;Terminator&quot;] scratchpad show;
+<div class="highlight"><pre><span></span><span class="err"># Add this to your i3 config (~/.config/i3/config) and restart i3 (Super+Shift+R)</span>
+<span class="err">exec --no-startup-id &quot;terminator -m&quot;</span>
+<span class="err">for_window [class=&quot;Terminator&quot; title=&quot;^((?!Terminator Preferences).)*$&quot;] move scratchpad, move position 0 0, resize set 1366 768;</span>
+<span class="err">bindsym F1 [class=&quot;Terminator&quot;] scratchpad show;</span>
 </pre></div>
 
 
@@ -79,8 +79,8 @@ which is also in Scratchpad from showing. for example, Using the code below we
 can simply send any active programs into Scratchpad using <code>Super+Shift+F1</code> key
 and retrieve them one by one by hitting <code>Super+F1</code> and only by pressing <code>F1</code> we
 can toggle <strong>Terminator</strong>:</p>
-<div class="highlight"><pre><span></span><span class="x">bindsym </span><span class="p">$</span><span class="nv">mod</span><span class="x">+Shift+F1 move container to scratchpad</span>
-<span class="x">bindsym </span><span class="p">$</span><span class="nv">mod</span><span class="x">+F1 [class=&quot;^((?!Terminator).)*</span><span class="p">$</span><span class="x">&quot;] scratchpad show</span>
+<div class="highlight"><pre><span></span><span class="err">bindsym $mod+Shift+F1 move container to scratchpad</span>
+<span class="err">bindsym $mod+F1 [class=&quot;^((?!Terminator).)*$&quot;] scratchpad show</span>
 </pre></div>
     </div>
 

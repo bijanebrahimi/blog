@@ -1,5 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - FreeBSD</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/freebsd.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-02-24T22:05:00+03:30</updated><entry><title>Freebsd's .mount.conf</title><link href="http://bijanebrahimi.github.io/blog/freebsds-mountconf.html" rel="alternate"></link><published>2017-02-24T22:05:00+03:30</published><updated>2017-02-24T22:05:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-24:/blog/freebsds-mountconf.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Routines Excluded - FreeBSD</title><link href="http://bijanebrahimi.github.io/blog/" rel="alternate"></link><link href="http://bijanebrahimi.github.io/blog/feeds/freebsd.atom.xml" rel="self"></link><id>http://bijanebrahimi.github.io/blog/</id><updated>2017-10-27T11:21:00+03:30</updated><entry><title>Building FreeBSD Custom Kernel</title><link href="http://bijanebrahimi.github.io/blog/building-freebsd-custom-kernel.html" rel="alternate"></link><published>2017-10-27T11:21:00+03:30</published><updated>2017-10-27T11:21:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-27:/blog/building-freebsd-custom-kernel.html</id><summary type="html">&lt;p&gt;According to &lt;a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook"&gt;FreeBSD Handbook&lt;/a&gt;, there are two ways of building a custom
+kernel: &lt;a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/developers-handbook/kernelbuild.html"&gt;The Traditional Way&lt;/a&gt; and &lt;a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig-building.html"&gt;The New Way&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Either way, we should create a custom kernel configuration file, Then we use
+this custom kernel configuration for building the new kernel:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /usr/src
+$ cp sys/amd64/config/GENERIC …&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;According to &lt;a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook"&gt;FreeBSD Handbook&lt;/a&gt;, there are two ways of building a custom
+kernel: &lt;a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/developers-handbook/kernelbuild.html"&gt;The Traditional Way&lt;/a&gt; and &lt;a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig-building.html"&gt;The New Way&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Either way, we should create a custom kernel configuration file, Then we use
+this custom kernel configuration for building the new kernel:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;cd&lt;/span&gt; /usr/src
+$ cp sys/amd64/config/GENERIC sys/amd64/config/CUSTOM
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For example, we can enable kernel debuggings enabled in our custom
+configuration:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat &amp;gt;&amp;gt; sys/amd64/config/CUSTOM &amp;lt;EOF
+makeoptions -g
+options KDB
+options DDB
+EOF
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, to compile the new kernel with our custom configuration:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;make -j &lt;span class="m"&gt;16&lt;/span&gt; buildkernel &lt;span class="nv"&gt;KERNCONF&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;CUSTOM
+make -j &lt;span class="m"&gt;16&lt;/span&gt; installkernel &lt;span class="nv"&gt;KERNCONF&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;CUSTOM
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you're experiencing modifying kernel and trying to avoid re-
+compiling the kernel every time you have a small change in the
+source code, use the following command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;make -j &lt;span class="m"&gt;16&lt;/span&gt; buildkernel &lt;span class="nv"&gt;KERNCONF&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;CUSTOM -DKERNFAST
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;Tips&lt;/strong&gt;: Remember to remove the multiple make jobs &lt;code&gt;-j&lt;/code&gt; flags
+if you have errors in compiling the source to easily spot the
+error message:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;make buildkernel &lt;span class="nv"&gt;KERNCONF&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;CUSTOM -DKERNFAST
+&lt;/pre&gt;&lt;/div&gt;</content><category term="FreeBSD"></category><category term="freebsd"></category><category term="kernel"></category><category term="compile"></category></entry><entry><title>Freebsd's .mount.conf</title><link href="http://bijanebrahimi.github.io/blog/freebsds-mountconf.html" rel="alternate"></link><published>2017-02-24T22:05:00+03:30</published><updated>2017-02-24T22:05:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-02-24:/blog/freebsds-mountconf.html</id><summary type="html">&lt;h1&gt;Introduction&lt;/h1&gt;
 &lt;p&gt;As I'm getting more and more familiar with the FreeBSD Operating System and
 it's wonderfull architeture and design, I found the need to work with different
 versions of FreeBSD live (specially at work) and since it's not a good idea to install
@@ -57,7 +98,7 @@ filesystem:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="na"&gt;.timeout&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;
 &lt;span class="na"&gt;.md&lt;/span&gt; &lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="no"&gt;iso&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="no"&gt;FreeBSD-11.0-RELEASE-amd64-dvd1.iso&lt;/span&gt;
 &lt;span class="na"&gt;.timeout&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;
-&lt;span class="nl"&gt;cd9660:&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="nf"&gt;dev&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="no"&gt;md&lt;/span&gt;&lt;span class="c"&gt;# ro&lt;/span&gt;
+&lt;span class="nl"&gt;cd9660:&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="nf"&gt;dev&lt;/span&gt;&lt;span class="err"&gt;/&lt;/span&gt;&lt;span class="no"&gt;md&lt;/span&gt;&lt;span class="c1"&gt;# ro&lt;/span&gt;
 &lt;span class="na"&gt;.ask&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -69,35 +110,35 @@ message) if the &lt;code&gt;dev&lt;/code&gt; doesn't exist.&lt;/p&gt;
 &lt;h1&gt;The Solution&lt;/h1&gt;
 &lt;p&gt;The following is the whole process plus formatting and installing grub from a
 debian-based linux distro:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Installing GRUB, Assuming /dev/sdb is the USB flash drive device&lt;/span&gt;
-&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mount /dev/sdb1 /mnt&lt;/span&gt;
-&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mkdir /mnt/boot&lt;/span&gt;
-&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; grub-install --boot-directory=/mnt/boot /dev/sdb&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Installing GRUB, Assuming /dev/sdb is the USB flash drive device&lt;/span&gt;
+&lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="n"&gt;mount&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;dev&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;sdb1&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;mnt&lt;/span&gt;
+&lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="n"&gt;mkdir&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;mnt&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;boot&lt;/span&gt;
+&lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="n"&gt;grub&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;install&lt;/span&gt; &lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="n"&gt;boot&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;directory&lt;/span&gt;&lt;span class="o"&gt;=/&lt;/span&gt;&lt;span class="n"&gt;mnt&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;boot&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;dev&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;sdb&lt;/span&gt;
 
-&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Copy FreeBSD iso image and creating proper grub configuration file&lt;/span&gt;
-&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mkdir /mnt/iso&lt;/span&gt;
-&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cp ~/Downloads/FreeBSD-11.0-RELEASE-amd64-dvd1.iso /mnt/iso&lt;/span&gt;
-&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cat &amp;gt; /mnt/boot/grub/grub.cfg &amp;lt;&amp;lt; EOF&lt;/span&gt;
-&lt;span class="x"&gt;insmod loopback&lt;/span&gt;
-&lt;span class="x"&gt;insmod iso9660&lt;/span&gt;
-&lt;span class="x"&gt;insmod ufs2&lt;/span&gt;
-&lt;span class="x"&gt;insmod ntfs&lt;/span&gt;
-&lt;span class="x"&gt;menuentry &amp;quot;FreeBSD 11.0 amd64&amp;quot; &lt;/span&gt;&lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
-&lt;span class="x"&gt;  set isofile=&amp;quot;/iso/FreeBSD-11.0-RELEASE-amd64-dvd1.iso&amp;quot;&lt;/span&gt;
-&lt;span class="x"&gt;  loopback loop (hd0,1)&lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;isofile&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
-&lt;span class="x"&gt;  kfreebsd  (loop)/boot/kernel/kernel&lt;/span&gt;
-&lt;span class="x"&gt;}&lt;/span&gt;
-&lt;span class="x"&gt;EOF&lt;/span&gt;
+&lt;span class="c1"&gt;# Copy FreeBSD iso image and creating proper grub configuration file&lt;/span&gt;
+&lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="n"&gt;mkdir&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;mnt&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;iso&lt;/span&gt;
+&lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="n"&gt;cp&lt;/span&gt; &lt;span class="o"&gt;~/&lt;/span&gt;&lt;span class="n"&gt;Downloads&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;FreeBSD&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;11.0&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;RELEASE&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;amd64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;dvd1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;iso&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;mnt&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;iso&lt;/span&gt;
+&lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="n"&gt;cat&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;mnt&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;boot&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;grub&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;grub&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cfg&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;EOF&lt;/span&gt;
+&lt;span class="n"&gt;insmod&lt;/span&gt; &lt;span class="n"&gt;loopback&lt;/span&gt;
+&lt;span class="n"&gt;insmod&lt;/span&gt; &lt;span class="n"&gt;iso9660&lt;/span&gt;
+&lt;span class="n"&gt;insmod&lt;/span&gt; &lt;span class="n"&gt;ufs2&lt;/span&gt;
+&lt;span class="n"&gt;insmod&lt;/span&gt; &lt;span class="n"&gt;ntfs&lt;/span&gt;
+&lt;span class="n"&gt;menuentry&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;FreeBSD 11.0 amd64&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;set&lt;/span&gt; &lt;span class="n"&gt;isofile&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/iso/FreeBSD-11.0-RELEASE-amd64-dvd1.iso&amp;quot;&lt;/span&gt;
+  &lt;span class="n"&gt;loopback&lt;/span&gt; &lt;span class="n"&gt;loop&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hd0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;isofile&lt;/span&gt;
+  &lt;span class="n"&gt;kfreebsd&lt;/span&gt;  &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;loop&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;boot&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;kernel&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;kernel&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="n"&gt;EOF&lt;/span&gt;
 
-&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; Create FreeBSD mount configuration file&lt;/span&gt;
-&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; mkdir /mnt/dev&lt;/span&gt;
-&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt; cat &amp;gt; /mnt/.mount.conf &amp;lt;&amp;lt; EOF&lt;/span&gt;
-&lt;span class="x"&gt;.timeout 3&lt;/span&gt;
-&lt;span class="x"&gt;.md /iso/FreeBSD-11.0-RELEASE-amd64-dvd1.iso&lt;/span&gt;
-&lt;span class="x"&gt;.timeout 4&lt;/span&gt;
-&lt;span class="x"&gt;cd9660:/dev/md&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; ro&lt;/span&gt;
-&lt;span class="x"&gt;.ask&lt;/span&gt;
-&lt;span class="x"&gt;EOF&lt;/span&gt;
+&lt;span class="c1"&gt;# Create FreeBSD mount configuration file&lt;/span&gt;
+&lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="n"&gt;mkdir&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;mnt&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;dev&lt;/span&gt;
+&lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="n"&gt;cat&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;mnt&lt;/span&gt;&lt;span class="o"&gt;/.&lt;/span&gt;&lt;span class="n"&gt;mount&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;conf&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;EOF&lt;/span&gt;
+&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;timeout&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;
+&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;md&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;iso&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;FreeBSD&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;11.0&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;RELEASE&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;amd64&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;dvd1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;iso&lt;/span&gt;
+&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;timeout&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;
+&lt;span class="n"&gt;cd9660&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;dev&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;md&lt;/span&gt;&lt;span class="c1"&gt;# ro&lt;/span&gt;
+&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ask&lt;/span&gt;
+&lt;span class="n"&gt;EOF&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -107,13 +148,13 @@ fails mounting the root filesystem and drops into a prompt command line asking
 for the root filesystem. We can Enter &lt;code&gt;?&lt;/code&gt; to first get a list of known devies
 and Then mount our USB flash drive partition as a temporary root filesystem
 allowing kernel to find our &lt;code&gt;.mount.conf&lt;/code&gt; file:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mountroot&amp;gt; msdosfs:/dev/da0s1
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;mountroot&amp;gt; msdosfs:/dev/da0s1&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;This last step can be avoided by setting the &lt;code&gt;FreeBSD.vfs.root.mountfrom&lt;/code&gt; option
 from grub which I have not tested yet:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;set FreeBSD.vfs.root.mountfrom=msdosfs:/dev/da0s1
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;set FreeBSD.vfs.root.mountfrom=msdosfs:/dev/da0s1&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -122,13 +163,13 @@ directory in USB flash drive's root directory) you should login into your FreeBS
 iso image:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ df
 Filesystem 1K-blocks    Used  Avail Capcity  Mounted on
-/dev/md0      &lt;span class="m"&gt;286146&lt;/span&gt; &lt;span class="m"&gt;2861416&lt;/span&gt;      &lt;span class="m"&gt;8&lt;/span&gt;    100%  /
-/dev/da0s1   &lt;span class="m"&gt;7561408&lt;/span&gt; &lt;span class="m"&gt;6621600&lt;/span&gt;  &lt;span class="m"&gt;99808&lt;/span&gt;     88%  /mnt
-devfs              &lt;span class="m"&gt;1&lt;/span&gt;       &lt;span class="m"&gt;1&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;    100%  /dev
-/dev/md1       &lt;span class="m"&gt;31260&lt;/span&gt;     &lt;span class="m"&gt;308&lt;/span&gt;  &lt;span class="m"&gt;28452&lt;/span&gt;      1%  /var
-/dev/md2       &lt;span class="m"&gt;19356&lt;/span&gt;      &lt;span class="m"&gt;28&lt;/span&gt;  &lt;span class="m"&gt;17780&lt;/span&gt;      0%  /tmp
+/dev/md0      &lt;span class="m"&gt;286146&lt;/span&gt; &lt;span class="m"&gt;2861416&lt;/span&gt;      &lt;span class="m"&gt;8&lt;/span&gt;    &lt;span class="m"&gt;100&lt;/span&gt;%  /
+/dev/da0s1   &lt;span class="m"&gt;7561408&lt;/span&gt; &lt;span class="m"&gt;6621600&lt;/span&gt;  &lt;span class="m"&gt;99808&lt;/span&gt;     &lt;span class="m"&gt;88&lt;/span&gt;%  /mnt
+devfs              &lt;span class="m"&gt;1&lt;/span&gt;       &lt;span class="m"&gt;1&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;100&lt;/span&gt;%  /dev
+/dev/md1       &lt;span class="m"&gt;31260&lt;/span&gt;     &lt;span class="m"&gt;308&lt;/span&gt;  &lt;span class="m"&gt;28452&lt;/span&gt;      &lt;span class="m"&gt;1&lt;/span&gt;%  /var
+/dev/md2       &lt;span class="m"&gt;19356&lt;/span&gt;      &lt;span class="m"&gt;28&lt;/span&gt;  &lt;span class="m"&gt;17780&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;%  /tmp
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Look that the old root filesystem (&lt;code&gt;/dev/da0s1&lt;/code&gt;) is re-mounted on &lt;code&gt;/mnt&lt;/code&gt; as
-described in manual. Hope it helps other :-)&lt;/p&gt;</content><category term="freebsd"></category><category term="grub"></category><category term="iso"></category><category term="mount.conf"></category></entry></feed>
+described in manual. Hope it helps other :-)&lt;/p&gt;</content><category term="FreeBSD"></category><category term="freebsd"></category><category term="grub"></category><category term="iso"></category><category term="mount.conf"></category></entry></feed>

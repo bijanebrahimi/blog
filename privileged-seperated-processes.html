@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Privileged Seperated Processes</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="http://bijanebrahimi.github.io/blog/" class="pure-menu-heading  pure-menu-link">Routines Excluded</a>
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"></li>
+
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/pages/bookmarks.html" class="pure-menu-link">Bookmarks</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/books.html" class="pure-menu-link">Books</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="pure-menu-link">FreeBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="pure-menu-link">Gist</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/git.html" class="pure-menu-link">Git</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="pure-menu-link">OpenBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
+        </ul>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="category">OpenBSD</a><br />
+
+    <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+    &mdash; <abbr title="2017-10-24T20:17:00+03:30">Tue 24 October 2017</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image-small">
+                <div class="title-container">
+                    <h1>Privileged Seperated Processes</h1>
+                    <h4>Part I: talking to the other side</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <h2>An Intorduction</h2>
+<blockquote>
+<p>In computer programming and computer security, privilege separation is a
+technique in which a program is divided into parts which are limited to the
+specific privileges they require in order to perform a specific task. This is
+used to mitigate the potential damage of a computer security vulnerability.</p>
+<p><a href="https://en.wikipedia.org/wiki/Privilege_separation">Privilege Separation</a></p>
+</blockquote>
+<p>There are <a href="http://www.openbsd.org/papers/ven05-deraadt/">many great resources</a> describing the architecture of a priviledge
+separated process and the need for such architecrues, which I'm sure you already
+read or will ;-)</p>
+<p>What I'm really interested in, is the way the priviledged separated processes
+are able to talk to each other. Hope you haveare already familliar with Unix
+IPCs, but if you don't, here's <a href="http://beej.us/guide/bgipc/">Beej's Guide to Unix IPC</a>.</p>
+<p>This is (hopefully) the first of a few posts about writing privsep processes.
+Hope it helps.</p>
+<h2>socketpair(2)</h2>
+<blockquote>
+<p>The socketpair() call creates an unnamed pair of connected sockets in the
+specified domain d, of the specified type, and using the optionally
+specified protocol.  The descriptors used in referencing the new sockets
+are returned in sv[0] and sv<a href="https://en.wikipedia.org/wiki/Privilege_separation">1</a>.  The two sockets are indistinguishable.</p>
+</blockquote>
+<p>Unlike <a href="http://man.openbsd.org/pipe.2">pipe(2)</a> which are uni-directional way of sending messages,
+<a href="http://man.openbsd.org/socket.2">socket(2)</a> are bi-directional, which means they are perfect for processes to talk
+back to each others. <a href="http://man.openbsd.org/socketpair.2">socketpair(2)</a> will create two of them for us. each
+connected to the other using the specified Protocol.</p>
+<p><span class="graphviz" style="text-align: center;"><img src="data:image/png;base64,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"></span></p>
+<p>The above, Illustrates a socketpair of type <code>UNIX Sockets</code> shared by the aprent
+and the child. Since the sockets are indistinguishable, there's no difference
+which uses which.</p>
+<p>The following snippet, Creates a socket pair and pass it to the child:</p>
+<div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;err.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;sys/wait.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;sys/socket.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#define MAX_BUF_SIZE      128</span>
+
+<span class="kt">int</span> <span class="nf">child_process</span> <span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">);</span>
+<span class="kt">int</span> <span class="nf">parent_process</span> <span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="kt">pid_t</span> <span class="n">pid</span><span class="p">);</span>
+
+
+<span class="kt">int</span>
+<span class="nf">main</span> <span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">pid_t</span> <span class="n">child_pid</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">fd</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">socketpair</span> <span class="p">(</span><span class="n">AF_UNIX</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">PF_UNSPEC</span><span class="p">,</span> <span class="n">fd</span><span class="p">)</span> <span class="o">==</span> <span class="mi">-1</span><span class="p">)</span>
+        <span class="n">errx</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;Failed to open socketpair&quot;</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">((</span><span class="n">child_pid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">())</span> <span class="o">==</span> <span class="mi">-1</span><span class="p">)</span>
+        <span class="n">errx</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&quot;Failed to fork the process&quot;</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">child_pid</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parent_process</span> <span class="p">(</span><span class="n">fd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">child_pid</span><span class="p">);</span>
+    <span class="k">else</span>
+        <span class="k">return</span> <span class="n">child_process</span> <span class="p">(</span><span class="n">fd</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span> <span class="cm">/* Not reachable */</span>
+<span class="p">}</span>
+
+<span class="kt">int</span>
+<span class="nf">child_process</span> <span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MAX_BUF_SIZE</span><span class="p">];</span>
+
+    <span class="n">snprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MAX_BUF_SIZE</span><span class="p">,</span> <span class="s">&quot;Hello World&quot;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">write</span> <span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">MAX_BUF_SIZE</span><span class="p">)</span> <span class="o">==</span> <span class="mi">-1</span><span class="p">)</span>
+        <span class="n">errx</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;Failed to write Message&quot;</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span>
+<span class="nf">parent_process</span> <span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="kt">pid_t</span> <span class="n">pid</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">status</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">ssize_t</span> <span class="n">nbytes</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MAX_BUF_SIZE</span><span class="p">];</span>
+
+    <span class="k">if</span> <span class="p">((</span><span class="n">nbytes</span> <span class="o">=</span> <span class="n">read</span> <span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">MAX_BUF_SIZE</span><span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">==</span> <span class="mi">-1</span><span class="p">)</span>
+        <span class="n">warn</span> <span class="p">(</span><span class="s">&quot;Failed to read&quot;</span><span class="p">);</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">nbytes</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">buf</span><span class="p">[</span><span class="n">nbytes</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+        <span class="n">printf</span> <span class="p">(</span><span class="s">&quot;Received </span><span class="se">\&quot;</span><span class="s">%s</span><span class="se">\&quot;</span><span class="s"> from the Child</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">waitpid</span> <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">status</span><span class="p">,</span> <span class="n">WAIT_ANY</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">WEXITSTATUS</span><span class="p">(</span><span class="n">status</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>And the output is:</p>
+<div class="highlight"><pre><span></span>$ gcc -o privsep main.c
+$ ./privsep
+Received <span class="s2">&quot;Hello World&quot;</span> from the Child
+</pre></div>
+
+
+<p>Tips:</p>
+<ul>
+<li>Since the child process shares rge same memory address with it's parent, it
+has access to all the descriptors the parent has opened, so it is a good
+practice to close all unnecessary descriptors (like standard I/O) before
+actually running the child's logic after calling the <code>fork(2)</code>.</li>
+</ul>
+<p>In the next post, I will introduce the <code>imsg_init(3)</code>. The OpenBSD way of
+writing privsep processes.</p>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/openbsd.html">openbsd</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/imsg_init.html">imsg_init</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/socket_pair.html">socket_pair</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/privsep.html">privsep</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
+                        <p class="author-description">
+                          
+            I Love to Read, Code and Explore the Possibilities.
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'bijanebrahimi';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="http://bijanebrahimi.github.io/blog/" title="Routines Excluded">Routines Excluded</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/books.html">Books</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/freebsd.html">FreeBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/gist.html">Gist</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/git.html">Git</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/linux.html">Linux</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html">OpenBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/projects.html">Projects</a>
+        <a href="https://github.com/bijanebrahimi/blog">Fork Me on Github</a>
+
+    </footer>
+
+</body>
+</html>

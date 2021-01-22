@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>My OpenBSD Setup</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="http://bijanebrahimi.github.io/blog/" class="pure-menu-heading  pure-menu-link">Routines Excluded</a>
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"></li>
+
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/pages/bookmarks.html" class="pure-menu-link">Bookmarks</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/books.html" class="pure-menu-link">Books</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/freebsd.html" class="pure-menu-link">FreeBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="pure-menu-link">Gist</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/git.html" class="pure-menu-link">Git</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/linux.html" class="pure-menu-link">Linux</a></li>
+            <li class="pure-menu-item pure-menu-selected"><a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="pure-menu-link">OpenBSD</a></li>
+            <li class="pure-menu-item"><a href="http://bijanebrahimi.github.io/blog/category/projects.html" class="pure-menu-link">Projects</a></li>
+        </ul>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html" class="category">OpenBSD</a><br />
+
+    <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
+    &mdash; <abbr title="2017-10-31T21:15:00+03:30">Tue 31 October 2017</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image-small">
+                <div class="title-container">
+                    <h1>My OpenBSD Setup</h1>
+                    <h4>how I use i3wm on OpenBSD 6.2</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <p>Today, I'm going to write about my personal experience with OpenBSD on my Laptop
+as an OpenBSD user. I think I will come back day to day and update this blog
+post, but currently the following topics are coeverd:</p>
+<ul>
+<li><a href="#network-managers">Network Managers</a></li>
+<li><a href="#filesystem-auto-mount">Filesystem Auto-Mount</a></li>
+<li><a href="#desktop-notification-daemon">Desktop Notification Daemon</a></li>
+<li><a href="#integrated-development-window-manager">Integrated Development Window Manager</a></li>
+</ul>
+<p>TODO:</p>
+<ul>
+<li>Android Integration</li>
+<li>Development Environment</li>
+<li>Themes</li>
+</ul>
+<h2>Network Managers</h2>
+<p>I found <a href="https://github.com/akpoff/netctl/">netctl(8)</a> an interesting utility.It supports
+network configuration separated based on Location or nwids (for wifi networks).
+The manpage is complete (OpenBSD Style) but the idea is simple and clear. netctl
+keeps <a href="http://man.openbsd.org/hostname.if.5">hostname.if(5)</a> configuration files categorized in <code>/etc/hostname.d</code>
+directory by loaction or nwids and then symlink them into <code>/etc</code> at startup
+or by switching to different locations on-demand:</p>
+<div class="highlight"><pre><span></span>$ ls -lR /etc/hostname.*
+/etc/hostname.run0 -&gt; /etc/hostname.d/nwids/BlackHole.nwid
+
+/etc/hostname.d:
+nwids
+
+/etc/hostname.d/nwids:
+BlackHole.nwid
+ZWLan.nwid
+</pre></div>
+
+
+<p>But if you liked netctl, you might also wanted to read <a href="http://vincentdelft.be/post/post_20171023">Vincet's Blog Post, 
+Network Manager Control for OpenBSD</a>. Basically <a href="https://sourceforge.net/p/nmctl/code/ci/master/tree/">nmctl</a> is an improved
+version of rewritten in python. He also has an intergration section with openbox
+(if you're using).</p>
+<h2>Filesystem Auto-Mount</h2>
+<p>To automatically mount USB storage sticks, <a href="http://man.openbsd.org/hotplugd.8">hotplugd(8)</a> is the tool. You can
+find a nice example script in the manual or here at <a href="https://www.tumfatig.net/20110903/automount-usb-stick-on-openbsd/">TuM'Fatig Automount USB
+stick on OpenBSD</a>:</p>
+<p><strong>Update</strong>: an improved version of the script can be found in
+<a href="http://bijanebrahimi.github.io/blog/openbsd-hotplugd-scripting.html">here</a>.</p>
+<div class="highlight"><pre><span></span>$ doas rcctl <span class="nb">enable</span> hotplugd
+$ cat /etc/hotplug/attach
+<span class="c1">#!/bin/sh</span>
+
+<span class="nv">DEVCLASS</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">DEVNAME</span><span class="o">=</span><span class="nv">$2</span>
+<span class="nv">MOUNTROOT</span><span class="o">=</span><span class="s2">&quot;/mnt&quot;</span>
+<span class="nv">DEBUG</span><span class="o">=</span><span class="m">1</span>
+
+<span class="k">case</span> <span class="nv">$DEVCLASS</span> in
+<span class="m">2</span><span class="o">)</span>
+        <span class="c1"># disk devices</span>
+        <span class="nv">disklabel</span><span class="o">=</span><span class="sb">`</span>/sbin/disklabel <span class="nv">$DEVNAME</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">|</span> /usr/bin/sed -n <span class="s1">&#39;/^disk: /s/^disk: //p&#39;</span><span class="sb">`</span>
+<span class="o">[</span> <span class="nv">$DEBUG</span> <span class="o">==</span> <span class="m">1</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> logger -i <span class="s2">&quot;hotplugd discovered DISKLABEL </span><span class="nv">$disklabel</span><span class="s2">&quot;</span>
+        <span class="k">case</span> <span class="nv">$disklabel</span> in
+        <span class="s2">&quot;SCSI disk&quot;</span><span class="o">)</span>
+                <span class="nv">slices</span><span class="o">=</span><span class="sb">`</span>/sbin/disklabel <span class="nv">$DEVNAME</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">|</span> <span class="se">\</span>
+                sed -n <span class="s1">&#39;/^ *[abd-z]: /s/^ *\([abd-z]\):.*/\1/p&#39;</span><span class="sb">`</span>
+                <span class="k">for</span> slice in <span class="si">${</span><span class="nv">slices</span><span class="si">}</span><span class="p">;</span> <span class="k">do</span>
+<span class="o">[</span> <span class="nv">$DEBUG</span> <span class="o">==</span> <span class="m">1</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> logger -i <span class="s2">&quot;hotplugd attaching SLICE </span><span class="nv">$slice</span><span class="s2"> of DEVICE </span><span class="nv">$DEVNAME</span><span class="s2">&quot;</span>
+                        <span class="o">[</span> ! -d <span class="nv">$MOUNTROOT</span>/<span class="nv">$DEVNAME$slice</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> mkdir -p -m <span class="m">1777</span> <span class="nv">$MOUNTROOT</span>/<span class="nv">$DEVNAME$slice</span>
+                        mount /dev/<span class="nv">$DEVNAME$slice</span> <span class="nv">$MOUNTROOT</span>/<span class="nv">$DEVNAME$slice</span>
+                <span class="k">done</span>
+                <span class="p">;;</span>
+        <span class="k">esac</span>
+        <span class="p">;;</span>
+<span class="m">3</span><span class="o">)</span>
+        <span class="c1"># network devices; requires hostname.$DEVNAME</span>
+        sh /etc/netstart <span class="nv">$DEVNAME</span>
+        <span class="p">;;</span>
+<span class="k">esac</span>
+$ doas chmod <span class="m">0755</span> /etc/hotplug/attach
+$ doas rcctl restart hotplugd
+</pre></div>
+
+
+<p>that's it. The next time you plug a USB stick, it will be mount at
+<code>/mnt/${dev}${slice}</code> directory automatically.</p>
+<h2>Desktop Notification Daemon</h2>
+<p>If you're using window managers like <a href="https://i3wm.org">i3wm</a>, you might find <a href="https://dunst-project.org/">dunst</a> a
+perfect simple notification daemon which is avilable as package:</p>
+<div class="highlight"><pre><span></span>$ doas pkg_add dunst
+</pre></div>
+
+
+<p>That's it. you don't need to enable anything since sending any message to
+notification, automatically runs dunst. To test the notification:</p>
+<div class="highlight"><pre><span></span>$ notify-send helloWorld
+</pre></div>
+
+
+<p>And here's a simple configuration I picked from a quick search on the web:</p>
+<div class="highlight"><pre><span></span>$ cat ~/.config/dunst/dunstrc 
+<span class="o">[</span>global<span class="o">]</span>
+<span class="nv">font</span> <span class="o">=</span> Iosevka Term <span class="m">11</span>
+
+<span class="c1"># Allow a small subset of html markup:</span>
+<span class="c1">#   &lt;b&gt;bold&lt;/b&gt;</span>
+<span class="c1">#   &lt;i&gt;italic&lt;/i&gt;</span>
+<span class="c1">#   &lt;s&gt;strikethrough&lt;/s&gt;</span>
+<span class="c1">#   &lt;u&gt;underline&lt;/u&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># For a complete reference see</span>
+<span class="c1"># &lt;http://developer.gnome.org/pango/stable/PangoMarkupFormat.html&gt;.</span>
+<span class="c1"># If markup is not allowed, those tags will be stripped out of the</span>
+<span class="c1"># message.</span>
+<span class="nv">allow_markup</span> <span class="o">=</span> yes
+<span class="nv">plain_text</span> <span class="o">=</span> no
+
+<span class="c1"># The format of the message.  Possible variables are:</span>
+<span class="c1">#   %a  appname</span>
+<span class="c1">#   %s  summary</span>
+<span class="c1">#   %b  body</span>
+<span class="c1">#   %i  iconname (including its path)</span>
+<span class="c1">#   %I  iconname (without its path)</span>
+<span class="c1">#   %p  progress value if set ([  0%] to [100%]) or nothing</span>
+<span class="c1"># Markup is allowed</span>
+<span class="nv">format</span> <span class="o">=</span> <span class="s2">&quot;&lt;b&gt;%s&lt;/b&gt;\n%b&quot;</span>
+
+<span class="c1"># Sort messages by urgency.</span>
+<span class="nv">sort</span> <span class="o">=</span> no
+
+<span class="c1"># Show how many messages are currently hidden (because of geometry).</span>
+<span class="nv">indicate_hidden</span> <span class="o">=</span> yes
+
+<span class="c1"># Alignment of message text.</span>
+<span class="c1"># Possible values are &quot;left&quot;, &quot;center&quot; and &quot;right&quot;.</span>
+<span class="nv">alignment</span> <span class="o">=</span> center
+
+<span class="c1"># The frequency with wich text that is longer than the notification</span>
+<span class="c1"># window allows bounces back and forth.</span>
+<span class="c1"># This option conflicts with &quot;word_wrap&quot;.</span>
+<span class="c1"># Set to 0 to disable.</span>
+<span class="nv">bounce_freq</span> <span class="o">=</span> <span class="m">0</span>
+
+<span class="c1"># Show age of message if message is older than show_age_threshold</span>
+<span class="c1"># seconds.</span>
+<span class="c1"># Set to -1 to disable.</span>
+<span class="nv">show_age_threshold</span> <span class="o">=</span> -1
+
+<span class="c1"># Split notifications into multiple lines if they don&#39;t fit into</span>
+<span class="c1"># geometry.</span>
+<span class="nv">word_wrap</span> <span class="o">=</span> yes
+
+<span class="c1"># Ignore newlines &#39;\n&#39; in notifications.</span>
+<span class="nv">ignore_newline</span> <span class="o">=</span> no
+
+<span class="c1"># Hide duplicate&#39;s count and stack them</span>
+<span class="nv">stack_duplicates</span> <span class="o">=</span> yes
+<span class="nv">hide_duplicates_count</span> <span class="o">=</span> yes
+
+
+<span class="c1"># The geometry of the window:</span>
+<span class="c1">#   [{width}]x{height}[+/-{x}+/-{y}]</span>
+<span class="c1"># The geometry of the message window.</span>
+<span class="c1"># The height is measured in number of notifications everything else</span>
+<span class="c1"># in pixels.  If the width is omitted but the height is given</span>
+<span class="c1"># (&quot;-geometry x2&quot;), the message window expands over the whole screen</span>
+<span class="c1"># (dmenu-like).  If width is 0, the window expands to the longest</span>
+<span class="c1"># message displayed.  A positive x is measured from the left, a</span>
+<span class="c1"># negative from the right side of the screen.  Y is measured from</span>
+<span class="c1"># the top and down respectevly.</span>
+<span class="c1"># The width can be negative.  In this case the actual width is the</span>
+<span class="c1"># screen width minus the width defined in within the geometry option.</span>
+<span class="c1">#geometry = &quot;250x50-40+40&quot;</span>
+<span class="nv">geometry</span> <span class="o">=</span> <span class="s2">&quot;300x50-15+49&quot;</span>
+
+<span class="c1"># Shrink window if it&#39;s smaller than the width.  Will be ignored if</span>
+<span class="c1"># width is 0.</span>
+<span class="nv">shrink</span> <span class="o">=</span> no
+
+<span class="c1"># The transparency of the window.  Range: [0; 100].</span>
+<span class="c1"># This option will only work if a compositing windowmanager is</span>
+<span class="c1"># present (e.g. xcompmgr, compiz, etc.).</span>
+<span class="nv">transparency</span> <span class="o">=</span> <span class="m">5</span>
+
+<span class="c1"># Don&#39;t remove messages, if the user is idle (no mouse or keyboard input)</span>
+<span class="c1"># for longer than idle_threshold seconds.</span>
+<span class="c1"># Set to 0 to disable.</span>
+<span class="nv">idle_threshold</span> <span class="o">=</span> <span class="m">0</span>
+
+<span class="c1"># Which monitor should the notifications be displayed on.</span>
+<span class="nv">monitor</span> <span class="o">=</span> <span class="m">0</span>
+
+<span class="c1"># Display notification on focused monitor.  Possible modes are:</span>
+<span class="c1">#   mouse: follow mouse pointer</span>
+<span class="c1">#   keyboard: follow window with keyboard focus</span>
+<span class="c1">#   none: don&#39;t follow anything</span>
+<span class="c1">#</span>
+<span class="c1"># &quot;keyboard&quot; needs a windowmanager that exports the</span>
+<span class="c1"># _NET_ACTIVE_WINDOW property.</span>
+<span class="c1"># This should be the case for almost all modern windowmanagers.</span>
+<span class="c1">#</span>
+<span class="c1"># If this option is set to mouse or keyboard, the monitor option</span>
+<span class="c1"># will be ignored.</span>
+<span class="nv">follow</span> <span class="o">=</span> none
+
+<span class="c1"># Should a notification popped up from history be sticky or timeout</span>
+<span class="c1"># as if it would normally do.</span>
+<span class="nv">sticky_history</span> <span class="o">=</span> yes
+
+<span class="c1"># Maximum amount of notifications kept in history</span>
+<span class="nv">history_length</span> <span class="o">=</span> <span class="m">15</span>
+
+<span class="c1"># Display indicators for URLs (U) and actions (A).</span>
+<span class="nv">show_indicators</span> <span class="o">=</span> no
+
+<span class="c1"># The height of a single line.  If the height is smaller than the</span>
+<span class="c1"># font height, it will get raised to the font height.</span>
+<span class="c1"># This adds empty space above and under the text.</span>
+<span class="nv">line_height</span> <span class="o">=</span> <span class="m">3</span>
+
+<span class="c1"># Draw a line of &quot;separatpr_height&quot; pixel height between two</span>
+<span class="c1"># notifications.</span>
+<span class="c1"># Set to 0 to disable.</span>
+<span class="nv">separator_height</span> <span class="o">=</span> <span class="m">2</span>
+
+<span class="c1"># Padding between text and separator.</span>
+<span class="nv">padding</span> <span class="o">=</span> <span class="m">6</span>
+
+<span class="c1"># Horizontal padding.</span>
+<span class="nv">horizontal_padding</span> <span class="o">=</span> <span class="m">6</span>
+
+<span class="c1"># Define a color for the separator.</span>
+<span class="c1"># possible values are:</span>
+<span class="c1">#  * auto: dunst tries to find a color fitting to the background;</span>
+<span class="c1">#  * foreground: use the same color as the foreground;</span>
+<span class="c1">#  * frame: use the same color as the frame;</span>
+<span class="c1">#  * anything else will be interpreted as a X color.</span>
+<span class="nv">separator_color</span> <span class="o">=</span> frame
+
+<span class="c1"># Print a notification on startup.</span>
+<span class="c1"># This is mainly for error detection, since dbus (re-)starts dunst</span>
+<span class="c1"># automatically after a crash.</span>
+<span class="nv">startup_notification</span> <span class="o">=</span> <span class="nb">false</span>
+
+<span class="c1"># dmenu path.</span>
+<span class="nv">dmenu</span> <span class="o">=</span> /usr/bin/dmenu -p dunst:
+
+<span class="c1"># Browser for opening urls in context menu.</span>
+<span class="nv">browser</span> <span class="o">=</span> /usr/bin/firefox -new-tab
+
+<span class="c1"># Align icons left/right/off</span>
+<span class="nv">icon_position</span> <span class="o">=</span> off
+<span class="nv">max_icon_size</span> <span class="o">=</span> <span class="m">80</span>
+
+<span class="c1"># Paths to default icons.</span>
+<span class="nv">icon_folders</span> <span class="o">=</span> /usr/share/icons/Paper/16x16/mimetypes/:/usr/share/icons/Paper/48x48/status/:/usr/share/icons/Paper/16x16/devices/:/usr/share/icons/Paper/48x48/notifications/:/usr/share/icons/Paper/48x48/emblems/
+
+
+<span class="o">[</span>frame<span class="o">]</span>
+<span class="nv">width</span> <span class="o">=</span> <span class="m">3</span>
+<span class="nv">color</span> <span class="o">=</span> <span class="s2">&quot;#8EC07C&quot;</span>
+
+<span class="o">[</span>shortcuts<span class="o">]</span>
+
+<span class="c1"># Shortcuts are specified as [modifier+][modifier+]...key</span>
+<span class="c1"># Available modifiers are &quot;ctrl&quot;, &quot;mod1&quot; (the alt-key), &quot;mod2&quot;,</span>
+<span class="c1"># &quot;mod3&quot; and &quot;mod4&quot; (windows-key).</span>
+<span class="c1"># Xev might be helpful to find names for keys.</span>
+
+<span class="c1"># Close notification.</span>
+<span class="nv">close</span> <span class="o">=</span> ctrl+space
+
+<span class="c1"># Close all notifications.</span>
+<span class="nv">close_all</span> <span class="o">=</span> ctrl+shift+space
+
+<span class="c1"># Redisplay last message(s).</span>
+<span class="c1"># On the US keyboard layout &quot;grave&quot; is normally above TAB and left</span>
+<span class="c1"># of &quot;1&quot;.</span>
+<span class="nb">history</span> <span class="o">=</span> ctrl+grave
+
+<span class="c1"># Context menu.</span>
+<span class="nv">context</span> <span class="o">=</span> ctrl+shift+period
+
+<span class="o">[</span>urgency_low<span class="o">]</span>
+<span class="c1"># IMPORTANT: colors have to be defined in quotation marks.</span>
+<span class="c1"># Otherwise the &quot;#&quot; and following would be interpreted as a comment.</span>
+<span class="nv">frame_color</span> <span class="o">=</span> <span class="s2">&quot;#3B7C87&quot;</span>
+<span class="nv">foreground</span> <span class="o">=</span> <span class="s2">&quot;#3B7C87&quot;</span>
+<span class="nv">background</span> <span class="o">=</span> <span class="s2">&quot;#191311&quot;</span>
+<span class="c1">#background = &quot;#2B313C&quot;</span>
+<span class="nv">timeout</span> <span class="o">=</span> <span class="m">4</span>
+
+<span class="o">[</span>urgency_normal<span class="o">]</span>
+<span class="nv">frame_color</span> <span class="o">=</span> <span class="s2">&quot;#5B8234&quot;</span>
+<span class="nv">foreground</span> <span class="o">=</span> <span class="s2">&quot;#5B8234&quot;</span>
+<span class="nv">background</span> <span class="o">=</span> <span class="s2">&quot;#191311&quot;</span>
+<span class="c1">#background = &quot;#2B313C&quot;</span>
+<span class="nv">timeout</span> <span class="o">=</span> <span class="m">6</span>
+
+<span class="o">[</span>urgency_critical<span class="o">]</span>
+<span class="nv">frame_color</span> <span class="o">=</span> <span class="s2">&quot;#B7472A&quot;</span>
+<span class="nv">foreground</span> <span class="o">=</span> <span class="s2">&quot;#B7472A&quot;</span>
+<span class="nv">background</span> <span class="o">=</span> <span class="s2">&quot;#191311&quot;</span>
+<span class="c1">#background = &quot;#2B313C&quot;</span>
+<span class="nv">timeout</span> <span class="o">=</span> <span class="m">8</span>
+
+
+<span class="c1"># Every section that isn&#39;t one of the above is interpreted as a rules to</span>
+<span class="c1"># override settings for certain messages.</span>
+<span class="c1"># Messages can be matched by &quot;appname&quot;, &quot;summary&quot;, &quot;body&quot;, &quot;icon&quot;, &quot;category&quot;,</span>
+<span class="c1"># &quot;msg_urgency&quot; and you can override the &quot;timeout&quot;, &quot;urgency&quot;, &quot;foreground&quot;,</span>
+<span class="c1"># &quot;background&quot;, &quot;new_icon&quot; and &quot;format&quot;.</span>
+<span class="c1"># Shell-like globbing will get expanded.</span>
+<span class="c1">#</span>
+<span class="c1"># SCRIPTING</span>
+<span class="c1"># You can specify a script that gets run when the rule matches by</span>
+<span class="c1"># setting the &quot;script&quot; option.</span>
+<span class="c1"># The script will be called as follows:</span>
+<span class="c1">#   script appname summary body icon urgency</span>
+<span class="c1"># where urgency can be &quot;LOW&quot;, &quot;NORMAL&quot; or &quot;CRITICAL&quot;.</span>
+<span class="c1">#</span>
+<span class="c1"># NOTE: if you don&#39;t want a notification to be displayed, set the format</span>
+<span class="c1"># to &quot;&quot;.</span>
+<span class="c1"># NOTE: It might be helpful to run dunst -print in a terminal in order</span>
+<span class="c1"># to find fitting options for rules.</span>
+
+<span class="c1">#[espeak]</span>
+<span class="c1">#    summary = &quot;*&quot;</span>
+<span class="c1">#    script = dunst_espeak.sh</span>
+
+<span class="c1">#[script-test]</span>
+<span class="c1">#    summary = &quot;*script*&quot;</span>
+<span class="c1">#    script = dunst_test.sh</span>
+
+<span class="c1">#[ignore]</span>
+<span class="c1">#    # This notification will not be displayed</span>
+<span class="c1">#    summary = &quot;foobar&quot;</span>
+<span class="c1">#    format = &quot;&quot;</span>
+
+<span class="c1">#[signed_on]</span>
+<span class="c1">#    appname = Pidgin</span>
+<span class="c1">#    summary = &quot;*signed on*&quot;</span>
+<span class="c1">#    urgency = low</span>
+<span class="c1">#</span>
+<span class="c1">#[signed_off]</span>
+<span class="c1">#    appname = Pidgin</span>
+<span class="c1">#    summary = *signed off*</span>
+<span class="c1">#    urgency = low</span>
+<span class="c1">#</span>
+<span class="c1">#[says]</span>
+<span class="c1">#    appname = Pidgin</span>
+<span class="c1">#    summary = *says*</span>
+<span class="c1">#    urgency = critical</span>
+<span class="c1">#</span>
+<span class="c1">#[twitter]</span>
+<span class="c1">#    appname = Pidgin</span>
+<span class="c1">#    summary = *twitter.com*</span>
+<span class="c1">#    urgency = normal</span>
+<span class="c1">#</span>
+<span class="c1"># vim: ft=cfg</span>
+</pre></div>
+
+
+<h1>Integrated Development Window Manager</h1>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="http://bijanebrahimi.github.io/blog/tag/bsd.html">bsd</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/openbsd.html">openbsd</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/netctl.html">netctl</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/wifi.html">wifi</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/nmctl.html">nmctl</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/network-manager.html">network-manager</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/hotplugd.html">hotplugd</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/automount.html">automount</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/dunst.html">dunst</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="http://bijanebrahimi.github.io/blog/author/bijan.html"><img src="http://gravatar.com/avatar/7596946117736307374be0d29ba22ffd" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a></h3>
+                        <p class="author-description">
+                          
+            I Love to Read, Code and Explore the Possibilities.
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'bijanebrahimi';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="http://bijanebrahimi.github.io/blog/" title="Routines Excluded">Routines Excluded</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/books.html">Books</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/freebsd.html">FreeBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/gist.html">Gist</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/git.html">Git</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/linux.html">Linux</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/openbsd.html">OpenBSD</a>
+        <a href="http://bijanebrahimi.github.io/blog/category/projects.html">Projects</a>
+        <a href="https://github.com/bijanebrahimi/blog">Fork Me on Github</a>
+
+    </footer>
+
+</body>
+</html>

@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
         <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
-        <link href="http://bijanebrahimi.github.io/blog/feeds/linux.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
 </head>
 <body>
 
@@ -77,15 +77,15 @@ or just use the <code>--auto-tune</code> option.</p>
 <p>That single command will probably add a noticeable extra minutes to your battery
 life. But there are still other ways to improve it more. Let's Go to powertop's
 <code>Overview Tab</code> again:</p>
-<div class="highlight"><pre><span></span>Power est.  Usage        Events/s    Category    Description
-  5.18 W    0.4 pkts/s               Device      Network interface: wlp2s0 (wl)
-  3.80 W    100.0%                   Device      Display backlight
-  1.26 W    165.5 ms/s   123.3       Process     /usr/share/atom/atom --type=zygote --no-sandbox
-  675 mW    95.9 ms/s    5.3         Process     atom
-  660 mW    94.0%                    Device      USB device: USB2.0-CRW (Generic)
-  262 mW    27.0 ms/s    90.1        Process     /usr/share/atom/atom --executed-from=/home/bijan --pid=1109
-  247 mW    27.2 ms/s    70.4        Process     /usr/lib/xorg-server/Xorg :0 -seat seat0 -auth /run/lightdm/root/:0 -nolisten tc
-  103 mW    2.0 ms/s     109.7        kWork      od_dbs_timer
+<div class="highlight"><pre><span></span><span class="err">Power est.  Usage        Events/s    Category    Description</span>
+<span class="err">  5.18 W    0.4 pkts/s               Device      Network interface: wlp2s0 (wl)</span>
+<span class="err">  3.80 W    100.0%                   Device      Display backlight</span>
+<span class="err">  1.26 W    165.5 ms/s   123.3       Process     /usr/share/atom/atom --type=zygote --no-sandbox</span>
+<span class="err">  675 mW    95.9 ms/s    5.3         Process     atom</span>
+<span class="err">  660 mW    94.0%                    Device      USB device: USB2.0-CRW (Generic)</span>
+<span class="err">  262 mW    27.0 ms/s    90.1        Process     /usr/share/atom/atom --executed-from=/home/bijan --pid=1109</span>
+<span class="err">  247 mW    27.2 ms/s    70.4        Process     /usr/lib/xorg-server/Xorg :0 -seat seat0 -auth /run/lightdm/root/:0 -nolisten tc</span>
+<span class="err">  103 mW    2.0 ms/s     109.7        kWork      od_dbs_timer</span>
 </pre></div>
 
 
@@ -96,34 +96,34 @@ The last two I never/rarely use.</p>
 <p>Since I never/rarely use my CD-RW and I never connect to Internet through wired
 connection, so it seems logical to me to disable them. to find my CD-RW device
 power location, I used powertop <code>Tunable Tab</code>:</p>
-<div class="highlight"><pre><span></span># Disable CR-RW
-$ echo 0 | s tee /sys/bus/usb/devices/1-1.3/power/autosuspend_delay_ms
-$ echo auto | s tee /sys/bus/usb/devices/1-1.3/power/control
+<div class="highlight"><pre><span></span><span class="err"># Disable CR-RW</span>
+<span class="err">$ echo 0 | s tee /sys/bus/usb/devices/1-1.3/power/autosuspend_delay_ms</span>
+<span class="err">$ echo auto | s tee /sys/bus/usb/devices/1-1.3/power/control</span>
 </pre></div>
 
 
 <p>To disable my Ethernet device, first I have to find it's device number:</p>
-<div class="highlight"><pre><span></span># Find Ethernet domain:bus:slot number
-$ lspci | grep -i ethernet
-03:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller (rev 10)
+<div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">Find</span> <span class="n">Ethernet</span> <span class="k">domain</span><span class="p">:</span><span class="n">bus</span><span class="p">:</span><span class="n">slot</span> <span class="nb">number</span>
+<span class="err">$</span> <span class="n">lspci</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">i</span> <span class="n">ethernet</span>
+<span class="mi">03</span><span class="p">:</span><span class="mi">00</span><span class="p">.</span><span class="mi">0</span> <span class="n">Ethernet</span> <span class="n">controller</span><span class="p">:</span> <span class="n">Realtek</span> <span class="n">Semiconductor</span> <span class="n">Co</span><span class="p">.,</span> <span class="n">Ltd</span><span class="p">.</span> <span class="n">RTL8111</span><span class="o">/</span><span class="mi">8168</span><span class="o">/</span><span class="mi">8411</span> <span class="n">PCI</span> <span class="n">Express</span> <span class="n">Gigabit</span> <span class="n">Ethernet</span> <span class="n">Controller</span> <span class="p">(</span><span class="n">rev</span> <span class="mi">10</span><span class="p">)</span>
 
-# Find relative device on /sys/devices
-$ find /sys/devices -name &quot;*03:00.0&quot;
-/sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0
+<span class="o">#</span> <span class="n">Find</span> <span class="k">relative</span> <span class="n">device</span> <span class="k">on</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">devices</span>
+<span class="err">$</span> <span class="n">find</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">devices</span> <span class="o">-</span><span class="n">name</span> <span class="ss">&quot;*03:00.0&quot;</span>
+<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">devices</span><span class="o">/</span><span class="n">pci0000</span><span class="p">:</span><span class="mi">00</span><span class="o">/</span><span class="mi">0000</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">02</span><span class="p">.</span><span class="mi">4</span><span class="o">/</span><span class="mi">0000</span><span class="p">:</span><span class="mi">03</span><span class="p">:</span><span class="mi">00</span><span class="p">.</span><span class="mi">0</span>
 
-# Turn off device
-echo 1 | s tee /sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0/remove
+<span class="o">#</span> <span class="n">Turn</span> <span class="k">off</span> <span class="n">device</span>
+<span class="n">echo</span> <span class="mi">1</span> <span class="o">|</span> <span class="n">s</span> <span class="n">tee</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">devices</span><span class="o">/</span><span class="n">pci0000</span><span class="p">:</span><span class="mi">00</span><span class="o">/</span><span class="mi">0000</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">02</span><span class="p">.</span><span class="mi">4</span><span class="o">/</span><span class="mi">0000</span><span class="p">:</span><span class="mi">03</span><span class="p">:</span><span class="mi">00</span><span class="p">.</span><span class="mi">0</span><span class="o">/</span><span class="n">remove</span>
 </pre></div>
 
 
 <h3>Backlight</h3>
 <p>To reduce the brightness LED backlight, I set a brightness value (between 0 and 255):</p>
-<div class="highlight"><pre><span></span><span class="err">#</span><span class="x"> Brightness</span>
-<span class="x">basedir=&quot;/sys/class/backlight/&quot;</span>
-<span class="x">handler=</span><span class="p">$</span><span class="nv">basedir</span><span class="p">$(</span><span class="err">ls</span> <span class="p">$</span><span class="nv">basedir</span><span class="p">)</span><span class="x">&quot;/&quot;</span>
+<div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">Brightness</span>
+<span class="n">basedir</span><span class="o">=</span><span class="ss">&quot;/sys/class/backlight/&quot;</span>
+<span class="k">handler</span><span class="o">=</span><span class="err">$</span><span class="n">basedir$</span><span class="p">(</span><span class="n">ls</span> <span class="err">$</span><span class="n">basedir</span><span class="p">)</span><span class="ss">&quot;/&quot;</span>
 
-<span class="x">chmod 666 </span><span class="p">$</span><span class="nv">handler</span><span class="x">/brightness</span>
-<span class="x">echo 100 &gt; handler/brightness</span>
+<span class="n">chmod</span> <span class="mi">666</span> <span class="err">$</span><span class="k">handler</span><span class="o">/</span><span class="n">brightness</span>
+<span class="n">echo</span> <span class="mi">100</span> <span class="o">&gt;</span> <span class="k">handler</span><span class="o">/</span><span class="n">brightness</span>
 </pre></div>
 
 
@@ -165,20 +165,20 @@ chmod <span class="m">666</span> /sys/class/backlight/radeon_bl0/brightness
 </td></tr></table>
 
 <p>And to create proper systemd service:</p>
-<div class="highlight"><pre><span></span># /etc/systemd/system/powertop_tuning.service
-[Unit]
-Description=&quot;PowerTop Tuning config&quot;
-ConditionPathExists=/usr/local/bin/powertop_tuning.sh
+<div class="highlight"><pre><span></span><span class="err">#</span><span class="w"> </span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="k">system</span><span class="o">/</span><span class="n">powertop_tuning</span><span class="p">.</span><span class="n">service</span><span class="w"></span>
+<span class="o">[</span><span class="n">Unit</span><span class="o">]</span><span class="w"></span>
+<span class="n">Description</span><span class="o">=</span><span class="ss">&quot;PowerTop Tuning config&quot;</span><span class="w"></span>
+<span class="n">ConditionPathExists</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="k">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">powertop_tuning</span><span class="p">.</span><span class="n">sh</span><span class="w"></span>
 
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-KillMode=none
-ExecStart=/usr/local/bin/powertop_tuning.sh
-ExecStop=exit
+<span class="o">[</span><span class="n">Service</span><span class="o">]</span><span class="w"></span>
+<span class="n">Type</span><span class="o">=</span><span class="n">oneshot</span><span class="w"></span>
+<span class="n">RemainAfterExit</span><span class="o">=</span><span class="n">yes</span><span class="w"></span>
+<span class="n">KillMode</span><span class="o">=</span><span class="k">none</span><span class="w"></span>
+<span class="n">ExecStart</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="k">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">powertop_tuning</span><span class="p">.</span><span class="n">sh</span><span class="w"></span>
+<span class="n">ExecStop</span><span class="o">=</span><span class="k">exit</span><span class="w"></span>
 
-[Install]
-WantedBy=multi-user.target
+<span class="o">[</span><span class="n">Install</span><span class="o">]</span><span class="w"></span>
+<span class="n">WantedBy</span><span class="o">=</span><span class="n">multi</span><span class="o">-</span><span class="k">user</span><span class="p">.</span><span class="n">target</span><span class="w"></span>
 </pre></div>
 
 

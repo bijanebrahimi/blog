@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>Makefiles, part one</title>
+        <title>Smallest and Longest Manpage you ever read</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="http://bijanebrahimi.github.io/blog/theme/css/main.css" />
         <link href="http://bijanebrahimi.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Full Atom Feed" />
-        <link href="http://bijanebrahimi.github.io/blog/feeds/gist.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
+        <link href="http://bijanebrahimi.github.io/blog/feeds/{slug}.atom.xml" type="application/atom+xml" rel="alternate" title="Routines Excluded Categories Atom Feed" />
 </head>
 <body>
 
@@ -37,7 +37,7 @@
     <a href="http://bijanebrahimi.github.io/blog/category/gist.html" class="category">Gist</a><br />
 
     <a class="author" href="http://bijanebrahimi.github.io/blog/author/bijan.html">Bijan</a>
-    &mdash; <abbr title="2017-10-21T21:47:00+03:30">Sat 21 October 2017</abbr>
+    &mdash; <abbr title="2017-10-31T21:53:00+03:30">Tue 31 October 2017</abbr>
 </div>        </div>
     </div>
 
@@ -46,46 +46,30 @@
 
             <div class="background-image-small">
                 <div class="title-container">
-                    <h1>Makefiles, part one</h1>
-                    <h4>Simple Automation Scripts</h4>
+                    <h1>Smallest and Longest Manpage you ever read</h1>
+                    <h4>what's the longest manpage you actually read?</h4>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="entry-content">
-        <p>Today, I'm decided to post a series of NOT THAT technical posts about
-Makefiles and automation process. My goal is to learn more in the
-process of writing such series though there are many great an compete
-tutorials on the web. </p>
-<p>Consider the following <strong>hello world</strong> example since we're focusing
-mainly on writing Makefile scripts to compile and generate output
-binaries:</p>
-<div class="highlight"><pre><span></span><span class="cm">/* main.c */</span>
-<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&quot;main.h&quot;</span><span class="cp"></span>
-
-<span class="kt">int</span>
-<span class="nf">main</span> <span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span>
-<span class="p">{</span>
-        <span class="n">printf</span> <span class="p">(</span><span class="n">MESSAGE</span><span class="p">);</span>
-        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+        <h1>Introduction</h1>
+<p>Recently I asked a question on OpenSD IRC channel which led to a question
+entirely different. What's the smallest/longest manpage you ever read?</p>
+<div class="highlight"><pre><span></span>$ find /usr/local/share/man -type f -exec wc -l <span class="o">{}</span> <span class="se">\;</span>  <span class="p">|</span> sort
 </pre></div>
 
 
-<div class="highlight"><pre><span></span><span class="cm">/* main.h */</span>
-<span class="cp">#define MESSAGE &quot;HELLO WORLD&quot;</span>
-</pre></div>
+<p>On OpenBSD 6.2, the smallest is <a href="https://man.openbsd.org/dcphy.4">dcphy(4)</a> with 23 lines and the longest
+(by far distance) is <a href="https://man.openbsd.org/perltoc.1">perltoc(1)</a> with 33106 lines. But what's the longest
+manpage you actually read?</p>
     </div>
 
     <footer>
         <div class="tags">
-            <a href="http://bijanebrahimi.github.io/blog/tag/gist.html">gist</a>
-            <a href="http://bijanebrahimi.github.io/blog/tag/makefile.html">Makefile</a>
-            <a href="http://bijanebrahimi.github.io/blog/tag/gcc.html">gcc</a>
-            <a href="http://bijanebrahimi.github.io/blog/tag/openbsd.html">openbsd</a>
-            <a href="http://bijanebrahimi.github.io/blog/tag/unix.html">unix</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/openbsd.html">OpenBSD</a>
+            <a href="http://bijanebrahimi.github.io/blog/tag/manpages.html">Manpages</a>
         </div>
         <div class="pure-g post-footer">
             <div class="pure-u-1 pure-u-md-1-2">
