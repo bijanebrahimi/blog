@@ -17,7 +17,7 @@ with OpenBSD as a desktop.&lt;/p&gt;
 &lt;a href="http://www.jupiterbroadcasting.com/121362/the-spectre-of-meltdown-bsd-now-228/"&gt;latest episode&lt;/a&gt;, I managed to look at it again and enhance the script,
 specifically permission-wise. So mounting MSDOS and NTFS partitions are now done
 with proper user and grup permissions:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/sh&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="ch"&gt;#!/bin/sh&lt;/span&gt;
 
 &lt;span class="nv"&gt;DEVCLASS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;
 &lt;span class="nv"&gt;DEVNAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$2&lt;/span&gt;
@@ -29,7 +29,7 @@ with proper user and grup permissions:&lt;/p&gt;
 &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;DISPLAY&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;:0.0
 &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;HOME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/home/bijan
 
-&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$DEVCLASS&lt;/span&gt; in
+&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$DEVCLASS&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt;
 &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
     &lt;span class="c1"&gt;# disk devices&lt;/span&gt;
         /sbin/disklabel &lt;span class="nv"&gt;$DEVNAME&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk -F &lt;span class="s1"&gt;&amp;#39;[ ]*&amp;#39;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/^  [abd-z]:/&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="nb"&gt;read&lt;/span&gt; line&lt;span class="p"&gt;;&lt;/span&gt;
@@ -37,7 +37,7 @@ with proper user and grup permissions:&lt;/p&gt;
         &lt;span class="nv"&gt;mount_flags&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-o noexec,noatime,nodev&amp;quot;&lt;/span&gt;
                 &lt;span class="nv"&gt;slice&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk -F &lt;span class="s1"&gt;&amp;#39;:&amp;#39;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{print $1}&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
                 &lt;span class="nv"&gt;type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk -F &lt;span class="s1"&gt;&amp;#39;[ ]*&amp;#39;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{print $4}&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
-                &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$type&lt;/span&gt; in
+                &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$type&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt;
         ISO9660 &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="m"&gt;4&lt;/span&gt;.2BSD&lt;span class="o"&gt;)&lt;/span&gt;
                         &lt;span class="p"&gt;;;&lt;/span&gt;
         ext2fs&lt;span class="o"&gt;)&lt;/span&gt;
@@ -67,11 +67,10 @@ with proper user and grup permissions:&lt;/p&gt;
     sh /etc/netstart &lt;span class="nv"&gt;$DEVNAME&lt;/span&gt;
     &lt;span class="p"&gt;;;&lt;/span&gt;
 &lt;span class="k"&gt;esac&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;strong&gt;Original&lt;/strong&gt;:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ doas rcctl &lt;span class="nb"&gt;enable&lt;/span&gt; hotplugd
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ doas rcctl &lt;span class="nb"&gt;enable&lt;/span&gt; hotplugd
 $ cat /etc/hotplug/attach
 &lt;span class="c1"&gt;#!/bin/sh&lt;/span&gt;
 
@@ -82,14 +81,14 @@ $ cat /etc/hotplug/attach
 &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;DISPLAY&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;:0.0
 &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;HOME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/home/bijan
 
-&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$DEVCLASS&lt;/span&gt; in
+&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$DEVCLASS&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt;
 &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
         &lt;span class="c1"&gt;# disk devices&lt;/span&gt;
         /sbin/disklabel &lt;span class="nv"&gt;$DEVNAME&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk -F &lt;span class="s1"&gt;&amp;#39;[ ]*&amp;#39;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/^  [abd-z]:/&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="nb"&gt;read&lt;/span&gt; line&lt;span class="p"&gt;;&lt;/span&gt;
         &lt;span class="k"&gt;do&lt;/span&gt;
                 &lt;span class="nv"&gt;slice&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk -F &lt;span class="s1"&gt;&amp;#39;:&amp;#39;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{print $1}&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
                 &lt;span class="nv"&gt;fs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk -F &lt;span class="s1"&gt;&amp;#39;[ ]*&amp;#39;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{print $4}&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
-                &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$fs&lt;/span&gt; in
+                &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$fs&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt;
                 MSDOS &lt;span class="p"&gt;|&lt;/span&gt; ISO9660 &lt;span class="p"&gt;|&lt;/span&gt; ext2fs &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="m"&gt;4&lt;/span&gt;.2BSD&lt;span class="o"&gt;)&lt;/span&gt;
                         &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$DEBUG&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; logger -i &lt;span class="s2"&gt;&amp;quot;hotplugd attaching SLICE &lt;/span&gt;&lt;span class="nv"&gt;$slice&lt;/span&gt;&lt;span class="s2"&gt; of DEVICE &lt;/span&gt;&lt;span class="nv"&gt;$DEVNAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
                         &lt;span class="o"&gt;[&lt;/span&gt; ! -d &lt;span class="nv"&gt;$MOUNTROOT&lt;/span&gt;/&lt;span class="nv"&gt;$DEVNAME$slice&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; mkdir -p -m &lt;span class="m"&gt;1777&lt;/span&gt; &lt;span class="nv"&gt;$MOUNTROOT&lt;/span&gt;/&lt;span class="nv"&gt;$DEVNAME$slice&lt;/span&gt;
@@ -104,7 +103,7 @@ $ cat /etc/hotplug/attach
     sh /etc/netstart &lt;span class="nv"&gt;$DEVNAME&lt;/span&gt;
     &lt;span class="p"&gt;;;&lt;/span&gt;
 &lt;span class="k"&gt;esac&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</content><category term="OpenBSD"></category><category term="openbsd"></category><category term="hotplugd"></category><category term="mount"></category></entry><entry><title>OpenBSD's Network stack (PART 1)</title><link href="http://bijanebrahimi.github.io/blog/openbsds-network-stack-part-1.html" rel="alternate"></link><published>2017-12-15T13:15:00+03:30</published><updated>2017-12-15T13:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-12-15:/blog/openbsds-network-stack-part-1.html</id><summary type="html">&lt;h2&gt;The OpenBSD Network Stack Graph&lt;/h2&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="OpenBSD"></category><category term="openbsd"></category><category term="hotplugd"></category><category term="mount"></category></entry><entry><title>OpenBSD's Network stack (PART 1)</title><link href="http://bijanebrahimi.github.io/blog/openbsds-network-stack-part-1.html" rel="alternate"></link><published>2017-12-15T13:15:00+03:30</published><updated>2017-12-15T13:15:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-12-15:/blog/openbsds-network-stack-part-1.html</id><summary type="html">&lt;h2&gt;The OpenBSD Network Stack Graph&lt;/h2&gt;
 &lt;p&gt;Since &lt;a href="https://www.openbsd.org/papers/asiabsdcon08-network.pdf"&gt;OpenBSD Network Stack Internals&lt;/a&gt; by Claudio Jeker at AsiaBSDCon 2008,
 there's a noticeable changes in OpenBSD network stack. obviously the removal
 of using softnet task queue for forwarding IP packets which is now done by almost
@@ -179,7 +178,7 @@ The manpage is complete (OpenBSD Style) but the idea is simple and clear. netctl
 keeps &lt;a href="http://man.openbsd.org/hostname.if.5"&gt;hostname.if(5)&lt;/a&gt; configuration files categorized in &lt;code&gt;/etc/hostname.d&lt;/code&gt;
 directory by loaction or nwids and then symlink them into &lt;code&gt;/etc&lt;/code&gt; at startup
 or by switching to different locations on-demand:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ls -lR /etc/hostname.*
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ ls -lR /etc/hostname.*
 /etc/hostname.run0 -&amp;gt; /etc/hostname.d/nwids/BlackHole.nwid
 
 /etc/hostname.d:
@@ -188,8 +187,7 @@ nwids
 /etc/hostname.d/nwids:
 BlackHole.nwid
 ZWLan.nwid
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;But if you liked netctl, you might also wanted to read &lt;a href="http://vincentdelft.be/post/post_20171023"&gt;Vincet's Blog Post, 
 Network Manager Control for OpenBSD&lt;/a&gt;. Basically &lt;a href="https://sourceforge.net/p/nmctl/code/ci/master/tree/"&gt;nmctl&lt;/a&gt; is an improved
@@ -201,7 +199,7 @@ find a nice example script in the manual or here at &lt;a href="https://www.tumf
 stick on OpenBSD&lt;/a&gt;:&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: an improved version of the script can be found in
 &lt;a href="http://bijanebrahimi.github.io/blog/openbsd-hotplugd-scripting.html"&gt;here&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ doas rcctl &lt;span class="nb"&gt;enable&lt;/span&gt; hotplugd
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ doas rcctl &lt;span class="nb"&gt;enable&lt;/span&gt; hotplugd
 $ cat /etc/hotplug/attach
 &lt;span class="c1"&gt;#!/bin/sh&lt;/span&gt;
 
@@ -210,16 +208,16 @@ $ cat /etc/hotplug/attach
 &lt;span class="nv"&gt;MOUNTROOT&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/mnt&amp;quot;&lt;/span&gt;
 &lt;span class="nv"&gt;DEBUG&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
 
-&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$DEVCLASS&lt;/span&gt; in
+&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$DEVCLASS&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt;
 &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
         &lt;span class="c1"&gt;# disk devices&lt;/span&gt;
         &lt;span class="nv"&gt;disklabel&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;/sbin/disklabel &lt;span class="nv"&gt;$DEVNAME&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; /usr/bin/sed -n &lt;span class="s1"&gt;&amp;#39;/^disk: /s/^disk: //p&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
 &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$DEBUG&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; logger -i &lt;span class="s2"&gt;&amp;quot;hotplugd discovered DISKLABEL &lt;/span&gt;&lt;span class="nv"&gt;$disklabel&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
-        &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$disklabel&lt;/span&gt; in
+        &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nv"&gt;$disklabel&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt;
         &lt;span class="s2"&gt;&amp;quot;SCSI disk&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
                 &lt;span class="nv"&gt;slices&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;/sbin/disklabel &lt;span class="nv"&gt;$DEVNAME&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;&lt;span class="p"&gt;&amp;amp;&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
                 sed -n &lt;span class="s1"&gt;&amp;#39;/^ *[abd-z]: /s/^ *\([abd-z]\):.*/\1/p&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
-                &lt;span class="k"&gt;for&lt;/span&gt; slice in &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;slices&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+                &lt;span class="k"&gt;for&lt;/span&gt; slice &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;slices&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
 &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$DEBUG&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; logger -i &lt;span class="s2"&gt;&amp;quot;hotplugd attaching SLICE &lt;/span&gt;&lt;span class="nv"&gt;$slice&lt;/span&gt;&lt;span class="s2"&gt; of DEVICE &lt;/span&gt;&lt;span class="nv"&gt;$DEVNAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
                         &lt;span class="o"&gt;[&lt;/span&gt; ! -d &lt;span class="nv"&gt;$MOUNTROOT&lt;/span&gt;/&lt;span class="nv"&gt;$DEVNAME$slice&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; mkdir -p -m &lt;span class="m"&gt;1777&lt;/span&gt; &lt;span class="nv"&gt;$MOUNTROOT&lt;/span&gt;/&lt;span class="nv"&gt;$DEVNAME$slice&lt;/span&gt;
                         mount /dev/&lt;span class="nv"&gt;$DEVNAME$slice&lt;/span&gt; &lt;span class="nv"&gt;$MOUNTROOT&lt;/span&gt;/&lt;span class="nv"&gt;$DEVNAME$slice&lt;/span&gt;
@@ -234,26 +232,23 @@ $ cat /etc/hotplug/attach
 &lt;span class="k"&gt;esac&lt;/span&gt;
 $ doas chmod &lt;span class="m"&gt;0755&lt;/span&gt; /etc/hotplug/attach
 $ doas rcctl restart hotplugd
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;that's it. The next time you plug a USB stick, it will be mount at
 &lt;code&gt;/mnt/${dev}${slice}&lt;/code&gt; directory automatically.&lt;/p&gt;
 &lt;h2&gt;Desktop Notification Daemon&lt;/h2&gt;
 &lt;p&gt;If you're using window managers like &lt;a href="https://i3wm.org"&gt;i3wm&lt;/a&gt;, you might find &lt;a href="https://dunst-project.org/"&gt;dunst&lt;/a&gt; a
 perfect simple notification daemon which is avilable as package:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ doas pkg_add dunst
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ doas pkg_add dunst
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;That's it. you don't need to enable anything since sending any message to
 notification, automatically runs dunst. To test the notification:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ notify-send helloWorld
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ notify-send helloWorld
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;And here's a simple configuration I picked from a quick search on the web:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat ~/.config/dunst/dunstrc 
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ cat ~/.config/dunst/dunstrc 
 &lt;span class="o"&gt;[&lt;/span&gt;global&lt;span class="o"&gt;]&lt;/span&gt;
 &lt;span class="nv"&gt;font&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; Iosevka Term &lt;span class="m"&gt;11&lt;/span&gt;
 
@@ -513,8 +508,7 @@ notification, automatically runs dunst. To test the notification:&lt;/p&gt;
 &lt;span class="c1"&gt;#    urgency = normal&lt;/span&gt;
 &lt;span class="c1"&gt;#&lt;/span&gt;
 &lt;span class="c1"&gt;# vim: ft=cfg&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h1&gt;Integrated Development Window Manager&lt;/h1&gt;</content><category term="OpenBSD"></category><category term="bsd"></category><category term="openbsd"></category><category term="netctl"></category><category term="wifi"></category><category term="nmctl"></category><category term="network-manager"></category><category term="hotplugd"></category><category term="automount"></category><category term="dunst"></category></entry><entry><title>Privileged Seperated Processes</title><link href="http://bijanebrahimi.github.io/blog/privileged-seperated-processes.html" rel="alternate"></link><published>2017-10-24T20:17:00+03:30</published><updated>2017-10-24T20:17:00+03:30</updated><author><name>Bijan</name></author><id>tag:bijanebrahimi.github.io,2017-10-24:/blog/privileged-seperated-processes.html</id><summary type="html">&lt;h2&gt;An Intorduction&lt;/h2&gt;
 &lt;blockquote&gt;
@@ -553,7 +547,7 @@ connected to the other using the specified Protocol.&lt;/p&gt;
 and the child. Since the sockets are indistinguishable, there's no difference
 which uses which.&lt;/p&gt;
 &lt;p&gt;The following snippet, Creates a socket pair and pass it to the child:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
 &lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;unistd.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
 &lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;err.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
 &lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;sys/wait.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
@@ -615,15 +609,13 @@ which uses which.&lt;/p&gt;
     &lt;span class="n"&gt;waitpid&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;WAIT_ANY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;WEXITSTATUS&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;And the output is:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcc -o privsep main.c
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ gcc -o privsep main.c
 $ ./privsep
 Received &lt;span class="s2"&gt;&amp;quot;Hello World&amp;quot;&lt;/span&gt; from the Child
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Tips:&lt;/p&gt;
 &lt;ul&gt;
@@ -652,31 +644,30 @@ database or server-side logic.&lt;/p&gt;
 to ease the process of writing and publishing your posts, However the format of
 this Makefile is in GNU Make format and you'll get the following errors if you
 run it on your BSD (FreeBSD and OpenBSD as I am aware of):&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ make devserver
-No closing parenthesis in archive specification
-*** Parse error in /path/to/pelican/project: Error in archive specification: &lt;span class="s2"&gt;&amp;quot;(0, 1)&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:31&lt;span class="o"&gt;)&lt;/span&gt;
-*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:33&lt;span class="o"&gt;)&lt;/span&gt;
-No closing parenthesis in archive specification
-*** Parse error: Error in archive specification: &lt;span class="s2"&gt;&amp;quot;(0, 1)&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:36&lt;span class="o"&gt;)&lt;/span&gt;
-*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:38&lt;span class="o"&gt;)&lt;/span&gt;
-*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;PORT&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:74&lt;span class="o"&gt;)&lt;/span&gt;
-*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;else&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:76&lt;span class="o"&gt;)&lt;/span&gt;
-*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:78&lt;span class="o"&gt;)&lt;/span&gt;
-*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;SERVER&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:81&lt;span class="o"&gt;)&lt;/span&gt;
-*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;else&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:83&lt;span class="o"&gt;)&lt;/span&gt;
-*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:85&lt;span class="o"&gt;)&lt;/span&gt;
-*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;PORT&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:89&lt;span class="o"&gt;)&lt;/span&gt;
-*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;else&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:91&lt;span class="o"&gt;)&lt;/span&gt;
-*** Parse error: Need an operator in &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:93&lt;span class="o"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ make devserver
+No closing parenthesis &lt;span class="k"&gt;in&lt;/span&gt; archive specification
+*** Parse error &lt;span class="k"&gt;in&lt;/span&gt; /path/to/pelican/project: Error &lt;span class="k"&gt;in&lt;/span&gt; archive specification: &lt;span class="s2"&gt;&amp;quot;(0, 1)&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:31&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:33&lt;span class="o"&gt;)&lt;/span&gt;
+No closing parenthesis &lt;span class="k"&gt;in&lt;/span&gt; archive specification
+*** Parse error: Error &lt;span class="k"&gt;in&lt;/span&gt; archive specification: &lt;span class="s2"&gt;&amp;quot;(0, 1)&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:36&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:38&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;PORT&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:74&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;else&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:76&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:78&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;SERVER&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:81&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;else&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:83&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:85&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;PORT&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:89&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;else&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:91&lt;span class="o"&gt;)&lt;/span&gt;
+*** Parse error: Need an operator &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;endif&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Makefile:93&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;There's plentty of good resources online, referencing the differences. For
 portable makefiles, you should probably read &lt;a href="https://www.gnu.org/software/make/manual/html_node/Features.html"&gt;Features of GNU make&lt;/a&gt; and 
 &lt;a href="https://www.gnu.org/software/make/manual/html_node/Missing.html"&gt;Features of GNU make&lt;/a&gt; and of course, The OpenBSD's &lt;a href="https://man.openbsd.org/make.1"&gt;make(1)&lt;/a&gt; and The
 FreeBSD's &lt;a href="https://www.freebsd.org/cgi/man.cgi?query=make(1)"&gt;make(1)&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;The following patch illustrates the changes and I hope it helps others:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gh"&gt;diff --git a/Makefile b/Makefile&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="gh"&gt;diff --git a/Makefile b/Makefile&lt;/span&gt;
 &lt;span class="gh"&gt;index d1ddf80..d87b1e9 100644&lt;/span&gt;
 &lt;span class="gd"&gt;--- a/Makefile&lt;/span&gt;
 &lt;span class="gi"&gt;+++ b/Makefile&lt;/span&gt;
@@ -744,8 +735,7 @@ FreeBSD's &lt;a href="https://www.freebsd.org/cgi/man.cgi?query=make(1)"&gt;make
 
  stopserver:
         $(BASEDIR)/develop_server.sh stop
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;More to Read:&lt;/p&gt;
 &lt;ul&gt;
@@ -765,41 +755,36 @@ image or using the manual process which is not recommended.&lt;/li&gt;
 &lt;li&gt;Second, Upgrading the binary packages.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;I choose Upgrading via a bootable media since it is the highly recommended way:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;$curl&lt;/span&gt; -o install62.fs https://openbsd.mirror.netelligent.ca/pub/OpenBSD/6.2/amd64/install62.fs
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;$curl&lt;/span&gt; -o install62.fs https://openbsd.mirror.netelligent.ca/pub/OpenBSD/6.2/amd64/install62.fs
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Writing the image to the USB stick was a matter of executing &lt;code&gt;dd&lt;/code&gt; command (as always):&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sysctl hw.disknames
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ sysctl hw.disknames
 hw.disknames&lt;span class="o"&gt;=&lt;/span&gt;sd0:da0bedc25009303c,cd0:,sd1:9e5b01f8dc3ea3f3
 $ doas dd &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;install62.fs &lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/dev/rsd1c &lt;span class="nv"&gt;bs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1m
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Again, if you're unfamiliar with anything like OpenBSD way of &lt;a href="https://www.openbsd.org/faq/faq14.html"&gt;dealing with storage devices&lt;/a&gt; and
 other things, please consider reading the entire &lt;a href="https://www.openbsd.org/faq/"&gt;FAQ&lt;/a&gt;. It really pays off, I promise ;-)&lt;/p&gt;
 &lt;p&gt;Now the next move is follow the pre-upgrade which I actually forgot. For my currect
 setup, it was only to manually remove the man pages to avoid having old manpages in
 the new system after successfull upgrade:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ doas rm -rf /usr/share/man/
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ doas rm -rf /usr/share/man/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Now, Just rebooted the machine and booted from the USB stick and Press (U)pgrade and that was it.
 After confirming the keyboard layout and my laptop's primary disk where my OpenBSD installation
 resides, the process of Upgrading &lt;strong&gt;The Base System&lt;/strong&gt; was done. After completion and rebooting
 the machine, the first thing the new OS did was retrieving the newer firmwares which I skipped
 since at the time, I had no (reliable) Internet connection, but don't worry, you can do it later:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ uname -a
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ uname -a
 OpenBSD localhost.lenovo &lt;span class="m"&gt;6&lt;/span&gt;.2 GENERIC.MP#134 amd64
 $ doas fw_update
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Now, it's time to &lt;strong&gt;update the binary packages&lt;/strong&gt; since their dependencies on the base system has
 just been upgraded. But that was just one command away:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ doas pkg_add -u
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ doas pkg_add -u
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;That was it. Hope to write more about OpenBSD in the near future.&lt;/p&gt;</content><category term="OpenBSD"></category><category term="openbsd"></category><category term="upgrade"></category></entry></feed>

@@ -65,12 +65,11 @@ workspace</p>
 <p>Using scratchpad, we can turn any terminal into a drop-down terminal. I'm using <a href="http://www.tenshu.net/p/terminator.html">terminator</a> which supports tiling (and more)
 and <code>F1</code> key as hot key to toggle terminator since I have no other use for formally
 known help button key on linux.</p>
-<div class="highlight"><pre><span></span><span class="err"># Add this to your i3 config (~/.config/i3/config) and restart i3 (Super+Shift+R)</span>
-<span class="err">exec --no-startup-id &quot;terminator -m&quot;</span>
-<span class="err">for_window [class=&quot;Terminator&quot; title=&quot;^((?!Terminator Preferences).)*$&quot;] move scratchpad, move position 0 0, resize set 1366 768;</span>
-<span class="err">bindsym F1 [class=&quot;Terminator&quot;] scratchpad show;</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code># <span class="nv">Add</span> <span class="nv">this</span> <span class="nv">to</span> <span class="nv">your</span> <span class="nv">i3</span> <span class="nv">config</span> <span class="ss">(</span><span class="o">~/</span>.<span class="nv">config</span><span class="o">/</span><span class="nv">i3</span><span class="o">/</span><span class="nv">config</span><span class="ss">)</span> <span class="nv">and</span> <span class="nv">restart</span> <span class="nv">i3</span> <span class="ss">(</span><span class="nv">Super</span><span class="o">+</span><span class="nv">Shift</span><span class="o">+</span><span class="nv">R</span><span class="ss">)</span>
+<span class="k">exec</span> <span class="o">--</span><span class="nv">no</span><span class="o">-</span><span class="nv">startup</span><span class="o">-</span><span class="nv">id</span> <span class="s2">&quot;</span><span class="s">terminator -m</span><span class="s2">&quot;</span>
+<span class="nv">for_window</span> [<span class="nv">class</span><span class="o">=</span><span class="s2">&quot;</span><span class="s">Terminator</span><span class="s2">&quot;</span> <span class="nv">title</span><span class="o">=</span><span class="s2">&quot;</span><span class="s">^((?!Terminator Preferences).)*$</span><span class="s2">&quot;</span>] <span class="nv">move</span> <span class="nv">scratchpad</span>, <span class="nv">move</span> <span class="nv">position</span> <span class="mi">0</span> <span class="mi">0</span>, <span class="nv">resize</span> <span class="nv">set</span> <span class="mi">1366</span> <span class="mi">768</span><span class="c1">;</span>
+<span class="nv">bindsym</span> <span class="nv">F1</span> [<span class="nv">class</span><span class="o">=</span><span class="s2">&quot;</span><span class="s">Terminator</span><span class="s2">&quot;</span>] <span class="nv">scratchpad</span> <span class="k">show</span><span class="c1">;</span>
+</code></pre></div>
 
 <p>You can also view the changes via <a href="https://gist.github.com/bijanebrahimi/6641e8022dffb2e6a5dd">Github Gist</a>.</p>
 <p><strong>Update</strong>: It's possible to send other programs into scratchpad workspace, and
@@ -79,9 +78,9 @@ which is also in Scratchpad from showing. for example, Using the code below we
 can simply send any active programs into Scratchpad using <code>Super+Shift+F1</code> key
 and retrieve them one by one by hitting <code>Super+F1</code> and only by pressing <code>F1</code> we
 can toggle <strong>Terminator</strong>:</p>
-<div class="highlight"><pre><span></span><span class="err">bindsym $mod+Shift+F1 move container to scratchpad</span>
-<span class="err">bindsym $mod+F1 [class=&quot;^((?!Terminator).)*$&quot;] scratchpad show</span>
-</pre></div>
+<div class="highlight"><pre><span></span><code><span class="nv">bindsym</span> $<span class="nv">mod</span><span class="o">+</span><span class="nv">Shift</span><span class="o">+</span><span class="nv">F1</span> <span class="nv">move</span> <span class="nv">container</span> <span class="nv">to</span> <span class="nv">scratchpad</span>
+<span class="nv">bindsym</span> $<span class="nv">mod</span><span class="o">+</span><span class="nv">F1</span> [<span class="nv">class</span><span class="o">=</span><span class="s2">&quot;</span><span class="s">^((?!Terminator).)*$</span><span class="s2">&quot;</span>] <span class="nv">scratchpad</span> <span class="k">show</span>
+</code></pre></div>
     </div>
 
     <footer>

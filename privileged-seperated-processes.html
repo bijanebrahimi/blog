@@ -86,7 +86,7 @@ connected to the other using the specified Protocol.</p>
 and the child. Since the sockets are indistinguishable, there's no difference
 which uses which.</p>
 <p>The following snippet, Creates a socket pair and pass it to the child:</p>
-<div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;err.h&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;sys/wait.h&gt;</span><span class="cp"></span>
@@ -148,15 +148,13 @@ which uses which.</p>
     <span class="n">waitpid</span> <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">status</span><span class="p">,</span> <span class="n">WAIT_ANY</span><span class="p">);</span>
     <span class="k">return</span> <span class="n">WEXITSTATUS</span><span class="p">(</span><span class="n">status</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>And the output is:</p>
-<div class="highlight"><pre><span></span>$ gcc -o privsep main.c
+<div class="highlight"><pre><span></span><code>$ gcc -o privsep main.c
 $ ./privsep
 Received <span class="s2">&quot;Hello World&quot;</span> from the Child
-</pre></div>
-
+</code></pre></div>
 
 <p>Tips:</p>
 <ul>

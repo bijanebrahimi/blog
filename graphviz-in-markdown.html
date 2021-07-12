@@ -62,7 +62,7 @@
 <p>Since we already had an omnibus version of gitlab running on a debian server, I tried to write a simple php-script serving on the already running bundle version of nginx in gitlab omnibus package. The following is the work around. If you have a similiar but not quiet the same situation, you may consider changing the following steps as fits your needs so I try to explain as much as needed.</p>
 <h1>Gitlab's Nginx, a proxy to local Apache</h1>
 <p>Since I knew php way better than ruby (still I'm not a php developer anymore), I deided to write my graphviz web-service in php language, so I installed apache (running on port 8090) and php and no to forget, the graphviz command tools:</p>
-<div class="highlight"><pre><span></span>$ apt-get install apache2 libapache2-mod-php5 graphviz
+<div class="highlight"><pre><span></span><code>$ apt-get install apache2 libapache2-mod-php5 graphviz
 $ editor /etc/apache2/ports.conf
 Listen 8090
 $ editor /etc/apache2/sites-enabled/000-default.conf
@@ -72,11 +72,10 @@ $ editor /etc/apache2/sites-enabled/000-default.conf
   ErrorLog <span class="cp">${</span><span class="n">APACHE_LOG_DIR</span><span class="cp">}</span>/error.log
   CustomLog <span class="cp">${</span><span class="n">APACHE_LOG_DIR</span><span class="cp">}</span>/access.log combined
 <span class="nt">&lt;/VirtualHost&gt;</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>and set the gitlab's nginx to work as a proxy to my apache web-server:</p>
-<div class="highlight"><pre><span></span>$ editor /var/opt/gitlab/nginx/conf/webtools.company_domain.net
+<div class="highlight"><pre><span></span><code>$ editor /var/opt/gitlab/nginx/conf/webtools.company_domain.net
 server <span class="o">{</span>
   listen *:80<span class="p">;</span>
   server_name webtools.company_domain.net<span class="p">;</span>
@@ -88,17 +87,15 @@ server <span class="o">{</span>
 <span class="o">}</span>
 $ nano /etc/gitlab/gitlab.rb
 nginx<span class="o">[</span><span class="s1">&#39;custom_nginx_config&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;include /var/opt/gitlab/nginx/conf/webtools.company_domain.net;&quot;</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now we shoould reconfigure gitlab to create the new nginx configuration file from our changes in <code>/etc/gitlab/gitlab.rb</code>:</p>
-<div class="highlight"><pre><span></span>$ gitlab-ctl reconfigure
+<div class="highlight"><pre><span></span><code>$ gitlab-ctl reconfigure
 $ gitlab-ctl restart nginx
-</pre></div>
-
+</code></pre></div>
 
 <p>Now the only missing pieces is the actual php script. Since it's a prototype version of our graphviz web service, we only render svg formats:</p>
-<div class="highlight"><pre><span></span><span class="nx">$</span> <span class="nx">nano</span> <span class="o">/</span><span class="kd">var</span><span class="err">/www/webtools.company_domain.net/graphviz/index.php</span>
+<div class="highlight"><pre><span></span><code><span class="nx">$</span> <span class="nx">nano</span> <span class="o">/</span><span class="kd">var</span><span class="err">/www/webtools.company_domain.net/graphviz/index.php</span>
 <span class="cp">&lt;?php</span>
   <span class="nv">$dot_content</span> <span class="o">=</span> <span class="nb">rawurldecode</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;QUERY_STRING&#39;</span><span class="p">]);</span>
   <span class="nv">$dot_file</span> <span class="o">=</span> <span class="nb">tempnam</span><span class="p">(</span><span class="s2">&quot;/tmp&quot;</span><span class="p">,</span> <span class="s2">&quot;dot_&quot;</span><span class="p">);</span>
@@ -107,11 +104,10 @@ $ gitlab-ctl restart nginx
   <span class="nb">system</span><span class="p">(</span><span class="s2">&quot;dot -Tsvg &quot;</span><span class="o">.</span><span class="nv">$dot_file</span><span class="p">);</span>
   <span class="nb">unlink</span><span class="p">(</span><span class="nv">$dot_file</span><span class="p">);</span>
 <span class="cp">?&gt;</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now, the following markdown script should nicely render as a svg image in our rendered markdown wiki pages:</p>
-<div class="highlight"><pre><span></span><span class="o">!</span><span class="p">[</span><span class="n">Alt</span> <span class="n">Text</span><span class="p">](</span><span class="nl">http</span><span class="p">:</span><span class="c1">//webtools.company_domain.net/graphviz/?</span>
+<div class="highlight"><pre><span></span><code><span class="o">!</span><span class="p">[</span><span class="n">Alt</span> <span class="n">Text</span><span class="p">](</span><span class="nl">http</span><span class="p">:</span><span class="c1">//webtools.company_domain.net/graphviz/?</span>
 <span class="n">digraph</span> <span class="n">G</span> <span class="p">{</span>
     <span class="n">aize</span> <span class="o">=</span><span class="s">&quot;4,4&quot;</span><span class="p">;</span>
     <span class="n">main</span> <span class="p">[</span><span class="n">shape</span><span class="o">=</span><span class="n">box</span><span class="p">];</span>
@@ -127,8 +123,7 @@ $ gitlab-ctl restart nginx
     <span class="n">node</span> <span class="p">[</span><span class="n">shape</span><span class="o">=</span><span class="n">box</span><span class="p">,</span><span class="n">style</span><span class="o">=</span><span class="n">filled</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s">&quot;.7 .3 1.0&quot;</span><span class="p">];</span>
     <span class="n">execute</span> <span class="o">-&gt;</span> <span class="n">compare</span><span class="p">;</span>
   <span class="p">})</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Hope it helps other people as well :-)</p>
     </div>

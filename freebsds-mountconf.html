@@ -105,13 +105,12 @@ backing store.</p>
 root directory which should contain a <code>md</code> command creating a memory backed
 virtual disk from our FreeBSD's iso image and then mount it as our new root
 filesystem:</p>
-<div class="highlight"><pre><span></span><span class="na">.timeout</span> <span class="mi">3</span>
+<div class="highlight"><pre><span></span><code><span class="na">.timeout</span> <span class="mi">3</span>
 <span class="na">.md</span> <span class="err">/</span><span class="no">iso</span><span class="err">/</span><span class="no">FreeBSD-11.0-RELEASE-amd64-dvd1.iso</span>
 <span class="na">.timeout</span> <span class="mi">4</span>
 <span class="nl">cd9660:</span><span class="err">/</span><span class="nf">dev</span><span class="err">/</span><span class="no">md</span><span class="c1"># ro</span>
 <span class="na">.ask</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><strong>Important</strong>: please note that when the kernel mounts the new rootfilesystem, 
 there should be a directory named <code>dev</code> inside the new root filesystem for kernerl
@@ -120,7 +119,7 @@ message) if the <code>dev</code> doesn't exist.</p>
 <h1>The Solution</h1>
 <p>The following is the whole process plus formatting and installing grub from a
 debian-based linux distro:</p>
-<div class="highlight"><pre><span></span><span class="c1"># Installing GRUB, Assuming /dev/sdb is the USB flash drive device</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Installing GRUB, Assuming /dev/sdb is the USB flash drive device</span>
 <span class="o">$</span> <span class="n">mount</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sdb1</span> <span class="o">/</span><span class="n">mnt</span>
 <span class="o">$</span> <span class="n">mkdir</span> <span class="o">/</span><span class="n">mnt</span><span class="o">/</span><span class="n">boot</span>
 <span class="o">$</span> <span class="n">grub</span><span class="o">-</span><span class="n">install</span> <span class="o">--</span><span class="n">boot</span><span class="o">-</span><span class="n">directory</span><span class="o">=/</span><span class="n">mnt</span><span class="o">/</span><span class="n">boot</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sdb</span>
@@ -149,8 +148,7 @@ debian-based linux distro:</p>
 <span class="n">cd9660</span><span class="p">:</span><span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">md</span><span class="c1"># ro</span>
 <span class="o">.</span><span class="n">ask</span>
 <span class="n">EOF</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>That's It. Now after reboot and booting the USB flash drive, GRUB loads the
 freebsd kernel from it's <code>loopback</code> device, and when FreeBSD kernel loads, it
@@ -158,28 +156,25 @@ fails mounting the root filesystem and drops into a prompt command line asking
 for the root filesystem. We can Enter <code>?</code> to first get a list of known devies
 and Then mount our USB flash drive partition as a temporary root filesystem
 allowing kernel to find our <code>.mount.conf</code> file:</p>
-<div class="highlight"><pre><span></span><span class="err">mountroot&gt; msdosfs:/dev/da0s1</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>mountroot&gt; msdosfs:/dev/da0s1
+</code></pre></div>
 
 <p>This last step can be avoided by setting the <code>FreeBSD.vfs.root.mountfrom</code> option
 from grub which I have not tested yet:</p>
-<div class="highlight"><pre><span></span><span class="err">set FreeBSD.vfs.root.mountfrom=msdosfs:/dev/da0s1</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>set FreeBSD.vfs.root.mountfrom=msdosfs:/dev/da0s1
+</code></pre></div>
 
 <p>If nothing goes wrong (specially if you didn't forget to create a <code>dev</code>
 directory in USB flash drive's root directory) you should login into your FreeBSD
 iso image:</p>
-<div class="highlight"><pre><span></span>$ df
+<div class="highlight"><pre><span></span><code>$ df
 Filesystem 1K-blocks    Used  Avail Capcity  Mounted on
 /dev/md0      <span class="m">286146</span> <span class="m">2861416</span>      <span class="m">8</span>    <span class="m">100</span>%  /
 /dev/da0s1   <span class="m">7561408</span> <span class="m">6621600</span>  <span class="m">99808</span>     <span class="m">88</span>%  /mnt
 devfs              <span class="m">1</span>       <span class="m">1</span>      <span class="m">0</span>    <span class="m">100</span>%  /dev
 /dev/md1       <span class="m">31260</span>     <span class="m">308</span>  <span class="m">28452</span>      <span class="m">1</span>%  /var
 /dev/md2       <span class="m">19356</span>      <span class="m">28</span>  <span class="m">17780</span>      <span class="m">0</span>%  /tmp
-</pre></div>
-
+</code></pre></div>
 
 <p>Look that the old root filesystem (<code>/dev/da0s1</code>) is re-mounted on <code>/mnt</code> as
 described in manual. Hope it helps other :-)</p>

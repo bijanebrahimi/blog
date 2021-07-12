@@ -70,24 +70,22 @@ In The <code>Overview Tab</code> you can actually see what processes/devices are
 how much power and By applying the Good option in <code>Tunables Tab</code>, powertop
 automatically tunes them. you can do this manually for every item in Tunable tab
 or just use the <code>--auto-tune</code> option.</p>
-<div class="highlight"><pre><span></span>$ sudo powertop --auto-tune
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ sudo powertop --auto-tune
+</code></pre></div>
 
 <p>That single command will probably add a noticeable extra minutes to your battery
 life. But there are still other ways to improve it more. Let's Go to powertop's
 <code>Overview Tab</code> again:</p>
-<div class="highlight"><pre><span></span><span class="err">Power est.  Usage        Events/s    Category    Description</span>
-<span class="err">  5.18 W    0.4 pkts/s               Device      Network interface: wlp2s0 (wl)</span>
-<span class="err">  3.80 W    100.0%                   Device      Display backlight</span>
-<span class="err">  1.26 W    165.5 ms/s   123.3       Process     /usr/share/atom/atom --type=zygote --no-sandbox</span>
-<span class="err">  675 mW    95.9 ms/s    5.3         Process     atom</span>
-<span class="err">  660 mW    94.0%                    Device      USB device: USB2.0-CRW (Generic)</span>
-<span class="err">  262 mW    27.0 ms/s    90.1        Process     /usr/share/atom/atom --executed-from=/home/bijan --pid=1109</span>
-<span class="err">  247 mW    27.2 ms/s    70.4        Process     /usr/lib/xorg-server/Xorg :0 -seat seat0 -auth /run/lightdm/root/:0 -nolisten tc</span>
-<span class="err">  103 mW    2.0 ms/s     109.7        kWork      od_dbs_timer</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>Power est.  Usage        Events/s    Category    Description
+  5.18 W    0.4 pkts/s               Device      Network interface: wlp2s0 (wl)
+  3.80 W    100.0%                   Device      Display backlight
+  1.26 W    165.5 ms/s   123.3       Process     /usr/share/atom/atom --type=zygote --no-sandbox
+  675 mW    95.9 ms/s    5.3         Process     atom
+  660 mW    94.0%                    Device      USB device: USB2.0-CRW (Generic)
+  262 mW    27.0 ms/s    90.1        Process     /usr/share/atom/atom --executed-from=/home/bijan --pid=1109
+  247 mW    27.2 ms/s    70.4        Process     /usr/lib/xorg-server/Xorg :0 -seat seat0 -auth /run/lightdm/root/:0 -nolisten tc
+  103 mW    2.0 ms/s     109.7        kWork      od_dbs_timer
+</code></pre></div>
 
 <p>According to above, after my wireless interface (which i use), the display backlight,
 USB CD-RW and my Ethernet interface are the most draining power sources.
@@ -96,56 +94,53 @@ The last two I never/rarely use.</p>
 <p>Since I never/rarely use my CD-RW and I never connect to Internet through wired
 connection, so it seems logical to me to disable them. to find my CD-RW device
 power location, I used powertop <code>Tunable Tab</code>:</p>
-<div class="highlight"><pre><span></span><span class="err"># Disable CR-RW</span>
-<span class="err">$ echo 0 | s tee /sys/bus/usb/devices/1-1.3/power/autosuspend_delay_ms</span>
-<span class="err">$ echo auto | s tee /sys/bus/usb/devices/1-1.3/power/control</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code># Disable CR-RW
+$ echo 0 | s tee /sys/bus/usb/devices/1-1.3/power/autosuspend_delay_ms
+$ echo auto | s tee /sys/bus/usb/devices/1-1.3/power/control
+</code></pre></div>
 
 <p>To disable my Ethernet device, first I have to find it's device number:</p>
-<div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">Find</span> <span class="n">Ethernet</span> <span class="k">domain</span><span class="p">:</span><span class="n">bus</span><span class="p">:</span><span class="n">slot</span> <span class="nb">number</span>
-<span class="err">$</span> <span class="n">lspci</span> <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">i</span> <span class="n">ethernet</span>
-<span class="mi">03</span><span class="p">:</span><span class="mi">00</span><span class="p">.</span><span class="mi">0</span> <span class="n">Ethernet</span> <span class="n">controller</span><span class="p">:</span> <span class="n">Realtek</span> <span class="n">Semiconductor</span> <span class="n">Co</span><span class="p">.,</span> <span class="n">Ltd</span><span class="p">.</span> <span class="n">RTL8111</span><span class="o">/</span><span class="mi">8168</span><span class="o">/</span><span class="mi">8411</span> <span class="n">PCI</span> <span class="n">Express</span> <span class="n">Gigabit</span> <span class="n">Ethernet</span> <span class="n">Controller</span> <span class="p">(</span><span class="n">rev</span> <span class="mi">10</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code># Find Ethernet domain:bus:slot number
+$ lspci | grep -i ethernet
+03:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller (rev 10)
 
-<span class="o">#</span> <span class="n">Find</span> <span class="k">relative</span> <span class="n">device</span> <span class="k">on</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">devices</span>
-<span class="err">$</span> <span class="n">find</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">devices</span> <span class="o">-</span><span class="n">name</span> <span class="ss">&quot;*03:00.0&quot;</span>
-<span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">devices</span><span class="o">/</span><span class="n">pci0000</span><span class="p">:</span><span class="mi">00</span><span class="o">/</span><span class="mi">0000</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">02</span><span class="p">.</span><span class="mi">4</span><span class="o">/</span><span class="mi">0000</span><span class="p">:</span><span class="mi">03</span><span class="p">:</span><span class="mi">00</span><span class="p">.</span><span class="mi">0</span>
+# Find relative device on /sys/devices
+$ find /sys/devices -name &quot;*03:00.0&quot;
+/sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0
 
-<span class="o">#</span> <span class="n">Turn</span> <span class="k">off</span> <span class="n">device</span>
-<span class="n">echo</span> <span class="mi">1</span> <span class="o">|</span> <span class="n">s</span> <span class="n">tee</span> <span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">devices</span><span class="o">/</span><span class="n">pci0000</span><span class="p">:</span><span class="mi">00</span><span class="o">/</span><span class="mi">0000</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mi">02</span><span class="p">.</span><span class="mi">4</span><span class="o">/</span><span class="mi">0000</span><span class="p">:</span><span class="mi">03</span><span class="p">:</span><span class="mi">00</span><span class="p">.</span><span class="mi">0</span><span class="o">/</span><span class="n">remove</span>
-</pre></div>
-
+# Turn off device
+echo 1 | s tee /sys/devices/pci0000:00/0000:00:02.4/0000:03:00.0/remove
+</code></pre></div>
 
 <h3>Backlight</h3>
 <p>To reduce the brightness LED backlight, I set a brightness value (between 0 and 255):</p>
-<div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">Brightness</span>
-<span class="n">basedir</span><span class="o">=</span><span class="ss">&quot;/sys/class/backlight/&quot;</span>
-<span class="k">handler</span><span class="o">=</span><span class="err">$</span><span class="n">basedir$</span><span class="p">(</span><span class="n">ls</span> <span class="err">$</span><span class="n">basedir</span><span class="p">)</span><span class="ss">&quot;/&quot;</span>
+<div class="highlight"><pre><span></span><code># Brightness
+basedir=&quot;/sys/class/backlight/&quot;
+handler=$basedir$(ls $basedir)&quot;/&quot;
 
-<span class="n">chmod</span> <span class="mi">666</span> <span class="err">$</span><span class="k">handler</span><span class="o">/</span><span class="n">brightness</span>
-<span class="n">echo</span> <span class="mi">100</span> <span class="o">&gt;</span> <span class="k">handler</span><span class="o">/</span><span class="n">brightness</span>
-</pre></div>
-
+chmod 666 $handler/brightness
+echo 100 &gt; handler/brightness
+</code></pre></div>
 
 <h1>Running as a Service</h1>
 <p>To execute the above commands at boot up, I created a shell script and run that
 as a service.</p>
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="c1"># /usr/local/bin/powertop_tuning.sh</span>
 
 <span class="c1"># Auto-tune powertop</span>
@@ -161,11 +156,10 @@ powertop --auto-tune
 <span class="c1"># Brightness</span>
 chmod <span class="m">666</span> /sys/class/backlight/radeon_bl0/brightness
 <span class="nb">echo</span> <span class="m">80</span> &gt; /sys/class/backlight/radeon_bl0/brightness
-</pre></div>
+</code></pre></div>
 </td></tr></table>
-
 <p>And to create proper systemd service:</p>
-<div class="highlight"><pre><span></span><span class="err">#</span><span class="w"> </span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="k">system</span><span class="o">/</span><span class="n">powertop_tuning</span><span class="p">.</span><span class="n">service</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="err">#</span><span class="w"> </span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="k">system</span><span class="o">/</span><span class="n">powertop_tuning</span><span class="p">.</span><span class="n">service</span><span class="w"></span>
 <span class="o">[</span><span class="n">Unit</span><span class="o">]</span><span class="w"></span>
 <span class="n">Description</span><span class="o">=</span><span class="ss">&quot;PowerTop Tuning config&quot;</span><span class="w"></span>
 <span class="n">ConditionPathExists</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="k">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">powertop_tuning</span><span class="p">.</span><span class="n">sh</span><span class="w"></span>
@@ -179,13 +173,11 @@ chmod <span class="m">666</span> /sys/class/backlight/radeon_bl0/brightness
 
 <span class="o">[</span><span class="n">Install</span><span class="o">]</span><span class="w"></span>
 <span class="n">WantedBy</span><span class="o">=</span><span class="n">multi</span><span class="o">-</span><span class="k">user</span><span class="p">.</span><span class="n">target</span><span class="w"></span>
-</pre></div>
-
+</code></pre></div>
 
 <p>So, to make <code>powertop_tuning</code> service run automatically, just enable the service:</p>
-<div class="highlight"><pre><span></span>$ sudo systemctl <span class="nb">enable</span> powertop_tuning.service
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ sudo systemctl <span class="nb">enable</span> powertop_tuning.service
+</code></pre></div>
 
 <h1>Conclusion</h1>
 <p>The result is very satisfactory. In daily usage, my battery life went up

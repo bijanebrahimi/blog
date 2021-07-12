@@ -65,11 +65,11 @@
 </ul>
 <p>each Monitor will be attached to a seperate Video Card.</p>
 <h3>Introduction</h3>
-<p>the <a href="https://en.wikipedia.org/wiki/X_Window_System">X Window System</a> is a system program which implements the hardware layer and the basis for graphical user interfaces (GUIs). to run seperate Desktop Environment in linux, we need to run seperate X servers as well. each X server will use separate Video card, Mouse and Keyboard (input devices). for that we have to configure the X server to do that. but first we have to identify the devices we have plugged to the computer to address them later in the X configuration file.
-<!-- BREAK --></p>
+<p>the <a href="https://en.wikipedia.org/wiki/X_Window_System">X Window System</a> is a system program which implements the hardware layer and the basis for graphical user interfaces (GUIs). to run seperate Desktop Environment in linux, we need to run seperate X servers as well. each X server will use separate Video card, Mouse and Keyboard (input devices). for that we have to configure the X server to do that. but first we have to identify the devices we have plugged to the computer to address them later in the X configuration file.</p>
+<!-- BREAK -->
 <h3>Hardware Detection</h3>
 <p>we can find our input devices (Mouse &amp; Keyboards) in <code>/dev/input</code> directory. lets look to see what have we here:</p>
-<div class="highlight"><pre><span></span>$ ls -la /dev/input
+<div class="highlight"><pre><span></span><code>$ ls -la /dev/input
 drwxr-xr-x  <span class="m">4</span> root root    <span class="m">320</span> Apr <span class="m">23</span> <span class="m">09</span>:57 .
 drwxr-xr-x <span class="m">15</span> root root   <span class="m">3060</span> Apr <span class="m">23</span> <span class="m">09</span>:59 ..
 drwxr-xr-x  <span class="m">2</span> root root    <span class="m">160</span> Apr <span class="m">23</span> <span class="m">09</span>:57 by-id
@@ -86,18 +86,16 @@ crw-------  <span class="m">1</span> root root <span class="m">13</span>, <span 
 crw-------  <span class="m">1</span> root root <span class="m">13</span>, <span class="m">63</span> Apr <span class="m">23</span> <span class="m">09</span>:57 mice
 crw-------  <span class="m">1</span> root root <span class="m">13</span>, <span class="m">32</span> Apr <span class="m">23</span> <span class="m">09</span>:57 mouse0
 crw-------  <span class="m">1</span> root root <span class="m">13</span>, <span class="m">33</span> Apr <span class="m">23</span> <span class="m">09</span>:57 mouse1
-</pre></div>
-
+</code></pre></div>
 
 <p>before explaining what is each of these files and directories, first we have to look at their permissions. they belogs to root user and group. so for reading them, we have to have read permission. run the below commands as super user or just run them using the <code>sudo</code> command which i did.</p>
 <p>each <code>/dev/input/event*</code> file is an input device file. to find out which one is related to which input device we can print the files and see if it contains output when we move our mouse or press a key. so i did run the command and played with my input devices to see which one is which.</p>
-<div class="highlight"><pre><span></span>$ sudo cat /dev/input/event0
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ sudo cat /dev/input/event0
+</code></pre></div>
 
 <p>do this till you find all of your input devices.</p>
 <p>an alternative way (which i preffer) is to look into <code>/dev/input/by-id/</code> directory. your Input devices should be listed there with their human readable names.</p>
-<div class="highlight"><pre><span></span>$ ls -la /dev/input/by-id/
+<div class="highlight"><pre><span></span><code>$ ls -la /dev/input/by-id/
 drwxr-xr-x <span class="m">2</span> root root <span class="m">160</span> Apr <span class="m">23</span> <span class="m">09</span>:57 .
 drwxr-xr-x <span class="m">2</span> root root <span class="m">160</span> Apr <span class="m">23</span> <span class="m">09</span>:57 .
 drwxr-xr-x <span class="m">4</span> root root <span class="m">320</span> Apr <span class="m">23</span> <span class="m">09</span>:57 ..
@@ -107,21 +105,18 @@ lrwxrwxrwx <span class="m">1</span> root root   <span class="m">9</span> Apr <sp
 lrwxrwxrwx <span class="m">1</span> root root   <span class="m">9</span> Apr <span class="m">23</span> <span class="m">09</span>:57 usb-CHICONY_USB_Keyboard-event-kbd -&gt; ../event3
 lrwxrwxrwx <span class="m">1</span> root root   <span class="m">9</span> Apr <span class="m">23</span> <span class="m">09</span>:57 usb-Logitech_Logitech_USB_Keyboard-event-if01 -&gt; ../event1
 lrwxrwxrwx <span class="m">1</span> root root   <span class="m">9</span> Apr <span class="m">23</span> <span class="m">09</span>:57 usb-Logitech_Logitech_USB_Keyboard-event-kbd -&gt; ../event0
-</pre></div>
-
+</code></pre></div>
 
 <p>since you may notice, there may be a lot more input devices there. that's because linux will create several input device files for devices like Keyboards which have fancy buttons. try the old <code>cat</code> command to find out which one is your proper device driver file. i did it this way:</p>
-<div class="highlight"><pre><span></span>$ sudo cat /dev/input/by-id/usb-15ca_USB_Optical_Mouse-event-mouse
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ sudo cat /dev/input/by-id/usb-15ca_USB_Optical_Mouse-event-mouse
+</code></pre></div>
 
 <p>write your input device names with their related device file name somewhere cause we're going to need those later.</p>
 <p>at last for Video Cards. Video cards are identified by their address on the PCI bus. so to find them we can use <code>lspci</code> command.</p>
-<div class="highlight"><pre><span></span>$ lspci <span class="p">|</span>  grep VGA
+<div class="highlight"><pre><span></span><code>$ lspci <span class="p">|</span>  grep VGA
 <span class="m">00</span>:09.0 VGA compatible controller: nVidia Corporation NV18 <span class="o">[</span>GeForce4 MX <span class="m">4000</span> AGP 8x<span class="o">]</span> <span class="o">(</span>rev c1<span class="o">)</span>
 <span class="m">00</span>:0a.0 VGA compatible controller: nVidia Corporation NV18 <span class="o">[</span>GeForce4 MX <span class="m">4000</span> AGP 8x<span class="o">]</span> <span class="o">(</span>rev c1<span class="o">)</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>this command lists the pci devices connected to the computer and filters the lines containing VGA. the number on the left is the device PCI address. now we have the table below for our multiseat configuration:</p>
 <ul>
@@ -136,100 +131,92 @@ lrwxrwxrwx <span class="m">1</span> root root   <span class="m">9</span> Apr <sp
 </ul>
 <h3>X Configuration</h3>
 <p>the X keeps it's configuration file in <code>/etc/X11</code> directory. we can directly modify it's current configuration file <code>xorg.conf</code> or we can simply create an alternative configuration file and tell X to read from it manually. that will help us to run X with default configurations if our configuration somehow didn't work.</p>
-<div class="highlight"><pre><span></span>$ sudo touch /etc/X11/xorg.conf.multiseat
+<div class="highlight"><pre><span></span><code>$ sudo touch /etc/X11/xorg.conf.multiseat
 $ sudo nano xorg.conf.multiseat
-</pre></div>
-
+</code></pre></div>
 
 <p>First of all, we need to set <a href="https://wiki.archlinux.org/index.php/Xorg_multiseat#The_basics">basic Xorg configuration</a>.</p>
-<div class="highlight"><pre><span></span><span class="err">Section &quot;ServerFlags&quot;</span>
-<span class="err">    Option &quot;AutoAddDevices&quot;     &quot;false&quot;</span>
-<span class="err">    Option &quot;AutoEnableDevices&quot;  &quot;false&quot;</span>
-<span class="err">    Option &quot;AllowMouseOpenFail&quot; &quot;on&quot;</span>
-<span class="err">    Option &quot;AllowEmptyInput&quot; &quot;on&quot;</span>
-<span class="err">    Option &quot;ZapWarning&quot;         &quot;on&quot;</span>
-<span class="err">    Option &quot;HandleSpecialKeys&quot;  &quot;off&quot; # Zapping on</span>
-<span class="err">    Option &quot;DRI2&quot; &quot;on&quot;</span>
-<span class="err">    Option &quot;Xinerama&quot; &quot;off&quot;</span>
-<span class="err">EndSection</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>Section &quot;ServerFlags&quot;
+    Option &quot;AutoAddDevices&quot;     &quot;false&quot;
+    Option &quot;AutoEnableDevices&quot;  &quot;false&quot;
+    Option &quot;AllowMouseOpenFail&quot; &quot;on&quot;
+    Option &quot;AllowEmptyInput&quot; &quot;on&quot;
+    Option &quot;ZapWarning&quot;         &quot;on&quot;
+    Option &quot;HandleSpecialKeys&quot;  &quot;off&quot; # Zapping on
+    Option &quot;DRI2&quot; &quot;on&quot;
+    Option &quot;Xinerama&quot; &quot;off&quot;
+EndSection
+</code></pre></div>
 
 <p>after that we need to define input devices, screens, monitors and layouts. do the following configuration for each seat you want to have. so first we need to define out input devices. look at the "Option Device". it is the device file name we detect earlier:</p>
-<div class="highlight"><pre><span></span><span class="err">Section &quot;InputDevice&quot;</span>
-<span class="err">    Identifier      &quot;Keyboard0&quot;</span>
-<span class="err">    Driver          &quot;evdev&quot;</span>
-<span class="err">    Option          &quot;Device&quot;                &quot;/dev/input/event0&quot;</span>
-<span class="err">    Option &quot;xkb_rules&quot; &quot;evdev&quot;</span>
-<span class="err">    Option &quot;xkb_model&quot; &quot;evdev&quot;</span>
-<span class="err">    Option &quot;xkb_layout&quot; &quot;us&quot;</span>
-<span class="err">    Option &quot;GrabDevice&quot; &quot;on&quot; # prevent send event to other X-servers</span>
-<span class="err">EndSection</span>
-<span class="err">Section &quot;InputDevice&quot;</span>
-<span class="err">    Identifier &quot;Mouse0&quot;</span>
-<span class="err">    Driver &quot;evdev&quot;</span>
-<span class="err">    Option &quot;Device&quot; &quot;/dev/input/event2&quot;</span>
-<span class="err">    Option &quot;GrabDevice&quot; &quot;on&quot;</span>
-<span class="err">EndSection</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="nv">Section</span> <span class="s2">&quot;</span><span class="s">InputDevice</span><span class="s2">&quot;</span>
+    <span class="nv">Identifier</span>      <span class="s2">&quot;</span><span class="s">Keyboard0</span><span class="s2">&quot;</span>
+    <span class="nv">Driver</span>          <span class="s2">&quot;</span><span class="s">evdev</span><span class="s2">&quot;</span>
+    <span class="nv">Option</span>          <span class="s2">&quot;</span><span class="s">Device</span><span class="s2">&quot;</span>                <span class="s2">&quot;</span><span class="s">/dev/input/event0</span><span class="s2">&quot;</span>
+    <span class="nv">Option</span> <span class="s2">&quot;</span><span class="s">xkb_rules</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="s">evdev</span><span class="s2">&quot;</span>
+    <span class="nv">Option</span> <span class="s2">&quot;</span><span class="s">xkb_model</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="s">evdev</span><span class="s2">&quot;</span>
+    <span class="nv">Option</span> <span class="s2">&quot;</span><span class="s">xkb_layout</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="s">us</span><span class="s2">&quot;</span>
+    <span class="nv">Option</span> <span class="s2">&quot;</span><span class="s">GrabDevice</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="s">on</span><span class="s2">&quot;</span> # <span class="nv">prevent</span> <span class="k">send</span> <span class="nv">event</span> <span class="nv">to</span> <span class="nv">other</span> <span class="nv">X</span><span class="o">-</span><span class="nv">servers</span>
+<span class="nv">EndSection</span>
+<span class="nv">Section</span> <span class="s2">&quot;</span><span class="s">InputDevice</span><span class="s2">&quot;</span>
+    <span class="nv">Identifier</span> <span class="s2">&quot;</span><span class="s">Mouse0</span><span class="s2">&quot;</span>
+    <span class="nv">Driver</span> <span class="s2">&quot;</span><span class="s">evdev</span><span class="s2">&quot;</span>
+    <span class="nv">Option</span> <span class="s2">&quot;</span><span class="s">Device</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="s">/dev/input/event2</span><span class="s2">&quot;</span>
+    <span class="nv">Option</span> <span class="s2">&quot;</span><span class="s">GrabDevice</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="s">on</span><span class="s2">&quot;</span>
+<span class="nv">EndSection</span>
+</code></pre></div>
 
 <p>now we need to define Screen with uses Monitor and Device which is our Video Card (you can tweak the Modes and ... if you like). the BusId Option is the PCI address we also found earlier.</p>
-<div class="highlight"><pre><span></span><span class="err">Section &quot;Device&quot;</span>
-<span class="err">    Identifier      &quot;Nvidia0&quot;</span>
-<span class="err">    Driver          &quot;nouveau&quot;</span>
-<span class="err">    BusId           &quot;PCI:00:09.0&quot;</span>
-<span class="err">EndSection</span>
-<span class="err">    Section &quot;Monitor&quot;</span>
-<span class="err">    Identifier      &quot;Lg0&quot;</span>
-<span class="err">    HorizSync       30-93</span>
-<span class="err">    VertRefresh     60</span>
-<span class="err">    Option          &quot;dpms&quot;</span>
-<span class="err">EndSection</span>
-<span class="err">Section &quot;Screen&quot;</span>
-<span class="err">    Identifier              &quot;Screen0&quot;</span>
-<span class="err">    Device                  &quot;Nvidia0&quot;</span>
-<span class="err">    Monitor                 &quot;Lg0&quot;</span>
-<span class="err">    DefaultDepth    24</span>
-<span class="err">    Option                  &quot;DPI&quot;   &quot;100x100&quot;</span>
-<span class="err">    Subsection &quot;Display&quot;</span>
-<span class="err">        Depth   24</span>
-<span class="err">        Modes   &quot;1280x1024&quot;     &quot;1024x768&quot;</span>
-<span class="err">    EndSubsection</span>
-<span class="err">EndSection</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>Section &quot;Device&quot;
+    Identifier      &quot;Nvidia0&quot;
+    Driver          &quot;nouveau&quot;
+    BusId           &quot;PCI:00:09.0&quot;
+EndSection
+    Section &quot;Monitor&quot;
+    Identifier      &quot;Lg0&quot;
+    HorizSync       30-93
+    VertRefresh     60
+    Option          &quot;dpms&quot;
+EndSection
+Section &quot;Screen&quot;
+    Identifier              &quot;Screen0&quot;
+    Device                  &quot;Nvidia0&quot;
+    Monitor                 &quot;Lg0&quot;
+    DefaultDepth    24
+    Option                  &quot;DPI&quot;   &quot;100x100&quot;
+    Subsection &quot;Display&quot;
+        Depth   24
+        Modes   &quot;1280x1024&quot;     &quot;1024x768&quot;
+    EndSubsection
+EndSection
+</code></pre></div>
 
 <p>and finally, we need to define a Layout which we will later tell X to load it. it simply gathers the defined input devices and Screens.</p>
-<div class="highlight"><pre><span></span><span class="err">Section &quot;ServerLayout&quot;</span>
-<span class="err">    Identifier      &quot;Seat0&quot;</span>
-<span class="err">    Screen          1               &quot;Screen0&quot;       1                   1</span>
-<span class="err">    InputDevice     &quot;Mouse0&quot;        &quot;CorePointer&quot;</span>
-<span class="err">    InputDevice     &quot;keyboard0&quot;      &quot;CoreKeyboard&quot;</span>
-<span class="err">    Option &quot;Clone&quot; &quot;off&quot;</span>
-<span class="err">    Option &quot;AutoAddDevices&quot; &quot;off&quot;</span>
-<span class="err">    Option &quot;DisableModInDev&quot; &quot;true&quot;</span>
-<span class="err">    Option &quot;SingleCard&quot; &quot;on&quot;   # use this to simplfied isolatedevice option</span>
-<span class="err">EndSection</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>Section &quot;ServerLayout&quot;
+    Identifier      &quot;Seat0&quot;
+    Screen          1               &quot;Screen0&quot;       1                   1
+    InputDevice     &quot;Mouse0&quot;        &quot;CorePointer&quot;
+    InputDevice     &quot;keyboard0&quot;      &quot;CoreKeyboard&quot;
+    Option &quot;Clone&quot; &quot;off&quot;
+    Option &quot;AutoAddDevices&quot; &quot;off&quot;
+    Option &quot;DisableModInDev&quot; &quot;true&quot;
+    Option &quot;SingleCard&quot; &quot;on&quot;   # use this to simplfied isolatedevice option
+EndSection
+</code></pre></div>
 
 <p>that's it. do this process again for the next seats and then you're done.</p>
 <h3>Test The Configuration</h3>
 <p>to test if everything is OK, we can run X using our multiseat configuration file and defined Layout. so we need to tell X where to look for COnfiguration file and load Which layout.</p>
-<div class="highlight"><pre><span></span>$ startx -- :1 -layout Seat0 -config xorg.conf.multiseat
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ startx -- :1 -layout Seat0 -config xorg.conf.multiseat
+</code></pre></div>
 
 <p>in the above code, i used <code>startx</code>. it is a front-end script to xinit. you can also simply run the X directly:</p>
-<div class="highlight"><pre><span></span>$ X -novtswitch -sharevts -nolisten tcp -config xorg.conf.multiseat -layout Seat0 :1
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ X -novtswitch -sharevts -nolisten tcp -config xorg.conf.multiseat -layout Seat0 :1
+</code></pre></div>
 
 <p>you may need to go to the 7th console to use it (CTRL+F7) as the second seat will be available on the 8th console and so on.</p>
-<div class="highlight"><pre><span></span>$ startx -- :2 -layout Seat0 -config xorg.conf.multiseat
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ startx -- :2 -layout Seat0 -config xorg.conf.multiseat
+</code></pre></div>
 
 <p>if anything happend,read the log files and search the web.</p>
 <h3>Configure Display Managers</h3>

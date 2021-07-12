@@ -76,7 +76,7 @@ The manpage is complete (OpenBSD Style) but the idea is simple and clear. netctl
 keeps <a href="http://man.openbsd.org/hostname.if.5">hostname.if(5)</a> configuration files categorized in <code>/etc/hostname.d</code>
 directory by loaction or nwids and then symlink them into <code>/etc</code> at startup
 or by switching to different locations on-demand:</p>
-<div class="highlight"><pre><span></span>$ ls -lR /etc/hostname.*
+<div class="highlight"><pre><span></span><code>$ ls -lR /etc/hostname.*
 /etc/hostname.run0 -&gt; /etc/hostname.d/nwids/BlackHole.nwid
 
 /etc/hostname.d:
@@ -85,8 +85,7 @@ nwids
 /etc/hostname.d/nwids:
 BlackHole.nwid
 ZWLan.nwid
-</pre></div>
-
+</code></pre></div>
 
 <p>But if you liked netctl, you might also wanted to read <a href="http://vincentdelft.be/post/post_20171023">Vincet's Blog Post, 
 Network Manager Control for OpenBSD</a>. Basically <a href="https://sourceforge.net/p/nmctl/code/ci/master/tree/">nmctl</a> is an improved
@@ -98,7 +97,7 @@ find a nice example script in the manual or here at <a href="https://www.tumfati
 stick on OpenBSD</a>:</p>
 <p><strong>Update</strong>: an improved version of the script can be found in
 <a href="http://bijanebrahimi.github.io/blog/openbsd-hotplugd-scripting.html">here</a>.</p>
-<div class="highlight"><pre><span></span>$ doas rcctl <span class="nb">enable</span> hotplugd
+<div class="highlight"><pre><span></span><code>$ doas rcctl <span class="nb">enable</span> hotplugd
 $ cat /etc/hotplug/attach
 <span class="c1">#!/bin/sh</span>
 
@@ -107,16 +106,16 @@ $ cat /etc/hotplug/attach
 <span class="nv">MOUNTROOT</span><span class="o">=</span><span class="s2">&quot;/mnt&quot;</span>
 <span class="nv">DEBUG</span><span class="o">=</span><span class="m">1</span>
 
-<span class="k">case</span> <span class="nv">$DEVCLASS</span> in
+<span class="k">case</span> <span class="nv">$DEVCLASS</span> <span class="k">in</span>
 <span class="m">2</span><span class="o">)</span>
         <span class="c1"># disk devices</span>
         <span class="nv">disklabel</span><span class="o">=</span><span class="sb">`</span>/sbin/disklabel <span class="nv">$DEVNAME</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">|</span> /usr/bin/sed -n <span class="s1">&#39;/^disk: /s/^disk: //p&#39;</span><span class="sb">`</span>
 <span class="o">[</span> <span class="nv">$DEBUG</span> <span class="o">==</span> <span class="m">1</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> logger -i <span class="s2">&quot;hotplugd discovered DISKLABEL </span><span class="nv">$disklabel</span><span class="s2">&quot;</span>
-        <span class="k">case</span> <span class="nv">$disklabel</span> in
+        <span class="k">case</span> <span class="nv">$disklabel</span> <span class="k">in</span>
         <span class="s2">&quot;SCSI disk&quot;</span><span class="o">)</span>
                 <span class="nv">slices</span><span class="o">=</span><span class="sb">`</span>/sbin/disklabel <span class="nv">$DEVNAME</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">|</span> <span class="se">\</span>
                 sed -n <span class="s1">&#39;/^ *[abd-z]: /s/^ *\([abd-z]\):.*/\1/p&#39;</span><span class="sb">`</span>
-                <span class="k">for</span> slice in <span class="si">${</span><span class="nv">slices</span><span class="si">}</span><span class="p">;</span> <span class="k">do</span>
+                <span class="k">for</span> slice <span class="k">in</span> <span class="si">${</span><span class="nv">slices</span><span class="si">}</span><span class="p">;</span> <span class="k">do</span>
 <span class="o">[</span> <span class="nv">$DEBUG</span> <span class="o">==</span> <span class="m">1</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> logger -i <span class="s2">&quot;hotplugd attaching SLICE </span><span class="nv">$slice</span><span class="s2"> of DEVICE </span><span class="nv">$DEVNAME</span><span class="s2">&quot;</span>
                         <span class="o">[</span> ! -d <span class="nv">$MOUNTROOT</span>/<span class="nv">$DEVNAME$slice</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> mkdir -p -m <span class="m">1777</span> <span class="nv">$MOUNTROOT</span>/<span class="nv">$DEVNAME$slice</span>
                         mount /dev/<span class="nv">$DEVNAME$slice</span> <span class="nv">$MOUNTROOT</span>/<span class="nv">$DEVNAME$slice</span>
@@ -131,26 +130,23 @@ $ cat /etc/hotplug/attach
 <span class="k">esac</span>
 $ doas chmod <span class="m">0755</span> /etc/hotplug/attach
 $ doas rcctl restart hotplugd
-</pre></div>
-
+</code></pre></div>
 
 <p>that's it. The next time you plug a USB stick, it will be mount at
 <code>/mnt/${dev}${slice}</code> directory automatically.</p>
 <h2>Desktop Notification Daemon</h2>
 <p>If you're using window managers like <a href="https://i3wm.org">i3wm</a>, you might find <a href="https://dunst-project.org/">dunst</a> a
 perfect simple notification daemon which is avilable as package:</p>
-<div class="highlight"><pre><span></span>$ doas pkg_add dunst
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ doas pkg_add dunst
+</code></pre></div>
 
 <p>That's it. you don't need to enable anything since sending any message to
 notification, automatically runs dunst. To test the notification:</p>
-<div class="highlight"><pre><span></span>$ notify-send helloWorld
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ notify-send helloWorld
+</code></pre></div>
 
 <p>And here's a simple configuration I picked from a quick search on the web:</p>
-<div class="highlight"><pre><span></span>$ cat ~/.config/dunst/dunstrc 
+<div class="highlight"><pre><span></span><code>$ cat ~/.config/dunst/dunstrc 
 <span class="o">[</span>global<span class="o">]</span>
 <span class="nv">font</span> <span class="o">=</span> Iosevka Term <span class="m">11</span>
 
@@ -410,8 +406,7 @@ notification, automatically runs dunst. To test the notification:</p>
 <span class="c1">#    urgency = normal</span>
 <span class="c1">#</span>
 <span class="c1"># vim: ft=cfg</span>
-</pre></div>
-
+</code></pre></div>
 
 <h1>Integrated Development Window Manager</h1>
     </div>

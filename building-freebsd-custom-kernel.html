@@ -58,39 +58,35 @@
 kernel: <a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/developers-handbook/kernelbuild.html">The Traditional Way</a> and <a href="https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig-building.html">The New Way</a>.</p>
 <p>Either way, we should create a custom kernel configuration file, Then we use
 this custom kernel configuration for building the new kernel:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /usr/src
+<div class="highlight"><pre><span></span><code>$ <span class="nb">cd</span> /usr/src
 $ cp sys/amd64/config/GENERIC sys/amd64/config/CUSTOM
-</pre></div>
-
+</code></pre></div>
 
 <p>For example, we can enable kernel debuggings enabled in our custom
 configuration:</p>
-<div class="highlight"><pre><span></span>$ cat &gt;&gt; sys/amd64/config/CUSTOM &lt;EOF
+<div class="highlight"><pre><span></span><code>$ cat &gt;&gt; sys/amd64/config/CUSTOM &lt;EOF
 makeoptions -g
 options KDB
 options DDB
 EOF
-</pre></div>
-
+</code></pre></div>
 
 <p>Now, to compile the new kernel with our custom configuration:</p>
-<div class="highlight"><pre><span></span>make -j <span class="m">16</span> buildkernel <span class="nv">KERNCONF</span><span class="o">=</span>CUSTOM
+<div class="highlight"><pre><span></span><code>make -j <span class="m">16</span> buildkernel <span class="nv">KERNCONF</span><span class="o">=</span>CUSTOM
 make -j <span class="m">16</span> installkernel <span class="nv">KERNCONF</span><span class="o">=</span>CUSTOM
-</pre></div>
-
+</code></pre></div>
 
 <p>If you're experiencing modifying kernel and trying to avoid re-
 compiling the kernel every time you have a small change in the
 source code, use the following command:</p>
-<div class="highlight"><pre><span></span>make -j <span class="m">16</span> buildkernel <span class="nv">KERNCONF</span><span class="o">=</span>CUSTOM -DKERNFAST
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>make -j <span class="m">16</span> buildkernel <span class="nv">KERNCONF</span><span class="o">=</span>CUSTOM -DKERNFAST
+</code></pre></div>
 
 <p><strong>Tips</strong>: Remember to remove the multiple make jobs <code>-j</code> flags
 if you have errors in compiling the source to easily spot the
 error message:</p>
-<div class="highlight"><pre><span></span>make buildkernel <span class="nv">KERNCONF</span><span class="o">=</span>CUSTOM -DKERNFAST
-</pre></div>
+<div class="highlight"><pre><span></span><code>make buildkernel <span class="nv">KERNCONF</span><span class="o">=</span>CUSTOM -DKERNFAST
+</code></pre></div>
     </div>
 
     <footer>

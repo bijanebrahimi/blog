@@ -65,31 +65,30 @@ database or server-side logic.</p>
 to ease the process of writing and publishing your posts, However the format of
 this Makefile is in GNU Make format and you'll get the following errors if you
 run it on your BSD (FreeBSD and OpenBSD as I am aware of):</p>
-<div class="highlight"><pre><span></span>$ make devserver
-No closing parenthesis in archive specification
-*** Parse error in /path/to/pelican/project: Error in archive specification: <span class="s2">&quot;(0, 1)&quot;</span> <span class="o">(</span>Makefile:31<span class="o">)</span>
-*** Parse error: Need an operator in <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:33<span class="o">)</span>
-No closing parenthesis in archive specification
-*** Parse error: Error in archive specification: <span class="s2">&quot;(0, 1)&quot;</span> <span class="o">(</span>Makefile:36<span class="o">)</span>
-*** Parse error: Need an operator in <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:38<span class="o">)</span>
-*** Parse error: Need an operator in <span class="s1">&#39;PORT&#39;</span> <span class="o">(</span>Makefile:74<span class="o">)</span>
-*** Parse error: Need an operator in <span class="s1">&#39;else&#39;</span> <span class="o">(</span>Makefile:76<span class="o">)</span>
-*** Parse error: Need an operator in <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:78<span class="o">)</span>
-*** Parse error: Need an operator in <span class="s1">&#39;SERVER&#39;</span> <span class="o">(</span>Makefile:81<span class="o">)</span>
-*** Parse error: Need an operator in <span class="s1">&#39;else&#39;</span> <span class="o">(</span>Makefile:83<span class="o">)</span>
-*** Parse error: Need an operator in <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:85<span class="o">)</span>
-*** Parse error: Need an operator in <span class="s1">&#39;PORT&#39;</span> <span class="o">(</span>Makefile:89<span class="o">)</span>
-*** Parse error: Need an operator in <span class="s1">&#39;else&#39;</span> <span class="o">(</span>Makefile:91<span class="o">)</span>
-*** Parse error: Need an operator in <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:93<span class="o">)</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ make devserver
+No closing parenthesis <span class="k">in</span> archive specification
+*** Parse error <span class="k">in</span> /path/to/pelican/project: Error <span class="k">in</span> archive specification: <span class="s2">&quot;(0, 1)&quot;</span> <span class="o">(</span>Makefile:31<span class="o">)</span>
+*** Parse error: Need an operator <span class="k">in</span> <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:33<span class="o">)</span>
+No closing parenthesis <span class="k">in</span> archive specification
+*** Parse error: Error <span class="k">in</span> archive specification: <span class="s2">&quot;(0, 1)&quot;</span> <span class="o">(</span>Makefile:36<span class="o">)</span>
+*** Parse error: Need an operator <span class="k">in</span> <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:38<span class="o">)</span>
+*** Parse error: Need an operator <span class="k">in</span> <span class="s1">&#39;PORT&#39;</span> <span class="o">(</span>Makefile:74<span class="o">)</span>
+*** Parse error: Need an operator <span class="k">in</span> <span class="s1">&#39;else&#39;</span> <span class="o">(</span>Makefile:76<span class="o">)</span>
+*** Parse error: Need an operator <span class="k">in</span> <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:78<span class="o">)</span>
+*** Parse error: Need an operator <span class="k">in</span> <span class="s1">&#39;SERVER&#39;</span> <span class="o">(</span>Makefile:81<span class="o">)</span>
+*** Parse error: Need an operator <span class="k">in</span> <span class="s1">&#39;else&#39;</span> <span class="o">(</span>Makefile:83<span class="o">)</span>
+*** Parse error: Need an operator <span class="k">in</span> <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:85<span class="o">)</span>
+*** Parse error: Need an operator <span class="k">in</span> <span class="s1">&#39;PORT&#39;</span> <span class="o">(</span>Makefile:89<span class="o">)</span>
+*** Parse error: Need an operator <span class="k">in</span> <span class="s1">&#39;else&#39;</span> <span class="o">(</span>Makefile:91<span class="o">)</span>
+*** Parse error: Need an operator <span class="k">in</span> <span class="s1">&#39;endif&#39;</span> <span class="o">(</span>Makefile:93<span class="o">)</span>
+</code></pre></div>
 
 <p>There's plentty of good resources online, referencing the differences. For
 portable makefiles, you should probably read <a href="https://www.gnu.org/software/make/manual/html_node/Features.html">Features of GNU make</a> and 
 <a href="https://www.gnu.org/software/make/manual/html_node/Missing.html">Features of GNU make</a> and of course, The OpenBSD's <a href="https://man.openbsd.org/make.1">make(1)</a> and The
 FreeBSD's <a href="https://www.freebsd.org/cgi/man.cgi?query=make(1)">make(1)</a></p>
 <p>The following patch illustrates the changes and I hope it helps others:</p>
-<div class="highlight"><pre><span></span><span class="gh">diff --git a/Makefile b/Makefile</span>
+<div class="highlight"><pre><span></span><code><span class="gh">diff --git a/Makefile b/Makefile</span>
 <span class="gh">index d1ddf80..d87b1e9 100644</span>
 <span class="gd">--- a/Makefile</span>
 <span class="gi">+++ b/Makefile</span>
@@ -157,8 +156,7 @@ FreeBSD's <a href="https://www.freebsd.org/cgi/man.cgi?query=make(1)">make(1)</a
 
  stopserver:
         $(BASEDIR)/develop_server.sh stop
-</pre></div>
-
+</code></pre></div>
 
 <p>More to Read:</p>
 <ul>

@@ -58,15 +58,14 @@
 <p>There are many good articles and blog posts on the Interenet describing how to migrate from svn to git repository. There are a lot of advantages to migrate to git, (<a href="nvie.com/posts/a-successful-git-branching-model">git-flow</a> to metion one) but there are also a few draw-backs. For example svn supports <a href="http://svnbook.red-bean.com/en/1.7/svn.serverconfig.pathbasedauthz.html">Path-Based Authorization</a> meaning great control over who sees what parts of the project. Unfortunately git does not provide such mechanism meaning to overcome this task, we should split such files or directories into separate git repositories to restrict access per project and yet keep the project as a whole. In this post I explain how to use git submdules to do that.</p>
 <h1>Git-Flow using submodules</h1>
 <p>Imagine the following scenario in which we have a shared library named <strong>lib-shared</strong> and two projects named <strong>protocol-x</strong> and <strong>shell-y</strong> which different developers have access to one of them.</p>
-<div class="highlight"><pre><span></span>$ find . -type d
+<div class="highlight"><pre><span></span><code>$ find . -type d
 ./libs/lib-shared
 ./routing/protocol-x
 ./cli/shell-y
-</pre></div>
-
+</code></pre></div>
 
 <p>What we're going to do is to create a separate git repository for each project (as sub-projects):</p>
-<div class="highlight"><pre><span></span>$ mkdir lib-shared
+<div class="highlight"><pre><span></span><code>$ mkdir lib-shared
 $ <span class="nb">cd</span> lib-shared
 $ git init
 $ touch .gitignore
@@ -99,11 +98,10 @@ $ git tag -a v0.1 -m v0.1
 $ git push origin --all
 $ git push --tags
 $ <span class="nb">cd</span> ..
-</pre></div>
-
+</code></pre></div>
 
 <p>And we create another project (super-project) containing these projects. To do that, we should add above sub-projects as submodules. </p>
-<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /home/manager/
+<div class="highlight"><pre><span></span><code>$ <span class="nb">cd</span> /home/manager/
 $ mkdir super-project
 $ <span class="nb">cd</span> super-project
 $ git init
@@ -111,28 +109,25 @@ $ git remote add origin git@debian:root/super-project.git
 $ git submodule add -b master --name lib-shared git@debian:root/lib-shared libs/lib-shared
 $ git submodule add -b master --name protocol-x git@debian:root/protocol-x protocols/protocol-x
 $ git submodule add -b master --name shell-y git@debian:root/shell-y cli/shell-y
-</pre></div>
-
+</code></pre></div>
 
 <p>Running <code>git status</code> we can see that git created a file named <code>.gitmodules</code> which keeps a list of our current submodules. This file should be a part of source code and it'll help other people cloning this super-project to know which submodules they should also get using <code>git submodule init</code> (if they have permission ofc). Also Git sees these sub-projects as files instead of directories. This is how git sees submodules. Each submodule points to a git commit SHA-1 which in our case is the latest commit in master branch of each-subproject. You can confirm this by running <code>git diff --staged</code> command. More interestingly, we can see which version of submodules out super-project is following (before committing):</p>
-<div class="highlight"><pre><span></span>$ git submodule status
+<div class="highlight"><pre><span></span><code>$ git submodule status
  fa75a2c38ed4b80f1c42e4434fd3d43e230605ba cli/shell-y <span class="o">(</span>v0.1<span class="o">)</span>
  9f0dd01bea1ec7f719bf17e2ff2018dc64fbe335 libs/lib-shared <span class="o">(</span>v0.1<span class="o">)</span>
  a2b7c92292a6b47a5ece5feea9e3390879d49d89 protocols/protocol-x <span class="o">(</span>v0.1<span class="o">)</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now we can commit the changes in our super-project:</p>
-<div class="highlight"><pre><span></span>$ git commit -m <span class="s2">&quot;added libshared, protocol-x and shell-y sub-projects&quot;</span>
+<div class="highlight"><pre><span></span><code>$ git commit -m <span class="s2">&quot;added libshared, protocol-x and shell-y sub-projects&quot;</span>
 $ git tag -a v0.1 -m <span class="s2">&quot;v0.1&quot;</span>
 $ git push origin --all
 $ git push --tags
-</pre></div>
-
+</code></pre></div>
 
 <p><img alt="image" src="/blog/assets/images/git_submodules_diagram_01.svg"></p>
 <p>Now to follow our git-flow, we need to fork a new branch named <strong>dev</strong> from master branch. What we should do  first is to create a dev branch in all of our sub-projects using <code>git submodule foreach</code> which executes given commands in each of our (initialized) submodules:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /home/manager/projects/super-project
+<div class="highlight"><pre><span></span><code>$ <span class="nb">cd</span> /home/manager/projects/super-project
 $ git checkout -b dev master
 $ git submodule foreach <span class="s1">&#39;git pull origin master; git checkout -b dev master; $ $ git push origin dev&#39;</span>
 $ sed -i<span class="s1">&#39;&#39;</span> <span class="s1">&#39;s/branch = master/branch = dev/g&#39;</span> .gitmodules
@@ -141,12 +136,11 @@ $ git commit -m <span class="s2">&quot;forked dev branch&quot;</span>
 $ git push origin dev
 $ git tag -a v0.1-dev -m v0.1-dev
 $ git push origin --tags
-</pre></div>
-
+</code></pre></div>
 
 <p><img alt="image" src="/blog/assets/images/git_submodules_diagram_02.svg"></p>
 <p>Now it's time for our developers to clone the super project and changes some code. our developer <strong>kevin</strong> is the maintainer of the shell-y and only have access to our shared library beside his project so he should avoid trying to get protocol-x project:</p>
-<div class="highlight"><pre><span></span>$ make /home/kevin/projects/kevin-project
+<div class="highlight"><pre><span></span><code>$ make /home/kevin/projects/kevin-project
 $ <span class="nb">cd</span> ~/kevin/projects/kevin-project
 $ git init
 $ git remote add origin git@debian:root/super-project.git
@@ -155,51 +149,46 @@ $ git checkout -b dev remotes/origin/dev
 $ git submodule init cli/shell-y
 $ git submodule init libs/lib-shared
 $ git submodule update --remote
-</pre></div>
-
+</code></pre></div>
 
 <p><img alt="image" src="/blog/assets/images/git_submodules_diagram_03.svg"></p>
 <p>To make a change in lib-shared, he needs to fork a new feature-branch from lib-shared's dev branch and simply pushes his branch to remote and notify the manager:</p>
-<div class="highlight"><pre><span></span><span class="err">cd libs/lib-shared</span>
-<span class="err">git checkout -b feature-authors remotes/origin/dev</span>
-<span class="err">touch AUTHORS</span>
-<span class="err">git add AUTHORS</span>
-<span class="err">git commit -m &quot;added AUTHORS file&quot;</span>
-<span class="err">echo &quot;bijan-e&quot; &gt; AUTHORS</span>
-<span class="err">git commit -a -m &quot;added bijan-e to AUTHORS&quot;</span>
-<span class="err">git push origin feature-authors</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>cd libs/lib-shared
+git checkout -b feature-authors remotes/origin/dev
+touch AUTHORS
+git add AUTHORS
+git commit -m &quot;added AUTHORS file&quot;
+echo &quot;bijan-e&quot; &gt; AUTHORS
+git commit -a -m &quot;added bijan-e to AUTHORS&quot;
+git push origin feature-authors
+</code></pre></div>
 
 <p><strong>Note</strong>: If kevin now goes to the root of his super-project, he sees that his super-project has changes:</p>
-<div class="highlight"><pre><span></span>$ git submodule status
+<div class="highlight"><pre><span></span><code>$ git submodule status
  fa75a2c38ed4b80f1c42e4434fd3d43e230605ba ../cli/shell-y <span class="o">(</span>v0.1<span class="o">)</span>
 +51b9fbe3b08bc793193a70a48e762b4a5629514f lib-shared <span class="o">(</span>v0.1-2-g51b9fbe<span class="o">)</span>
 -a2b7c92292a6b47a5ece5feea9e3390879d49d89 ../protocols/protocol-x
-</pre></div>
-
+</code></pre></div>
 
 <p><img alt="image" src="/blog/assets/images/git_submodules_diagram_04.svg"></p>
 <p>The <code>+</code> sign beside lib-shared submodule shows that this subodule has changes which super-project does not added yet. the <code>-</code> sign beside protocol-x submodule indictes that this module has not been initialized. Since his changes to lib-shared has not been accepted yet, he should revert update this submodule to point at the right hash commit which dev knows:</p>
-<div class="highlight"><pre><span></span>$ git submodule update
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ git submodule update
+</code></pre></div>
 
 <p><img alt="image" src="/blog/assets/images/git_submodules_diagram_05.svg"></p>
 <p>Now The manager is notified and should review kevin's changes and decide if it's good enough to be merged into lib-shared's dev branch:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /home/manager/projects/super-project/libs/lib-shared
+<div class="highlight"><pre><span></span><code>$ <span class="nb">cd</span> /home/manager/projects/super-project/libs/lib-shared
 $ git pull origin
 $ git tag -a v0.1-dev -m v0.1-dev
 $ git checkout -b feature-authors remotes/origin/feature-authors
 $ // Code Review
 $ git checkout dev
 $ git merge --no-ff feature-authors -m <span class="s2">&quot;merged feature authors&quot;</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><img alt="image" src="/blog/assets/images/git_submodules_diagram_06.svg"></p>
 <p>Now lib-shared has reached v0.1-dev-3 should be included in super-project's dev branch:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /home/manager/projects/super-project
+<div class="highlight"><pre><span></span><code>$ <span class="nb">cd</span> /home/manager/projects/super-project
 $ git submodule status
  fa75a2c38ed4b80f1c42e4434fd3d43e230605ba cli/shell-y <span class="o">(</span>v0.1<span class="o">)</span>
 +04edc4cd6f3916f5d51a7f5cc7a6df92b11014a9 libs/lib-shared <span class="o">(</span>v0.1-dev-3-g04edc4c<span class="o">)</span>
@@ -210,25 +199,22 @@ Submodule libs/lib-shared 9f0dd01..04edc4c:
 $ git add libs/lib-shared
 $ git commit -m <span class="s2">&quot;merged lib-shared v0.1-dev-3&quot;</span>
 $ git push origin dev --recurse-submodules<span class="o">=</span>on-demand
-</pre></div>
-
+</code></pre></div>
 
 <p>The changes of lib-shared and super-project should can be send to their remotes manually for each project or only once from super-project using <code>--recurse-submodules</code> argument. Note that push doesn't push submodule's tags so we need to push submodules's tags separately:</p>
-<div class="highlight"><pre><span></span>$ git submodule foreach <span class="s1">&#39;git push --tags&#39;</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ git submodule foreach <span class="s1">&#39;git push --tags&#39;</span>
+</code></pre></div>
 
 <p><img alt="image" src="/blog/assets/images/git_submodules_diagram_07.svg"></p>
 <p>Now kevin can fetch new changes in dev:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /home/kevin/projects/kevin-project
+<div class="highlight"><pre><span></span><code>$ <span class="nb">cd</span> /home/kevin/projects/kevin-project
 $ git pull origin dev
 $ git submodule update --remote
-</pre></div>
-
+</code></pre></div>
 
 <p><img alt="image" src="/blog/assets/images/git_submodules_diagram_08.svg"></p>
 <p>Merging branches in super-project is a little tricky. When merging dev branch into master, we should always check not to change <code>.gitmodules</code> between merges. To do that we use <code>--no-commit</code> argument just to do merge the, and before <code>git commit</code> we should revert any changing comming from dev to master into <code>.gitmodules</code>:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /home/manager/projects/super-project
+<div class="highlight"><pre><span></span><code>$ <span class="nb">cd</span> /home/manager/projects/super-project
 $ git checkout master
 $ git submodule update
 $ git submodule foreach <span class="s1">&#39;git checkout master&#39;</span>
@@ -238,26 +224,23 @@ $ git checkout -- .gitmodules
 $ git diff --submodule --staged
 Submodule libs 9f0dd01..04edc4c:
   &gt; merged feature authors
-</pre></div>
-
+</code></pre></div>
 
 <p>The <code>git diff --submodule --staged</code> shows which changes is going from submodules. We can use this commit messages to create a <code>CHANGELOG</code> file. FInally before committing we should also merge submodules changes using <code>--merge</code> argument:</p>
-<div class="highlight"><pre><span></span>$ git submodule update --merge
+<div class="highlight"><pre><span></span><code>$ git submodule update --merge
 Updating 9f0dd01..04edc4c
 Fast-forward
  AUTHORS <span class="p">|</span> <span class="m">1</span> +
  <span class="m">1</span> file changed, <span class="m">1</span> insertion<span class="o">(</span>+<span class="o">)</span>
  create mode <span class="m">100644</span> AUTHORS
-Submodule path <span class="s1">&#39;libs/lib-shared&#39;</span>: merged in <span class="s1">&#39;04edc4cd6f3916f5d51a7f5cc7a6df92b11014a9&#39;</span>
-</pre></div>
-
+Submodule path <span class="s1">&#39;libs/lib-shared&#39;</span>: merged <span class="k">in</span> <span class="s1">&#39;04edc4cd6f3916f5d51a7f5cc7a6df92b11014a9&#39;</span>
+</code></pre></div>
 
 <p>This confirms what the changes from dev's submodules are also merged into master's submodules. We should finalize this merge by committing changes and pushing both super-project and sub-project merge commits to remote:</p>
-<div class="highlight"><pre><span></span>$ git commit -m <span class="s2">&quot;merged v0.1-dev-1 into master&quot;</span>
+<div class="highlight"><pre><span></span><code>$ git commit -m <span class="s2">&quot;merged v0.1-dev-1 into master&quot;</span>
 $ git submodule foreach <span class="s1">&#39;git push origin master&#39;</span>
 $ git push origin master
-</pre></div>
-
+</code></pre></div>
 
 <p><img alt="image" src="/blog/assets/images/git_submodules_diagram_09.svg"></p>
     </div>

@@ -67,45 +67,41 @@ Please ensure you understand them before trying to execute them.</p>
 1GB SC-Card. To check the size of the media, simply execute <code>fdisk -l</code>. My SD-Card
 has around <strong>940MB</strong> capacity, So the following command creates an image file
 with the exact size:</p>
-<div class="highlight"><pre><span></span>truncate -s 940M sd-card.img
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>truncate -s 940M sd-card.img
+</code></pre></div>
 
 <p>The instructions to create partition table on the image, should be done
 on a block device.
 The next step is to create block devices from the raspberry image and my
 own image. Here I choose <code>/dev/loop1</code> for the rasbian image file and <code>/dev/loop2</code>
 for the custom image file.</p>
-<div class="highlight"><pre><span></span>losetup /dev/loop1 <span class="m">2020</span>-05-27-raspios-buster-lite-armhf.img
+<div class="highlight"><pre><span></span><code>losetup /dev/loop1 <span class="m">2020</span>-05-27-raspios-buster-lite-armhf.img
 losetup /dev/loop2 sd-card.img
-</pre></div>
-
+</code></pre></div>
 
 <p>So, from now on, the <code>/dev/loop1</code> device, represents the raspbian image and the
 <code>/dev/loop2</code> device should represents my custom image device.</p>
 <p>Then, I needed to properly copy the boot instructions from the Raspbian into the image.
 The boot instructions are located after the partition table at sector zero and ends before
 the start position of the first partition. </p>
-<div class="highlight"><pre><span></span>fdisk -l /dev/loop1
+<div class="highlight"><pre><span></span><code>fdisk -l /dev/loop1
 &lt;sniped&gt;
 Units: sectors of <span class="m">1</span> * <span class="nv">512</span> <span class="o">=</span> <span class="m">512</span> bytes
 &lt;sniped&gt;
 Device       Boot  Start     End Sectors  Size Id Type
 /dev/loop1p1        <span class="m">8192</span>  <span class="m">532479</span>  <span class="m">524288</span>  256M  c W95 FAT32 <span class="o">(</span>LBA<span class="o">)</span>
 /dev/loop1p2      <span class="m">532480</span> <span class="m">3620863</span> <span class="m">3088384</span>  <span class="m">1</span>.5G <span class="m">83</span> Linux
-</pre></div>
-
+</code></pre></div>
 
 <p>From the <code>fdisk</code> output, it's clear that I need to copy the sectors from <code>0</code> to
 <code>8191</code>, just before the start of the first partition.</p>
-<div class="highlight"><pre><span></span>sudo dd <span class="k">if</span><span class="o">=</span>/dev/loop1 <span class="nv">of</span><span class="o">=</span>/dev/loop2 <span class="nv">bs</span><span class="o">=</span><span class="m">512</span> <span class="nv">count</span><span class="o">=</span><span class="m">8192</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>sudo dd <span class="k">if</span><span class="o">=</span>/dev/loop1 <span class="nv">of</span><span class="o">=</span>/dev/loop2 <span class="nv">bs</span><span class="o">=</span><span class="m">512</span> <span class="nv">count</span><span class="o">=</span><span class="m">8192</span>
+</code></pre></div>
 
 <p>Then, I needed to recreate the <strong>boot</strong> and <strong>root</strong> partitions according to the
 size of the media. So, I reserved <code>55MB</code> for the boot partition and the reset for
 the root partition. The following script, did just that:</p>
-<div class="highlight"><pre><span></span>sudo fdisk /dev/loop2 <span class="s">&lt;&lt;EOF</span>
+<div class="highlight"><pre><span></span><code>sudo fdisk /dev/loop2 <span class="s">&lt;&lt;EOF</span>
 <span class="s">d</span>
 <span class="s">1</span>
 <span class="s">d</span>
@@ -125,22 +121,20 @@ the root partition. The following script, did just that:</p>
 <span class="s">p</span>
 <span class="s">w</span>
 <span class="s">EOF</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>After creating the new paritions with the right size, I needed to force the kernel
 to re-read the new partition table containing the new partition sizes and then
 reformat.</p>
-<div class="highlight"><pre><span></span>partprobe /dev/loop2
+<div class="highlight"><pre><span></span><code>partprobe /dev/loop2
 sudo mkfs.fat /dev/loop2p1
 sudo mkfs.ext4 /dev/loop2p2
-</pre></div>
-
+</code></pre></div>
 
 <p>Now, all left to do is to copy all the files to the new image excluding the ones
 that's not actually useful, just to spare some space on SD-Card. First the boot
 partition:</p>
-<div class="highlight"><pre><span></span>mkdir -p /tmp/raspbian-boot
+<div class="highlight"><pre><span></span><code>mkdir -p /tmp/raspbian-boot
 mkdir -p /tmp/sdcard-boot
 
 mount /dev/loop1p1 /tmp/raspbian-boot
@@ -154,14 +148,13 @@ umount /dev/loop1p1
 umount /dev/loop2p1
 rmdir /tmp/raspbian-boot
 rmdir /tmp/sdcard-boot
-</pre></div>
-
+</code></pre></div>
 
 <p>Then, to Copy the root filesystem contents, I decided copy all the files except
 the files that are not necessary, like man-pages, linux kernel modules for
 different kernel versions and so one. The following commands copies exactly the
 needed files to boot on regular Raspberry pi 3:</p>
-<div class="highlight"><pre><span></span>mkdir -p /tmp/raspbian-root
+<div class="highlight"><pre><span></span><code>mkdir -p /tmp/raspbian-root
 mkdir -p /tmp/sdcard-root
 
 mount /dev/loop1p2 /tmp/raspbian-root
@@ -186,8 +179,7 @@ umount /dev/loop1p2
 umount /dev/loop2p2
 rmdir /tmp/raspbian-root
 rmdir /tmp/sdcard-root
-</pre></div>
-
+</code></pre></div>
 
 <p>That's it. Hopefully after boot, there's enough space for upgrade and installing
 missing softwares. If it's not, try removing other unnecessary files. Lucky for

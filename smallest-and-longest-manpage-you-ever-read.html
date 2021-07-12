@@ -57,9 +57,8 @@
         <h1>Introduction</h1>
 <p>Recently I asked a question on OpenSD IRC channel which led to a question
 entirely different. What's the smallest/longest manpage you ever read?</p>
-<div class="highlight"><pre><span></span>$ find /usr/local/share/man -type f -exec wc -l <span class="o">{}</span> <span class="se">\;</span>  <span class="p">|</span> sort
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ find /usr/local/share/man -type f -exec wc -l <span class="o">{}</span> <span class="se">\;</span>  <span class="p">|</span> sort
+</code></pre></div>
 
 <p>On OpenBSD 6.2, the smallest is <a href="https://man.openbsd.org/dcphy.4">dcphy(4)</a> with 23 lines and the longest
 (by far distance) is <a href="https://man.openbsd.org/perltoc.1">perltoc(1)</a> with 33106 lines. But what's the longest

@@ -77,12 +77,11 @@ other there. you should definitely check <a href="https://davedavenport.github.i
 <p>Script modi can be enabled using <code>name:script</code> syntax. Just save the following
 script somewhere in your <code>PATH</code> directory like <code>/usr/local/bin</code>, make sure it's
 executable and run the following:</p>
-<div class="highlight"><pre><span></span><span class="err">rofi -modi TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>rofi -modi TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t
+</code></pre></div>
 
 <p><img alt="rofi-todo" src="http://bijanebrahimi.github.io/blog/assets/images/rofi_todolist-rofi_todo.png"></p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
 
 <span class="nv">TODO_FILE</span><span class="o">=</span>~/.rofi_todos
 
@@ -114,15 +113,14 @@ executable and run the following:</p>
     <span class="k">fi</span>
     list_todos
 <span class="k">fi</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><strong>Instructions</strong>:
 - To <strong>Add new TODO</strong>, just type it (It should be Unique, BTW) at TODO prompt
 - To <strong>Delete one</strong>, Just Select the one and hit Enter</p>
 <p>If you're already using rofi, just add <code>TODO</code> modi to your existing command-line:</p>
-<div class="highlight"><pre><span></span><span class="err">rofi -modi DRun,Run,Window,TODO:/usr/local/bin/rofi_todo.sh -key-todo SuperL+t -show TODO</span>
-</pre></div>
+<div class="highlight"><pre><span></span><code><span class="nv">rofi</span> <span class="o">-</span><span class="nv">modi</span> <span class="nv">DRun</span>,<span class="nv">Run</span>,<span class="nv">Window</span>,<span class="nv">TODO</span>:<span class="o">/</span><span class="nv">usr</span><span class="o">/</span><span class="nv">local</span><span class="o">/</span><span class="nv">bin</span><span class="o">/</span><span class="nv">rofi_todo</span>.<span class="nv">sh</span> <span class="o">-</span><span class="nv">key</span><span class="o">-</span><span class="nv">todo</span> <span class="nv">SuperL</span><span class="o">+</span><span class="nv">t</span> <span class="o">-</span><span class="k">show</span> <span class="nv">TODO</span>
+</code></pre></div>
     </div>
 
     <footer>

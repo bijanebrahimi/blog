@@ -65,42 +65,37 @@ image or using the manual process which is not recommended.</li>
 <li>Second, Upgrading the binary packages.</li>
 </ul>
 <p>I choose Upgrading via a bootable media since it is the highly recommended way:</p>
-<div class="highlight"><pre><span></span><span class="nv">$curl</span> -o install62.fs https://openbsd.mirror.netelligent.ca/pub/OpenBSD/6.2/amd64/install62.fs
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="nv">$curl</span> -o install62.fs https://openbsd.mirror.netelligent.ca/pub/OpenBSD/6.2/amd64/install62.fs
+</code></pre></div>
 
 <p>Writing the image to the USB stick was a matter of executing <code>dd</code> command (as always):</p>
-<div class="highlight"><pre><span></span>$ sysctl hw.disknames
+<div class="highlight"><pre><span></span><code>$ sysctl hw.disknames
 hw.disknames<span class="o">=</span>sd0:da0bedc25009303c,cd0:,sd1:9e5b01f8dc3ea3f3
 $ doas dd <span class="k">if</span><span class="o">=</span>install62.fs <span class="nv">of</span><span class="o">=</span>/dev/rsd1c <span class="nv">bs</span><span class="o">=</span>1m
-</pre></div>
-
+</code></pre></div>
 
 <p>Again, if you're unfamiliar with anything like OpenBSD way of <a href="https://www.openbsd.org/faq/faq14.html">dealing with storage devices</a> and
 other things, please consider reading the entire <a href="https://www.openbsd.org/faq/">FAQ</a>. It really pays off, I promise ;-)</p>
 <p>Now the next move is follow the pre-upgrade which I actually forgot. For my currect
 setup, it was only to manually remove the man pages to avoid having old manpages in
 the new system after successfull upgrade:</p>
-<div class="highlight"><pre><span></span>$ doas rm -rf /usr/share/man/
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ doas rm -rf /usr/share/man/
+</code></pre></div>
 
 <p>Now, Just rebooted the machine and booted from the USB stick and Press (U)pgrade and that was it.
 After confirming the keyboard layout and my laptop's primary disk where my OpenBSD installation
 resides, the process of Upgrading <strong>The Base System</strong> was done. After completion and rebooting
 the machine, the first thing the new OS did was retrieving the newer firmwares which I skipped
 since at the time, I had no (reliable) Internet connection, but don't worry, you can do it later:</p>
-<div class="highlight"><pre><span></span>$ uname -a
+<div class="highlight"><pre><span></span><code>$ uname -a
 OpenBSD localhost.lenovo <span class="m">6</span>.2 GENERIC.MP#134 amd64
 $ doas fw_update
-</pre></div>
-
+</code></pre></div>
 
 <p>Now, it's time to <strong>update the binary packages</strong> since their dependencies on the base system has
 just been upgraded. But that was just one command away:</p>
-<div class="highlight"><pre><span></span>$ doas pkg_add -u
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ doas pkg_add -u
+</code></pre></div>
 
 <p>That was it. Hope to write more about OpenBSD in the near future.</p>
     </div>

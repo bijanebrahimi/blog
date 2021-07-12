@@ -66,40 +66,36 @@
 <li><strong>Target</strong>: The machine that GCC will produce code for which is a freebsd machine (<code>--target</code> option).</li>
 </ul>
 <p><strong>Note</strong>: To decide the values of the above configuration, simply run <code>gdb --version</code> on the native machine. for a linux machine it's <code>x86_64-pc-linux-gnu</code> and for my target machine it's <code>amd64-marcel-freebsd9.2</code>. Since we're building and running our cross-compile on the same machine (<code>x86_64-pc-linux-gnu</code>), we don't need to specify the build and the host configuration which gcc will pick automatically.</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">TARGET</span><span class="o">=</span>amd64-marcel-freebsd9.2
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">TARGET</span><span class="o">=</span>amd64-marcel-freebsd9.2
+</code></pre></div>
 
 <p>And since, we don't wan to mix our cross-compile toolchains with our native binaries, we install our cross-compiler toolchains in the <code>/usr/cross-build</code> directory:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">PREFIX</span><span class="o">=</span>/usr/cross-build
+<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">PREFIX</span><span class="o">=</span>/usr/cross-build
 $ <span class="nb">export</span> <span class="nv">TARGET_PREFIX</span><span class="o">=</span><span class="nv">$PREFIX</span>/<span class="nv">$TARGET</span>
 $ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$PREFIX</span>/bin
-</pre></div>
-
+</code></pre></div>
 
 <p>One more important note before start compiling is that we need the head-files and libraries of the target machine. So we should copy <code>/lib</code> and <code>/include</code> directories from our freebsd machine to our cross-build directory:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">mkdir</span> -<span class="n">p</span> <span class="nv">$TARGET_PREFIX</span>{,<span class="sr">/lib,/</span><span class="n">include</span>}
+<div class="highlight"><pre><span></span><code>$ <span class="nb">mkdir</span> -<span class="n">p</span> <span class="nv">$TARGET_PREFIX</span>{,<span class="sr">/lib,/</span><span class="n">include</span>}
 <span class="c1"># copy /lib and /include directories from our freebsd machine in our target $TARGET_PREFIX directory.</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>GCC requires that a compiled copy of binutils be available for each targeted platform. So we need to download the source code of binutils and compile it for the freebsd machine.</p>
-<div class="highlight"><pre><span></span>$ mkdir -p build-binutils
+<div class="highlight"><pre><span></span><code>$ mkdir -p build-binutils
 $ wget https://ftp.gnu.org/gnu/binutils/binutils-2.27.tar.gz
 $ tar zxvf binutils-2.27.tar.gz
 $ <span class="nb">cd</span> build-binutils
 $ ../binutils-2.27/configure --target<span class="o">=</span><span class="nv">$TARGET</span> --prefix<span class="o">=</span><span class="nv">$PREFIX</span> -v
 $ make -j <span class="m">4</span>
 $ sudo make install
-</pre></div>
-
+</code></pre></div>
 
 <p>GCC also depends on the following components:
 * GMP: GNU Multiple Precision Arithmetic Library
 * MPFR: GNU Multiple-precision floating-point rounding library
 * MPC: GNU Multiple-precision C library</p>
 <p>To build our cross-compiler, we need to compile these dependencies but since these dependencies should produce code for our target machine, we need to build them for the host option set to our tagret (<code>--host=amd64-marcel-freebsd9.2</code>):</p>
-<div class="highlight"><pre><span></span>$ mkdir build-gmp
+<div class="highlight"><pre><span></span><code>$ mkdir build-gmp
 $ wget https://ftp.gnu.org/gnu/gmp/gmp-6.1.1.tar.xz
 $ tar xvf gmp-6.1.1.tar.xz
 $ <span class="nb">cd</span> build-gmp
@@ -125,43 +121,38 @@ $ ../mpc-1.0.3/configure --prefix<span class="o">=</span><span class="nv">$PREFI
 $ make -j <span class="m">4</span>
 $ sudo make install
 $ <span class="nb">cd</span> ..
-</pre></div>
-
+</code></pre></div>
 
 <p>Finally, to compile gcc we need to specify where to look for it's dependencies above:</p>
-<div class="highlight"><pre><span></span>$ mkdir build-gcc
+<div class="highlight"><pre><span></span><code>$ mkdir build-gcc
 $ wget https://ftp.gnu.org/gnu/gcc/gcc-6.2.0/gcc-6.2.0.tar.gz
 $ tar zxvf gcc-6.2.0.tar.gz
 $ <span class="nb">cd</span> build-gcc
 $ ../gcc-6.2.0/configure --without-headers --with-gnu-as --with-gnu-ld --enable-languages<span class="o">=</span>c,c++ --disable-nls --enable-libssp --enable-gold --enable-ld --target<span class="o">=</span><span class="nv">$TARGET</span> --prefix<span class="o">=</span><span class="nv">$PREFIX</span> --with-gmp<span class="o">=</span><span class="nv">$PREFIX</span> --with-mpc<span class="o">=</span><span class="nv">$PREFIX</span> --with-mpfr<span class="o">=</span><span class="nv">$PREFIX</span> --disable-libgomp
 $ <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$PREFIX</span>/lib make -j <span class="m">4</span>
 $ sudo make install
-</pre></div>
-
+</code></pre></div>
 
 <p>Now, we should have our own cross-compiler's toolchain in <code>/usr/cross-build/bin</code> directory. To use it we should include it in our <code>$PATH</code>:</p>
-<div class="highlight"><pre><span></span><span class="k">export</span> <span class="n">PATH</span><span class="o">=$</span><span class="n">PATH</span><span class="p">:</span><span class="o">$</span><span class="n">PREFIX</span><span class="o">/</span><span class="n">bin</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="k">export</span> <span class="n">PATH</span><span class="o">=$</span><span class="n">PATH</span><span class="p">:</span><span class="o">$</span><span class="n">PREFIX</span><span class="o">/</span><span class="n">bin</span>
+</code></pre></div>
 
 <p>To test our own cross-compiler, we simply run:</p>
-<div class="highlight"><pre><span></span><span class="err">$</span><span class="w"> </span><span class="n">gcc</span><span class="w"> </span><span class="n">main</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="o">-</span><span class="n">o</span><span class="w"> </span><span class="n">helloworld</span><span class="o">-</span><span class="n">linux</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="err">$</span><span class="w"> </span><span class="n">gcc</span><span class="w"> </span><span class="n">main</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="o">-</span><span class="n">o</span><span class="w"> </span><span class="n">helloworld</span><span class="o">-</span><span class="n">linux</span><span class="w"></span>
 <span class="err">$</span><span class="w"> </span><span class="k">file</span><span class="w"> </span><span class="n">helloword</span><span class="o">-</span><span class="n">linux</span><span class="w"></span>
 <span class="nl">main</span><span class="p">:</span><span class="w"> </span><span class="n">ELF</span><span class="w"> </span><span class="mi">64</span><span class="o">-</span><span class="nc">bit</span><span class="w"> </span><span class="n">LSB</span><span class="w"> </span><span class="n">executable</span><span class="p">,</span><span class="w"> </span><span class="n">x86</span><span class="o">-</span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">(</span><span class="n">SYSV</span><span class="p">),</span><span class="w"> </span><span class="n">dynamically</span><span class="w"> </span><span class="n">linked</span><span class="p">,</span><span class="w"> </span><span class="n">interpreter</span><span class="w"> </span><span class="o">/</span><span class="n">lib64</span><span class="o">/</span><span class="n">ld</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">x86</span><span class="o">-</span><span class="mf">64.</span><span class="n">so</span><span class="mf">.2</span><span class="p">,</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">GNU</span><span class="o">/</span><span class="n">Linux</span><span class="w"> </span><span class="mf">2.6.32</span><span class="p">,</span><span class="w"> </span><span class="n">BuildID</span><span class="o">[</span><span class="n">sha1</span><span class="o">]=</span><span class="n">ca5ba57ac722ef8521d50ee8ecbbdca4b44a76e1</span><span class="p">,</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">stripped</span><span class="w"></span>
 <span class="err">$</span><span class="w"> </span><span class="n">LD_LIBRARY_PATH</span><span class="o">=</span><span class="err">$</span><span class="k">PREFIX</span><span class="o">/</span><span class="n">lib</span><span class="w"> </span><span class="n">amd64</span><span class="o">-</span><span class="n">marcel</span><span class="o">-</span><span class="n">freebsd9</span><span class="mf">.2</span><span class="o">-</span><span class="n">gcc</span><span class="w"> </span><span class="n">helloworld</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="o">-</span><span class="n">o</span><span class="w"> </span><span class="n">helloworld</span><span class="o">-</span><span class="n">freebsd</span><span class="w"></span>
 <span class="err">$</span><span class="w"> </span><span class="k">file</span><span class="w"> </span><span class="n">helloworld</span><span class="o">-</span><span class="n">freebsd</span><span class="w"></span>
 <span class="nl">main</span><span class="p">:</span><span class="w"> </span><span class="n">ELF</span><span class="w"> </span><span class="mi">64</span><span class="o">-</span><span class="nc">bit</span><span class="w"> </span><span class="n">LSB</span><span class="w"> </span><span class="n">executable</span><span class="p">,</span><span class="w"> </span><span class="n">x86</span><span class="o">-</span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">(</span><span class="n">FreeBSD</span><span class="p">),</span><span class="w"> </span><span class="n">dynamically</span><span class="w"> </span><span class="n">linked</span><span class="p">,</span><span class="w"> </span><span class="n">interpreter</span><span class="w"> </span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">ld</span><span class="o">-</span><span class="n">elf</span><span class="p">.</span><span class="n">so</span><span class="mf">.1</span><span class="p">,</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">FreeBSD</span><span class="w"> </span><span class="mf">9.2</span><span class="p">,</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">stripped</span><span class="w"></span>
-</pre></div>
-
+</code></pre></div>
 
 <p>If you need a cross-compile version of gdb, simply compile the gdb for the target machine like above:</p>
-<div class="highlight"><pre><span></span>$ wget https://ftp.gnu.org/gnu/gdb/gdb-7.11.tar.xz
+<div class="highlight"><pre><span></span><code>$ wget https://ftp.gnu.org/gnu/gdb/gdb-7.11.tar.xz
 $ tar xvf gdb-7.11.tar.xz
 $ ../gdb-7.11.1/configure --prefix<span class="o">=</span><span class="nv">$PREFIX</span> --target<span class="o">=</span><span class="nv">$TARGET</span>
 $ make -j <span class="m">4</span>
 $ sudo make install
-</pre></div>
-
+</code></pre></div>
 
 <p>You can see the whole compile process in my <a href="https://gist.github.com/bijanebrahimi/62596745808f8667c40ff91b07d9e7b8">github gist</a>.</p>
     </div>

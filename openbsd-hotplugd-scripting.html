@@ -66,7 +66,7 @@ with OpenBSD as a desktop.</p>
 <a href="http://www.jupiterbroadcasting.com/121362/the-spectre-of-meltdown-bsd-now-228/">latest episode</a>, I managed to look at it again and enhance the script,
 specifically permission-wise. So mounting MSDOS and NTFS partitions are now done
 with proper user and grup permissions:</p>
-<div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/sh</span>
 
 <span class="nv">DEVCLASS</span><span class="o">=</span><span class="nv">$1</span>
 <span class="nv">DEVNAME</span><span class="o">=</span><span class="nv">$2</span>
@@ -78,7 +78,7 @@ with proper user and grup permissions:</p>
 <span class="nb">export</span> <span class="nv">DISPLAY</span><span class="o">=</span>:0.0
 <span class="nb">export</span> <span class="nv">HOME</span><span class="o">=</span>/home/bijan
 
-<span class="k">case</span> <span class="nv">$DEVCLASS</span> in
+<span class="k">case</span> <span class="nv">$DEVCLASS</span> <span class="k">in</span>
 <span class="m">2</span><span class="o">)</span>
     <span class="c1"># disk devices</span>
         /sbin/disklabel <span class="nv">$DEVNAME</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">|</span> awk -F <span class="s1">&#39;[ ]*&#39;</span> <span class="s1">&#39;/^  [abd-z]:/&#39;</span> <span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> line<span class="p">;</span>
@@ -86,7 +86,7 @@ with proper user and grup permissions:</p>
         <span class="nv">mount_flags</span><span class="o">=</span><span class="s2">&quot;-o noexec,noatime,nodev&quot;</span>
                 <span class="nv">slice</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> <span class="nv">$line</span> <span class="p">|</span> awk -F <span class="s1">&#39;:&#39;</span> <span class="s1">&#39;{print $1}&#39;</span><span class="sb">`</span>
                 <span class="nv">type</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> <span class="nv">$line</span> <span class="p">|</span> awk -F <span class="s1">&#39;[ ]*&#39;</span> <span class="s1">&#39;{print $4}&#39;</span><span class="sb">`</span>
-                <span class="k">case</span> <span class="nv">$type</span> in
+                <span class="k">case</span> <span class="nv">$type</span> <span class="k">in</span>
         ISO9660 <span class="p">|</span> <span class="m">4</span>.2BSD<span class="o">)</span>
                         <span class="p">;;</span>
         ext2fs<span class="o">)</span>
@@ -116,11 +116,10 @@ with proper user and grup permissions:</p>
     sh /etc/netstart <span class="nv">$DEVNAME</span>
     <span class="p">;;</span>
 <span class="k">esac</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><strong>Original</strong>:</p>
-<div class="highlight"><pre><span></span>$ doas rcctl <span class="nb">enable</span> hotplugd
+<div class="highlight"><pre><span></span><code>$ doas rcctl <span class="nb">enable</span> hotplugd
 $ cat /etc/hotplug/attach
 <span class="c1">#!/bin/sh</span>
 
@@ -131,14 +130,14 @@ $ cat /etc/hotplug/attach
 <span class="nb">export</span> <span class="nv">DISPLAY</span><span class="o">=</span>:0.0
 <span class="nb">export</span> <span class="nv">HOME</span><span class="o">=</span>/home/bijan
 
-<span class="k">case</span> <span class="nv">$DEVCLASS</span> in
+<span class="k">case</span> <span class="nv">$DEVCLASS</span> <span class="k">in</span>
 <span class="m">2</span><span class="o">)</span>
         <span class="c1"># disk devices</span>
         /sbin/disklabel <span class="nv">$DEVNAME</span> <span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span> <span class="p">|</span> awk -F <span class="s1">&#39;[ ]*&#39;</span> <span class="s1">&#39;/^  [abd-z]:/&#39;</span> <span class="p">|</span> <span class="k">while</span> <span class="nb">read</span> line<span class="p">;</span>
         <span class="k">do</span>
                 <span class="nv">slice</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> <span class="nv">$line</span> <span class="p">|</span> awk -F <span class="s1">&#39;:&#39;</span> <span class="s1">&#39;{print $1}&#39;</span><span class="sb">`</span>
                 <span class="nv">fs</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> <span class="nv">$line</span> <span class="p">|</span> awk -F <span class="s1">&#39;[ ]*&#39;</span> <span class="s1">&#39;{print $4}&#39;</span><span class="sb">`</span>
-                <span class="k">case</span> <span class="nv">$fs</span> in
+                <span class="k">case</span> <span class="nv">$fs</span> <span class="k">in</span>
                 MSDOS <span class="p">|</span> ISO9660 <span class="p">|</span> ext2fs <span class="p">|</span> <span class="m">4</span>.2BSD<span class="o">)</span>
                         <span class="o">[</span> <span class="nv">$DEBUG</span> <span class="o">==</span> <span class="m">1</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> logger -i <span class="s2">&quot;hotplugd attaching SLICE </span><span class="nv">$slice</span><span class="s2"> of DEVICE </span><span class="nv">$DEVNAME</span><span class="s2">&quot;</span>
                         <span class="o">[</span> ! -d <span class="nv">$MOUNTROOT</span>/<span class="nv">$DEVNAME$slice</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> mkdir -p -m <span class="m">1777</span> <span class="nv">$MOUNTROOT</span>/<span class="nv">$DEVNAME$slice</span>
@@ -153,7 +152,7 @@ $ cat /etc/hotplug/attach
     sh /etc/netstart <span class="nv">$DEVNAME</span>
     <span class="p">;;</span>
 <span class="k">esac</span>
-</pre></div>
+</code></pre></div>
     </div>
 
     <footer>
